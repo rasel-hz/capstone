@@ -46,7 +46,7 @@ Reactions come only from real events. A repeat of the reaction already playing i
 | `public/mascot/animations/idle.webm` | ✅ Used for `idle` |
 | The other 10 states | ❌ Not created yet |
 
-Because the current art is one flat image, **the face can't change between states yet**. Those states differ only by whole-body movement. This is deliberate: the system doesn't fake facial animation, and the artwork isn't redrawn.
+Because the current art is one flat image, **the face can't change between states yet**. Those states differ by whole-body movement and by small effects drawn around the character (`MascotFx.tsx`), such as thought dots, sleep z's and sparkles. This is deliberate: the system doesn't fake facial animation, and the artwork isn't redrawn. A state's effects turn off automatically once it has its own clip or image.
 
 ## Adding a new animation
 

@@ -1,5 +1,21 @@
 # Changelog
 
+## Unreleased
+
+### Added
+- OpenAI chat through a small server that holds the key, with consent, data minimisation, three crisis layers, validated model output and a labelled fallback to the rules. See `docs/AI.md`.
+- Small effects around the mascot, so each state looks different until its own animation exists.
+- `npm start` to serve the production build and API. Node.js 22.18 or newer is now required.
+
+### Changed
+- `KHOWAYK_REFERENCE.md` §2 and §11.1 now describe the optional OpenAI connection, after checking it with a real key.
+- The support message now also covers harm from another person, and points to someone the user trusts instead of family. This wording still needs clinical review.
+- The chat declines general tasks such as code, homework and translation, so it stays a companion.
+
+### Fixed
+- A dropped OpenAI connection now retries once, and the server gives up before the browser does.
+- When the AI can't be reached, the notice now includes where to get help, because the rules can miss indirect distress.
+
 ## 0.2.0 — React refactor and mascot system (2026-11-06)
 
 ### Changed

@@ -39,7 +39,7 @@ This file is intended for product managers, UI/UX designers, frontend engineers,
 | Journey selection | CURRENT | 8 journey definitions, mostly mapped to same 6 challenge templates; not 8 distinct clinical programs. |
 | Challenges | CURRENT | 6 interactive types detailed in §8; some simplified implementations/limitations. |
 | Connected mission player | CURRENT | Intro, automatic challenge progression, feedback, skip/end/pause/exit, final summary. Edge cases need QA. |
-| Companion chat | CURRENT | Keyword/regex rule-based responses, not an LLM. Limited intent/context capture and explicit confirmation. |
+| Companion chat | CURRENT (basic) | OpenAI through a small server when a key is set and the user consents, with explicit confirmation of context. Keyword rules otherwise, labelled on screen. No tools, server-side memory or accounts yet. See `docs/AI.md`. |
 | AI conversation and reasoning | TARGET | Real AI model + tools + safety controls + structured extraction, memory consent, and evaluation. |
 | Mission personalization | CURRENT (basic) | Deterministic rule-based `genMission()`; no true AI planner or external data. |
 | Progress dashboard | CURRENT | Locally calculated completion, accuracy, 7-day chart, energy, and basic pattern statements. |
@@ -312,7 +312,7 @@ Animated oasis + mascot celebration + actual completed/total + actual XP + verif
 
 ### 11.1 Current state
 
-`send()` in HTML uses regex for low energy, late sleep, work/study, family events; requests user confirmation through `cs()` before storing context and/or shortening plan. Other intents: progress summary, greeting, thanks, fallback. Crisis keyword response exists but is rudimentary. There is **no connected language model**, retrieval, semantic understanding, voice AI, or backend conversation storage.
+`send()` in HTML uses regex for low energy, late sleep, work/study, family events; requests user confirmation through `cs()` before storing context and/or shortening plan. Other intents: progress summary, greeting, thanks, fallback. Crisis keyword response exists but is rudimentary. This describes the original prototype. The React app adds an optional OpenAI connection (`docs/AI.md`), but still has no retrieval, voice AI, or backend conversation storage.
 
 ### 11.2 Target AI capabilities
 

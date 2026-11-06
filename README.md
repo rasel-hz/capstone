@@ -1,10 +1,10 @@
 # خويّك | Khowayk
 
-A Saudi Arabic wellness and daily-life companion: playable daily missions, progress and in-app rewards, with a rule-based chat for now. It is not a diagnostic or treatment tool.
+A Saudi Arabic wellness and daily-life companion: playable daily missions, progress and in-app rewards, with a chat that uses OpenAI or keyword rules. It is not a diagnostic or treatment tool.
 
 ## Run it
 
-You need Node.js 20 or newer.
+You need Node.js 22.18 or newer.
 
 ```bash
 npm install
@@ -20,7 +20,8 @@ Then open http://localhost:8765.
 |---|---|
 | `npm run dev` | Development server on port 8765 |
 | `npm run build` | Type check and production build in `dist/` |
-| `npm run preview` | Serve the production build |
+| `npm run preview` | Serve the production build with Vite |
+| `npm start` | Serve the production build and API with Node, after `npm run build` |
 | `npm test` | Unit tests for missions, XP, saved data and crisis detection |
 | `npm run typecheck` | Type check only |
 
@@ -33,7 +34,8 @@ Then open http://localhost:8765.
 | `src/features/challenges/` | Catalog and the six games |
 | `src/features/companion/` | Chat rules and crisis detection |
 | `src/components/mascot/` | Mascot component, controller and asset manifest |
-| `src/services/` | Interfaces a real backend or AI can implement later |
+| `src/services/` | Storage and chat services |
+| `server/` | Holds the OpenAI key, safety gates and output validation |
 | `public/mascot/` | Mascot artwork |
 | `prototype/` | The original single-file app, kept for reference |
 | `docs/` | Architecture, mascot guide and task catalog |
@@ -42,7 +44,7 @@ Start with [KHOWAYK_REFERENCE.md](KHOWAYK_REFERENCE.md) for product requirements
 
 ## What is real today
 
-- All data stays in the browser under the `kw2` key. There is no backend or account system.
-- The chat uses keyword rules, not an AI model, and says so on screen.
+- App data stays in the browser under the `kw2` key. There is no database or account system.
+- The chat uses OpenAI only when a key is set and the user consents. Otherwise it uses keyword rules, and the screen says which. See [docs/AI.md](docs/AI.md), which also covers setting up your key.
 - Prayer time, driving and events are entered by the user. Nothing is connected to a live service.
 - Rewards are in-app only. There are no partners or vouchers.

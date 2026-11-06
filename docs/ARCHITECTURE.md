@@ -1,6 +1,6 @@
 # Architecture
 
-The app is React, TypeScript and Vite, with no backend. [KHOWAYK_REFERENCE.md](../KHOWAYK_REFERENCE.md) is the product requirements document. This file describes what exists.
+The app is React, TypeScript and Vite, with a small Node server for AI and no database. [KHOWAYK_REFERENCE.md](../KHOWAYK_REFERENCE.md) is the product requirements document. This file describes what exists.
 
 ## How the parts fit
 
@@ -50,9 +50,9 @@ A game must:
 - Render user text as plain React text, never with `dangerouslySetInnerHTML`.
 - Offer a tap alternative to any drag.
 
-## Adding real AI
+## AI
 
-Implement `CompanionService` in `services/companion.ts` and set `isAI: true`. The chat page already shows the thinking state only while a request is pending, and it hides the "rules, not a language model" notice when `isAI` is true. Keep `detectCrisis` running as a safety net, and keep the API key on a server, never in this frontend.
+See [AI.md](AI.md). `server/api.ts` is mounted inside the dev server by `vite.config.ts`, and by `server/index.ts` in production, so `npm run dev` is still one command. The key never reaches the frontend.
 
 ## Motion
 

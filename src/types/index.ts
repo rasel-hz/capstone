@@ -113,6 +113,8 @@ export interface AppState {
   theme: string;
   comeback: number;
   lastDaily: { d: string; all: boolean } | null;
+  /** Consent to send chat to the AI service. null means not asked yet. */
+  aiConsent: number | null;
 }
 
 export interface GameResult {

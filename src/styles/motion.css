@@ -8,6 +8,7 @@
 @keyframes breathe-out { from { transform: scale(1.5); } to { transform: scale(1); } }
 @keyframes fall { to { transform: translateY(105vh) rotate(540deg); } }
 @keyframes grow-bar { from { transform: scaleY(0); } }
+@keyframes typing { 0%, 100% { opacity: .35; } 50% { opacity: 1; } }
 
 .page { animation: rise var(--t-scene) var(--ease); }
 

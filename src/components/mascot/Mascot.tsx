@@ -3,7 +3,8 @@ import { useReducedMotion } from 'motion/react';
 import { useAppSelector } from '../../context/AppStateContext';
 import { level } from '../../utils';
 import { legacySvg } from './legacySvg';
-import { BASE_IMAGE, CLIPS, EXPRESSIONS, SIZES, type MascotSize, type MascotState } from './manifest';
+import { BASE_IMAGE, CLIPS, EXPRESSIONS, isOneShot, SIZES, type MascotSize, type MascotState } from './manifest';
+import { MascotFx } from './MascotFx';
 
 interface MascotProps {
   state?: MascotState;
@@ -73,16 +74,22 @@ export const Mascot = memo(function Mascot({ state = 'idle', size = 'medium', in
     </>
   );
 
+  // A real clip or drawing for this state replaces the effects. Focus tasks keep only the brief reactions.
+  const showFx = !artFailed && !clip && !EXPRESSIONS[state] && (!still || isOneShot(state));
+  const fx = showFx ? <MascotFx state={state} /> : null;
+
   if (onClick) {
     return (
       <button type="button" className={`${classes} mascot--button`} style={style} onClick={onClick} aria-label={label}>
         <span className="mascot__body">{art}</span>
+        {fx}
       </button>
     );
   }
   return (
     <span className={classes} style={style} {...a11y}>
       <span className="mascot__body">{art}</span>
+      {fx}
     </span>
   );
 });

@@ -22,7 +22,13 @@ export function detectCrisis(text: string): CrisisLevel {
   return 0;
 }
 
-const SUPPORT = 'يا بعدي، كلامك مهم عندي وأهتم فيك. أنا مو بديل عن إنسان يكون جنبك الحين. إذا في خطر عليك فاتصل بالإسعاف 997 أو توجّه لأقرب طوارئ، أو كلّم الصحة على 937. وإذا تقدر كلّم أحد من أهلك أو أصحابك الحين وخلّه يجلس معك.';
+// Also identifies replies saved under earlier wording, so keep this phrase in SUPPORT.
+const SUPPORT_MARKER = 'أنا مو بديل عن إنسان';
+const SUPPORT = `يا بعدي، كلامك مهم عندي وأهتم فيك. ${SUPPORT_MARKER} يكون جنبك الحين. إذا في خطر عليك فاتصل بالإسعاف 997 أو توجّه لأقرب طوارئ، أو كلّم الصحة على 937. وإذا تقدر كلّم شخص تثق فيه الحين.`;
 
+// Crisis exchanges stay out of the history sent to the AI service, in either direction.
+export const isCrisisText = (t: string) => detectCrisis(t) !== 0 || t.includes(SUPPORT_MARKER);
+
+// Level 2 also covers someone being harmed by another person, so it can't assume self-harm or safe family.
 export const crisisMessage = (lv: CrisisLevel) =>
-  (lv === 2 ? 'أبي أتأكد منك لأن كلامك يهمني: إذا تقصد إنك تفكر تؤذي نفسك أو ما ودك تعيش، لا تشيلها لحالك. ' : '') + SUPPORT;
+  (lv === 2 ? 'أبي أتأكد منك لأن كلامك يهمني: إذا أحد يؤذيك، أو تفكر تؤذي نفسك أو ما ودك تعيش، لا تشيلها لحالك. ' : '') + SUPPORT;

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { detectCrisis } from '../src/features/companion/crisis';
+import { crisisMessage, detectCrisis, isCrisisText } from '../src/features/companion/crisis';
 import { ruleReply } from '../src/features/companion/rules';
 import { defaultState } from '../src/services/storage';
 
@@ -10,6 +10,17 @@ describe('crisis detection', () => {
     ['اموت فيك', 0], ['بموت من الضحك', 0], ['ابي اموت من الضحك', 0], ['اموت من الجوع', 0], ['تعبان اليوم', 0], ['عندي عزيمة', 0], ['هلا', 0],
   ])('%s -> %i', (text, level) => {
     expect(detectCrisis(text)).toBe(level);
+  });
+
+  it('covers harm from another person without pointing to family', () => {
+    expect(crisisMessage(2)).toContain('أحد يؤذيك');
+    expect(crisisMessage(2)).not.toContain('أهلك');
+  });
+
+  it('recognises current and earlier support replies', () => {
+    expect(isCrisisText(crisisMessage(1))).toBe(true);
+    expect(isCrisisText('يا بعدي، كلامك مهم عندي وأهتم فيك. أنا مو بديل عن إنسان يكون جنبك الحين. وإذا تقدر كلّم أحد من أهلك أو أصحابك الحين وخلّه يجلس معك.')).toBe(true);
+    expect(isCrisisText('هلا والله')).toBe(false);
   });
 });
 

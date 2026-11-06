@@ -32,8 +32,13 @@ export function Settings() {
         </p>
       </div>
       <div className="card">
+        <h3>الردود الذكية (OpenAI)</h3>
+        <p className="note">لما تكون شغّالة، رسالتك وآخر رسايل المحادثة وملخص نتائجك تنرسل لـ OpenAI عشان يطلع الرد. ما نرسل اسمك ولا رحلاتك.</p>
+        <button type="button" className={`chip ${s.aiConsent === 1 ? 'on' : ''}`} aria-pressed={s.aiConsent === 1} onClick={() => store.update((d) => { d.aiConsent = d.aiConsent === 1 ? 0 : 1; })}>{s.aiConsent === 1 ? 'شغّالة' : 'موقفة'}</button>
+      </div>
+      <div className="card">
         <h3>بياناتك</h3>
-        <p className="note">كل شي محفوظ على جهازك فقط. تقدر تمسحه بالكامل.</p>
+        <p className="note">بياناتك محفوظة على جهازك. تقدر تمسحها بالكامل من هنا.</p>
         <button type="button" className="btn cor sm" onClick={wipe}>مسح بياناتي</button>
       </div>
     </>

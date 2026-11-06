@@ -3,10 +3,8 @@ import { Mascot } from '../../components/mascot/Mascot';
 import type { MascotState } from '../../components/mascot/manifest';
 import { useMascot } from '../../components/mascot/useMascot';
 import { useAppState, useStore } from '../../context/AppStateContext';
-import { ruleCompanion } from '../../services/companion';
+import { aiCompanion, isAiAvailable, ruleCompanion } from '../../services/companion';
 import { today } from '../../utils';
-
-const service = ruleCompanion;
 
 export function Companion() {
   const s = useAppState();
@@ -14,25 +12,44 @@ export function Companion() {
   const [text, setText] = useState('');
   const [focused, setFocused] = useState(false);
   const [waiting, setWaiting] = useState(false);
+  const [aiReady, setAiReady] = useState(false);
+  const [fellBack, setFellBack] = useState(false);
   const [supportive, setSupportive] = useState<MascotState | null>(null);
   const list = useRef<HTMLDivElement>(null);
   const driving = !!s.driving;
+  const useAi = aiReady && s.aiConsent === 1;
 
   // Thinking shows only while a real request is pending; listening only while the user is typing.
   const mascot = useMascot(waiting ? 'thinking' : supportive ?? (focused || text ? 'listening' : 'idle'));
 
   useEffect(() => {
+    let live = true;
+    void isAiAvailable().then((ok) => { if (live) setAiReady(ok); });
+    return () => { live = false; };
+  }, []);
+
+  useEffect(() => {
     if (list.current) list.current.scrollTop = list.current.scrollHeight;
-  }, [s.chat.length]);
+  }, [s.chat.length, waiting]);
 
   async function send() {
     const v = text.trim();
     if (!v || waiting || driving) return;
     setText('');
     mascot.clear();
+    // The history sent to the AI shouldn't repeat this message, so it is read before saving it.
+    const before = store.getState();
     store.update((d) => { d.chat.push({ t: v }); });
     setWaiting(true);
-    const reply = await service.respond(v, store.getState());
+    let reply;
+    try {
+      reply = await (useAi ? aiCompanion : ruleCompanion).respond(v, before);
+      setFellBack(false);
+    } catch {
+      // If the AI can't be reached, say so and answer with the rules instead of failing silently.
+      reply = await ruleCompanion.respond(v, before);
+      setFellBack(true);
+    }
     setWaiting(false);
     store.update((d) => {
       reply.messages.forEach((t) => d.chat.push({ b: 1, t }));
@@ -69,9 +86,18 @@ export function Companion() {
         <h1>خويّك</h1>
       </div>
       <p className="note">
-        {service.isAI ? '' : 'ردود المحادثة هنا تعتمد على قواعد داخل العرض، مو نموذج لغوي مربوط. '}
+        {useAi ? 'الردود من نموذج ذكاء اصطناعي (OpenAI)، وممكن يغلط. ' : 'ردود المحادثة هنا تعتمد على قواعد داخل التطبيق، مو نموذج لغوي. '}
         أنا مو معالج ولا أشخّص، وما أحل محل أهلك وأصحابك أو المختصين.
       </p>
+      {aiReady && s.aiConsent == null && (
+        <div className="card consent">
+          <h3>تبي تفعّل الردود الذكية؟</h3>
+          <p>لو وافقت، رسالتك وآخر رسايل المحادثة وملخص نتائجك في التحديات تنرسل لشركة OpenAI عشان يطلع الرد. ما نرسل اسمك ولا الرحلات اللي اخترتها.</p>
+          <p className="note">حسب سياسة OpenAI، بيانات الـ API ما تُستخدم للتدريب، وممكن تُحفظ عندهم لمدة تصل إلى ٣٠ يوم لمراقبة إساءة الاستخدام. ولا تكتب معلومات حساسة ما تبي تشاركها. تقدر توقفها بأي وقت من ملفي.</p>
+          <button type="button" className="btn sm" onClick={() => store.update((d) => { d.aiConsent = 1; })}>أوافق</button>{' '}
+          <button type="button" className="btn sm alt" onClick={() => store.update((d) => { d.aiConsent = 0; })}>لا، خلها بالقواعد</button>
+        </div>
+      )}
       <div className="card">
         <div className="chat" ref={list} role="log" aria-live="polite">
           {s.chat.map((m, i) => (m.card ? (
@@ -84,13 +110,16 @@ export function Companion() {
           ) : (
             <div key={i} className={`m ${m.b ? 'b' : 'u'}`}>{m.t}</div>
           )))}
+          {waiting && <div className="m b m--typing" aria-label="خويّك يكتب"><i /><i /><i /></div>}
         </div>
+        {fellBack && <p className="note" role="status">ما قدرت أوصل للرد الذكي الحين، فرديت عليك بالقواعد البسيطة، ويمكن ما فهمت كلامك زين. إذا تمر بوقت صعب أو في خطر عليك، كلّم شخص تثق فيه أو اتصل بالإسعاف 997.</p>}
         {driving && <p className="note">🚗 وقفنا الكتابة وأنت تسوق. أول ما توصل بالسلامة ألغِ خيار القيادة من الرئيسية.</p>}
         <div className="row">
           <input
             aria-label="رسالتك لخويّك"
             className="grow"
             placeholder="اكتب لخويّك..."
+            maxLength={1000}
             value={text}
             disabled={driving}
             onChange={(e) => { setText(e.target.value); if (supportive) setSupportive(null); }}
@@ -98,7 +127,7 @@ export function Companion() {
             onBlur={() => setFocused(false)}
             onKeyDown={(e) => { if (e.key === 'Enter') void send(); }}
           />
-          <button type="button" className="btn" disabled={driving} onClick={() => void send()}>أرسل</button>
+          <button type="button" className="btn" disabled={driving || waiting} onClick={() => void send()}>أرسل</button>
         </div>
       </div>
     </>

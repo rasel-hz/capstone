@@ -1,4 +1,4 @@
-import type { Challenge, ChallengeId, Journey } from '../../types';
+import type { Challenge, ChallengeId, Journey } from '../../types/index.ts';
 
 export const CHALLENGES: Record<ChallengeId, Challenge> = {
   video: { t: 'ركز معي شوي', cat: 'تركيز', min: 1, xp: 30, k: 'v' },
