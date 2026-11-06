@@ -1,0 +1,29 @@
+:root {
+  --sage: #8DBFA3;
+  --em: #28785B;
+  --lav: #A78BFA;
+  --lil: #E9DFFF;
+  --cor: #FF8E83;
+  --sun: #FFD36E;
+  --sky: #8BCDF1;
+  --pe: #FFC6A8;
+  --iv: #FFFDF8;
+  --cr: #F8F5EF;
+  --ink: #263D37;
+  --mut: #5a736b;
+
+  /* Motion: small feedback, then scenes. */
+  --t-micro: 180ms;
+  --t-card: 300ms;
+  --t-scene: 400ms;
+  --ease: cubic-bezier(.22, 1, .36, 1);
+
+  --shadow-card: 0 8px 26px rgba(40, 120, 91, .1);
+  --shadow-lift: 0 14px 34px rgba(40, 120, 91, .16);
+  color-scheme: light;
+}
+
+body.lilac {
+  --iv: #F6F1FF;
+  --cr: #EEE6FF;
+}

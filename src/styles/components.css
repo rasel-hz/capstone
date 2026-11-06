@@ -1,0 +1,107 @@
+/* Navigation */
+nav {
+  width: 210px; padding: 20px 12px; background: rgba(255, 255, 255, .7); backdrop-filter: blur(10px);
+  display: flex; flex-direction: column; gap: 6px; position: sticky; top: 0; height: 100vh; flex: none; z-index: 4;
+}
+nav b { font-size: 26px; padding: 6px 12px 14px; color: var(--em); }
+nav button {
+  position: relative; border: 0; background: none; font: inherit; color: var(--ink); padding: 11px 14px;
+  border-radius: 16px; text-align: start; cursor: pointer; transition: background var(--t-micro) var(--ease), color var(--t-micro) var(--ease);
+}
+nav button:hover { background: var(--lil); }
+nav button.on { color: #fff; }
+nav button.on:hover { background: none; }
+.nav-pill { position: absolute; inset: 0; border-radius: 16px; background: linear-gradient(135deg, var(--em), var(--sage)); }
+.nav-label { position: relative; }
+
+@media (max-width: 760px) {
+  nav {
+    width: 100%; height: auto; position: fixed; top: auto; bottom: 0; flex-direction: row; padding: 6px; justify-content: space-around;
+    padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px));
+  }
+  nav b { display: none; }
+  nav button { padding: 8px 4px; font-size: 11.5px; text-align: center; flex: 1; min-width: 0; }
+}
+
+/* Cards */
+.card { background: #fff; border-radius: 26px; padding: 18px; box-shadow: var(--shadow-card); margin-bottom: 14px; }
+.lift { transition: transform var(--t-card) var(--ease), box-shadow var(--t-card) var(--ease); }
+.lift:hover { transform: translateY(-3px); box-shadow: var(--shadow-lift); }
+.hero { display: flex; gap: 16px; align-items: center; background: linear-gradient(135deg, var(--lil), var(--pe)); flex-wrap: wrap; }
+.resume-card { border: 2px solid var(--sun); }
+.mission-card { background: linear-gradient(135deg, #fff, var(--lil)); }
+.mission-title { margin: 6px 0; }
+.it { border-radius: 20px; padding: 12px 14px; background: var(--cr); margin-bottom: 10px; }
+.stat { font-size: 34px; margin: 0; }
+.stat.em { color: var(--em); }
+.stat.lav { color: var(--lav); }
+.stat.gold { color: #c9971c; }
+.jc { color: #263D37; overflow: hidden; padding: 0; }
+.jc .b { padding: 14px 18px; }
+.jc svg { display: block; width: 100%; }
+.jc-note { color: #44594f; }
+.map { display: flex; gap: 8px; align-items: center; margin: 8px 0; flex-wrap: wrap; }
+.node {
+  width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  background: rgba(255, 255, 255, .75); border: 0; cursor: pointer; font: 700 12px inherit; font-family: inherit; color: var(--ink);
+  box-shadow: inset 0 0 0 1px rgba(38, 61, 55, .12); transition: transform var(--t-micro) var(--ease), background var(--t-micro) var(--ease);
+}
+.node:hover { transform: scale(1.06); }
+.node.d { background: var(--em); color: #fff; }
+
+/* Buttons and controls */
+.btn {
+  border: 0; background: linear-gradient(135deg, var(--em), #3a9a76); color: #fff; font: inherit; padding: 12px 22px; border-radius: 999px;
+  cursor: pointer; font-weight: 500; box-shadow: 0 6px 16px rgba(40, 120, 91, .3);
+  transition: transform var(--t-micro) var(--ease), box-shadow var(--t-micro) var(--ease), opacity var(--t-micro) var(--ease);
+}
+.btn:hover:not(:disabled) { transform: translateY(-1px) scale(1.02); box-shadow: 0 9px 20px rgba(40, 120, 91, .32); }
+.btn:active:not(:disabled) { transform: scale(.98); }
+.btn:disabled { opacity: .5; cursor: default; }
+.btn.alt { background: var(--lil); color: var(--ink); box-shadow: none; }
+.btn.cor { background: linear-gradient(135deg, var(--cor), #ffa89e); }
+.btn.sm { padding: 6px 14px; font-size: 14px; }
+.chip {
+  display: inline-block; padding: 6px 13px; border-radius: 999px; background: var(--lil); margin: 3px; font-size: 13px;
+  color: var(--ink); border: 0; font-family: inherit; transition: background var(--t-micro) var(--ease), color var(--t-micro) var(--ease), transform var(--t-micro) var(--ease);
+}
+button.chip { cursor: pointer; }
+button.chip:active { transform: scale(.96); }
+.chip.on { background: var(--em); color: #fff; }
+input {
+  font: inherit; padding: 11px 16px; border-radius: 999px; border: 2px solid var(--lil); background: #fff; color: var(--ink); width: 100%;
+  transition: border-color var(--t-micro) var(--ease);
+}
+input:focus { border-color: var(--lav); }
+input[type='checkbox'] { width: auto; }
+.name-input { max-width: 300px; text-align: center; }
+.num-input { width: 80px; }
+.check { display: block; margin: 6px 0; }
+.bar { height: 12px; border-radius: 9px; background: var(--cr); overflow: hidden; }
+.bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--sun), var(--sage), var(--em)); border-radius: 9px; transition: width .8s var(--ease); }
+.fab {
+  position: fixed; inset-inline-start: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); width: 68px; height: 68px; border-radius: 50%;
+  background: #fff; border: 0; box-shadow: 0 8px 24px rgba(40, 120, 91, .3); cursor: pointer; z-index: 5; padding: 4px;
+  display: flex; align-items: center; justify-content: center; transition: transform var(--t-micro) var(--ease);
+}
+.fab:hover { transform: translateY(-2px) scale(1.04); }
+@media (max-width: 760px) { .fab { bottom: calc(78px + env(safe-area-inset-bottom, 0px)); } }
+
+/* Dialogs */
+.ov {
+  position: fixed; inset: 0; background: rgba(38, 61, 55, .55); display: flex; align-items: center; justify-content: center; padding: 14px; z-index: 40;
+  animation: fade .2s var(--ease);
+}
+.ov--top { z-index: 60; }
+.ov .card { max-width: 520px; width: 100%; max-height: 90vh; overflow: auto; text-align: center; }
+
+/* Chat */
+.chat-head { display: flex; align-items: center; gap: 10px; }
+.chat { display: flex; flex-direction: column; gap: 8px; height: 50vh; overflow: auto; padding: 6px; }
+.m { max-width: 82%; padding: 10px 14px; border-radius: 18px; line-height: 1.75; animation: rise .3s var(--ease); overflow-wrap: anywhere; }
+.m.u { align-self: flex-start; background: var(--em); color: #fff; border-end-start-radius: 4px; }
+.m.b { align-self: flex-end; background: var(--lil); border-end-end-radius: 4px; }
+
+/* Onboarding */
+.onboard { text-align: center; max-width: 620px; padding-top: 6vh; }
+.onboard__dots { justify-content: center; margin-bottom: 12px; }

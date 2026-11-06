@@ -48,21 +48,20 @@ The prototype has 8 categories (journeys) but only 6 games, so most categories r
 
 ## 3. Rules every task follows
 
-### 3.1 The game interface (same as the prototype)
+### 3.1 The game interface
 
-Each game is a function `game(el, it, cb)`, where `el` is the container and `it` is the mission item.
+Each game is a React component that receives `GameProps`.
 
-```js
-// it.diff is 'easy' or 'normal'. Called when the task has really finished:
-cb({ acc: null /* or 0-100 when scored */, retries: 0, data: { /* task-specific */ } });
-
-// Every game must set all three. Today several games set only some (see section 7).
-G.stop   = () => {}; // clear every timer and animation frame
-G.pause  = () => {}; // freeze the timers, keep the state
-G.resume = () => {}; // continue from the same point
+```tsx
+export function YourGame({ diff, env, onDone }: GameProps) {
+  const timers = useTimers(env.paused); // delays that pause with the game and stop when it closes
+  env.say('curious', 'نص خويّك');        // updates the mascot and its speech bubble
+  // Call this when the task has really finished:
+  onDone({ acc: null /* or 0-100 when scored */, retries: 0, data: { /* task-specific */ } });
+}
 ```
 
-To add a game to the prototype, register it in three places: `CH` (the catalog), the `ins` map in `run()` (intro text), and the `f` map in `run()` (the function). In the React rebuild, keep this same contract so games can be moved over one at a time.
+To add one, follow "Adding a game" in [ARCHITECTURE.md](ARCHITECTURE.md). References elsewhere in this catalog to `CH`, `JN`, `cb` and `G` are the prototype's names for `CHALLENGES`, `JOURNEYS`, `onDone` and `useTimers`.
 
 ### 3.2 Defaults (each task only lists where it differs)
 
@@ -283,6 +282,8 @@ Don't start these until the first batch works end to end.
 | `uncertainty_education` | مو لازم أعرف كل شيء | `ocd` | **Clinical review. Blocked until then.** |
 
 ## 7. Fix these in the existing games first
+
+**Status:** fixed in version 0.2.0 (see [CHANGELOG.md](../CHANGELOG.md)), except `calm`, which still needs `grounding_54321` as its alternative and pace options. The XP row was resolved by paying XP once only, because the flat policy in section 3.2 already matched. The table is kept for reference.
 
 Each of these comes from reading the prototype code directly.
 

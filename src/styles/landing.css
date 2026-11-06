@@ -1,0 +1,17 @@
+.lp { background: var(--iv); overflow-x: clip; width: 100%; }
+.lp section { padding: 60px 20px; max-width: 1040px; margin: 0 auto; }
+.lt { position: sticky; top: 0; z-index: 10; display: flex; justify-content: space-between; align-items: center; padding: 10px 20px; background: rgba(255, 253, 248, .85); backdrop-filter: blur(10px); }
+.brand { font-size: 24px; color: var(--em); }
+.lh {
+  position: relative; min-height: 88vh; background: linear-gradient(180deg, #cfe9ff 0, #E9DFFF 38%, #FFC6A8 70%, var(--sage) 100%);
+  display: flex; align-items: center; justify-content: center; text-align: center; overflow: hidden; padding: 30px 18px;
+}
+.lh .in { position: relative; z-index: 2; max-width: 640px; }
+.lh h1 { font-size: clamp(28px, 5.5vw, 48px); line-height: 1.4; }
+.fl { position: absolute; opacity: .85; animation: floaty 6s ease-in-out infinite; pointer-events: none; transition: translate .4s var(--ease); }
+.rv { opacity: 0; transform: translateY(24px); transition: opacity .7s var(--ease), transform .7s var(--ease); }
+.rv.v { opacity: 1; transform: none; }
+.steps { display: flex; gap: 12px; overflow: auto; padding: 6px 2px 14px; }
+.steps .card { min-width: 170px; text-align: center; }
+.step-n { font-size: 30px; font-weight: 700; color: var(--lav); }
+.closing { background: linear-gradient(135deg, var(--lil), var(--pe), var(--sage)); border-radius: 36px; padding: 40px 16px; }
