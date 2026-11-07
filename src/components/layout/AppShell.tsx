@@ -1,4 +1,3 @@
-import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '../../context/AppStateContext';
 import { Challenges } from '../../pages/Challenges';
 import { Companion } from '../../pages/Companion';
@@ -8,15 +7,13 @@ import { Progress } from '../../pages/Progress';
 import { Rewards } from '../../pages/Rewards';
 import { Settings } from '../../pages/Settings';
 import type { ViewId } from '../../types';
-import { Mascot } from '../mascot/Mascot';
-import { NavBar } from '../navigation/NavBar';
+import { NavBar, SubTabs } from '../navigation/NavBar';
 
 const PAGES: Record<ViewId, (p: { onNavigate(v: ViewId): void }) => React.JSX.Element> = {
   home: Home, journeys: Journeys, chal: Challenges, chat: Companion, prog: Progress, rew: Rewards, set: Settings,
 };
 
 export function AppShell({ onNavigate }: { onNavigate(v: ViewId): void }) {
-  const { t } = useTranslation();
   const view = useAppSelector((s) => s.view) as ViewId;
   const Page = PAGES[view] || Home;
   return (
@@ -24,13 +21,9 @@ export function AppShell({ onNavigate }: { onNavigate(v: ViewId): void }) {
       <NavBar view={view} onNavigate={onNavigate} />
       {/* The new page appears straight away and fades in, so a tap is never held up by an exit animation. */}
       <main key={view} className="page">
+        <SubTabs view={view} onNavigate={onNavigate} />
         <Page onNavigate={onNavigate} />
       </main>
-      {view !== 'chat' && (
-        <button type="button" className="fab" aria-label={t('nav.openBuddy')} onClick={() => onNavigate('chat')}>
-          <Mascot state="idle" size={50} still />
-        </button>
-      )}
     </div>
   );
 }

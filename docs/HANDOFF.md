@@ -95,7 +95,7 @@ The app works without an API key, using keyword rules and saying so on screen. T
 - Never claim that games improve attention or treat a condition.
 - Never read mood or health from game scores.
 - No fake AI: the screen says "AI" only when AI is actually in use (§21).
-- Never invent prayer times, traffic, weather, calendar data, partners or offers. None of these are connected.
+- Never invent prayer times, traffic, weather, calendar data, partners or offers. Prayer times come only from the on-device Umm al-Qura calculation in `src/features/prayer/times.ts` or from the user; the rest aren't connected.
 - No task suggestions, XP or gamification in reply to a crisis message.
 - Nothing interactive while driving.
 
@@ -128,7 +128,7 @@ The app works without an API key, using keyword rules and saying so on screen. T
 
 ### 2. React refactor (`04a37fc`)
 - Moved the single-file prototype to a modular app. `prototype/index.html` is kept as a backup.
-- **Screens:** landing, onboarding and 7 tabs (home, journeys, challenges, companion, progress, rewards, settings).
+- **Screens:** landing, onboarding and 5 tabs (home, challenges with a journeys sub-tab, companion, progress with a rewards sub-tab, settings).
 - **Games at that point:** `video`, `mem`, `seq`, `time`, `calm`, `start2`. The redesign added six more.
 - **Mission engine:** moves through `intro → preroll → game → result → (easier offer) → next item → finish`, with pause, skip and resume.
 - **Data:** the prototype's `kw2` format still loads.

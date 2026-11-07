@@ -1,10 +1,29 @@
 # Changelog
 
+## Unreleased: five-tab navigation
+
+### Changed
+- The navigation has 5 tabs instead of 7: الرئيسية، تحدياتي، خويّك، تطوري، ملفي. Journeys became a sub-tab of Challenges, and rewards a sub-tab of Progress, so every page is still one or two taps away.
+- On phones, خويّك sits raised in the middle of the bar as the mascot.
+
+### Removed
+- The floating خويّك button on desktop, which repeated the chat tab.
+
+## Unreleased: calculated prayer times
+
+### Added
+- Prayer times calculated on the device for 20 Saudi cities, with the Umm al-Qura method and Isha 30 minutes later in Ramadan. The user picks a city in onboarding or ملفي; no location is read and nothing is sent. Uses the MIT-licensed `adhan` library.
+- With a city chosen, every prayer of the day is protected for the chosen minutes, and Home shows the next prayer. ملفي shows today's five times.
+
+### Changed
+- Entering the next prayer time by hand still works when no city is chosen, and is unchanged.
+- Screens that said no prayer times are connected now say they're calculated on the device and can differ from a local mosque by a minute or two.
+
 ## Unreleased: Android app
 
 ### Added
-- An Android app built with Capacitor from the same code, in `android/`. See `docs/ANDROID.md`. Not yet run on a device.
-- Android back button handling: it closes the top screen, goes Home, then leaves the app in the background.
+- An Android app built with Capacitor from the same code, in `android/`. See `docs/ANDROID.md`. Runs on the Android emulator; games and the AI chat are not yet tried there.
+- Android back button handling: it closes the top screen, steps back through onboarding, goes Home, then leaves the app in the background.
 - The server accepts requests from the installed app's own origins. Other websites are still rejected.
 
 ### Changed

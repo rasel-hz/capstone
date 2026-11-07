@@ -53,7 +53,7 @@
     "progress": "See your progress"
   },
   "dayTitle": "Your day",
-  "daySub": "Only what you told me. No calendar or prayer times are connected.",
+  "daySub": "Only what you told me, plus prayer times if you chose your city. No calendar is connected.",
   "nextPrayer": "Next prayer",
   "youEnterIt": "(you enter it)",
   "prayerSaved": "{{time}}, with {{mins}} minutes protected after it, for today only.",
@@ -61,5 +61,7 @@
   "approvedEmpty": "Nothing saved yet. Tell me about your day in the chat, and I'll ask before saving anything.",
   "schedule": "Your schedule",
   "scheduleNone": "Not set",
-  "editInProfile": "Edit in My Profile"
+  "editInProfile": "Edit in My Profile",
+  "prayerCalc": "Calculated for {{city}} with Umm al-Qura, with {{mins}} minutes protected after each call to prayer.",
+  "prayerCityHint": "Want it automatic? Choose your city in your profile."
 }

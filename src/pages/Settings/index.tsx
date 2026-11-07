@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Dialog, IconBadge, PageHeader, Segmented, SettingRow, Toggle } from '../../components/ui/kit';
 import { useAppState, useStore } from '../../context/AppStateContext';
 import { JOURNEYS } from '../../features/challenges/catalog';
+import { CitySelect, TodayPrayers } from '../../features/prayer/PrayerCity';
 import { formatList, type Lang, type Msg, msg } from '../../i18n';
 import { useLanguage } from '../../i18n/useLanguage';
 import { level, today } from '../../utils';
@@ -100,12 +101,17 @@ export function Settings({ onNavigate }: { onNavigate(v: ViewId): void }) {
 
       <Group id="day" title={t('settings.day')} icon={MapPin}>
         <SettingRow title={t('settings.schedule')}><Segmented<string> label={t('settings.schedule')} value={s.sched} options={['work', 'study', 'flex'].map((v) => ({ value: v, label: t(`common.sched.${v}`) }))} onChange={(v) => set((d) => { d.sched = v; })} /></SettingRow>
-        <SettingRow title={t('settings.nextPrayer')} note={t('settings.nextPrayerNote')}>
-          <div className="row">
-            <input type="time" aria-label={t('settings.prayerLabel')} value={prayer} onChange={(e) => setPrayer(e.target.value)} />
-            <button type="button" className="btn sm alt" onClick={() => { set((d) => { d.prayer = prayer; d.prayerDay = today(); }); flash('settings.flashPrayer'); }}>{t('common.save')}</button>
-          </div>
+        <SettingRow title={t('common.prayer.city')} note={t('settings.cityNote')}>
+          <CitySelect value={s.city} onChange={(c) => { set((d) => { d.city = c; }); flash(c ? 'settings.flashCity' : 'settings.flashManual'); }} />
         </SettingRow>
+        {s.city ? <><TodayPrayers city={s.city} /><p className="note">{t('common.prayer.calcNote')}</p></> : (
+          <SettingRow title={t('settings.nextPrayer')} note={t('settings.nextPrayerNote')}>
+            <div className="row">
+              <input type="time" aria-label={t('settings.prayerLabel')} value={prayer} onChange={(e) => setPrayer(e.target.value)} />
+              <button type="button" className="btn sm alt" onClick={() => { set((d) => { d.prayer = prayer; d.prayerDay = today(); }); flash('settings.flashPrayer'); }}>{t('common.save')}</button>
+            </div>
+          </SettingRow>
+        )}
         <SettingRow title={t('settings.protect')}><Segmented<number> label={t('settings.protectLabel')} value={s.pp} options={[0, 20, 30, 45].map((v) => ({ value: v, label: v ? t('common.minShort', { n: v }) : t('settings.none') }))} onChange={(v) => set((d) => { d.pp = v; })} /></SettingRow>
         <div className="set-note"><CarFront size={18} aria-hidden="true" /><div>
           <b>{t('settings.driving')}</b>

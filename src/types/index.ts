@@ -130,6 +130,8 @@ export interface AppState {
   aiConsent: number | null;
   /** The day the manual prayer time was entered, so a stale time doesn't apply tomorrow. */
   prayerDay: string;
+  /** City for calculated prayer times. Empty means the user enters the time by hand. */
+  city: string;
   /** Larger text setting. */
   largeText: number;
   /** Interface language. */

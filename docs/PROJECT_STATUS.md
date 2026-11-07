@@ -60,6 +60,13 @@ This file lists what has been done and what still needs doing. For how to run th
 - Added the 10 remaining clips from Masko, so all 11 states have their own animation.
 - Reactions now play their full length, including during games.
 
+### 7. Prayer times
+- Calculated on the device for 20 Saudi cities with the Umm al-Qura method, with Isha 30 minutes later in Ramadan. No location is read.
+- With a city chosen, every prayer of the day is protected, Home shows the next prayer, and ملفي shows today's five times. Manual entry still works without a city.
+
+### 8. Navigation
+- Cut the bar from 7 tabs to 5, with خويّك raised in the middle on phones. Journeys and rewards became sub-tabs of Challenges and Progress.
+
 ## What we need to do
 
 ### Android app
@@ -101,6 +108,8 @@ This file lists what has been done and what still needs doing. For how to run th
 - [ ] Update reference §8 and §9, which still describe the games as they were before the redesign.
 - [ ] Add game checkpoints. A resumed challenge restarts from the beginning, and says so on screen.
 - [ ] Replace the 24-second animated scene in `video` with rights-cleared video.
+- [ ] Check calculated prayer times against the official Umm al-Qura calendar for a few cities and dates, including Ramadan. Only Riyadh on one date was compared so far.
+- [ ] Decide whether to add more cities or a "use my location" option, which would need a consent design.
 
 ### Mascot
 - [ ] **iPhone and Safari** show the still image, because WebM transparency isn't reliable there. Check whether Masko offers MOV or HEVC.

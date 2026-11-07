@@ -30,7 +30,7 @@
   "day": "Your day",
   "schedule": "Your schedule",
   "nextPrayer": "Next prayer",
-  "nextPrayerNote": "You enter it yourself, for today only. No prayer-time service is connected.",
+  "nextPrayerNote": "You enter it yourself, for today only.",
   "prayerLabel": "Next prayer time",
   "protect": "Protected time after the call to prayer",
   "protectLabel": "Protected time in minutes",
@@ -70,5 +70,8 @@
   "confirmDelete": "Delete",
   "typedLabel": "Delete typed text",
   "typedQ": "Delete the text you typed?",
-  "typedText": "Your tasks, steps and notes in challenges will be deleted. Your points and results stay."
+  "typedText": "Your tasks, steps and notes in challenges will be deleted. Your points and results stay.",
+  "cityNote": "Choose your city to protect every prayer automatically, or enter the time yourself.",
+  "flashCity": "City saved. Prayer times are calculated each day.",
+  "flashManual": "Back to entering the time yourself."
 }
