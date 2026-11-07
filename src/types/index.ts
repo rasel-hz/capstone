@@ -1,7 +1,10 @@
 // Shapes mirror the `kw2` localStorage document from the prototype, so saved data keeps working.
 export type Gender = 'm' | 'f';
 export type JourneyId = 'adhd' | 'anx' | 'ocd' | 'mood' | 'sleep' | 'soc' | 'aut' | 'gen';
-export type ChallengeId = 'video' | 'mem' | 'seq' | 'time' | 'calm' | 'start2';
+export type ChallengeId =
+  | 'video' | 'mem' | 'seq' | 'time' | 'calm' | 'start2'
+  | 'attention_scene' | 'priority_board' | 'breakdown' | 'study_sprint' | 'emotion_map' | 'calm_landscape';
+export type ChallengeCategory = 'تركيز' | 'ذاكرة' | 'تخطيط' | 'وعي بالوقت' | 'استرخاء' | 'مهمة حقيقية';
 export type Difficulty = 'easy' | 'normal';
 export type ContextTag = 'event' | 'work' | 'sleep';
 export type EnergyLevel = 'high' | 'mid' | 'low';
@@ -12,10 +15,20 @@ export type MissionStatus = 'IN_PROGRESS' | 'PAUSED' | 'DONE';
 
 export interface Challenge {
   t: string;
-  cat: string;
+  cat: ChallengeCategory;
   min: number;
   xp: number;
   k: string;
+  /** One line for cards. */
+  desc: string;
+  /** Why someone might pick it. Never a health claim. */
+  purpose: string;
+  /** Has a real easier version. */
+  hasEasy: boolean;
+  /** Produces a first-try accuracy score. Unscored challenges are never compared with scored ones. */
+  scored: boolean;
+  /** Self-report only: no XP and no achievements, and its results stay on the device (reference 14.2). */
+  selfReport?: boolean;
 }
 
 export interface Journey {
@@ -115,6 +128,10 @@ export interface AppState {
   lastDaily: { d: string; all: boolean } | null;
   /** Consent to send chat to the AI service. null means not asked yet. */
   aiConsent: number | null;
+  /** The day the manual prayer time was entered, so a stale time doesn't apply tomorrow. */
+  prayerDay: string;
+  /** Larger text setting. */
+  largeText: number;
 }
 
 export interface GameResult {

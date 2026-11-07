@@ -1,4 +1,5 @@
 import type { AppState } from '../../types';
+import { CHALLENGES } from '../challenges/catalog';
 import { isLowEnergy } from '../mission/planner';
 import { isCrisisText } from './crisis';
 import { progressStats } from '../progress/stats';
@@ -19,7 +20,8 @@ export function buildChatRequest(message: string, s: AppState) {
       attempts: st.attempts.length,
       completed: st.completed.length,
       avgAccuracy: st.avgAccuracy,
-      byChallenge: st.byChallenge.map(([id, a]) => {
+      // Self-reported feelings stay on the device, even as a count.
+      byChallenge: st.byChallenge.filter(([id]) => !CHALLENGES[id].selfReport).map(([id, a]) => {
         const scored = a.filter((h) => h.acc != null);
         return { id, count: a.length, lastAccuracy: scored.length ? scored[scored.length - 1].acc : null };
       }),

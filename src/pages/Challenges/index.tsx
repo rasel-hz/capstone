@@ -1,32 +1,49 @@
+import { motion } from 'motion/react';
 import { useState } from 'react';
+import { PageHeader } from '../../components/ui/kit';
 import { useAppState } from '../../context/AppStateContext';
-import { CHALLENGES } from '../../features/challenges/catalog';
+import { ChallengeCard } from '../../features/challenges/ChallengeCard';
+import { CATEGORIES, CHALLENGES } from '../../features/challenges/catalog';
 import { useMissions } from '../../features/mission/MissionProvider';
-import { lastAccuracy } from '../../features/mission/planner';
-import type { ChallengeId } from '../../types';
+import type { AppState, ChallengeId } from '../../types';
+
+const ALL = 'الكل';
+const IDS = Object.keys(CHALLENGES) as ChallengeId[];
+
+// Features something the user hasn't tried yet, or their least recent one. It's a browsing aid, not a recommendation engine.
+function featuredId(s: AppState): ChallengeId {
+  const untried = IDS.find((id) => !s.hist.some((h) => h.id === id && h.status === 'COMPLETED'));
+  if (untried) return untried;
+  const lastPlayed = (id: ChallengeId) => Math.max(0, ...s.hist.filter((h) => h.id === id).map((h) => h.ts));
+  return [...IDS].sort((a, b) => lastPlayed(a) - lastPlayed(b))[0];
+}
 
 export function Challenges() {
   const s = useAppState();
   const missions = useMissions();
-  const [filter, setFilter] = useState('الكل');
-  const cats = ['الكل', ...new Set(Object.values(CHALLENGES).map((c) => c.cat))];
-  const list = (Object.entries(CHALLENGES) as [ChallengeId, (typeof CHALLENGES)[ChallengeId]][]).filter(([, c]) => filter === 'الكل' || c.cat === filter);
+  const [filter, setFilter] = useState(ALL);
+  const [featured] = useState(() => featuredId(s));
+  const list = IDS.filter((id) => (filter === ALL ? id !== featured : CHALLENGES[id].cat === filter));
+  const play = (id: ChallengeId) => missions.start([{ id, why: 'اخترته بنفسك', diff: 'normal' }]);
   return (
     <>
-      <h1>تحدياتي</h1>
-      <div>{cats.map((c) => <button key={c} type="button" className={`chip ${filter === c ? 'on' : ''}`} aria-pressed={filter === c} onClick={() => setFilter(c)}>{c}</button>)}</div>
-      <br />
-      <div className="grid">
-        {list.map(([k, c]) => {
-          const last = lastAccuracy(s, k);
-          return (
-            <div key={k} className="card lift">
-              <h2 className="flush">{c.t}</h2>
-              <p className="note">{c.cat} · +{c.xp} XP{last != null ? ' · آخر دقة ' + last + '%' : ''}</p>
-              <button type="button" className="btn" onClick={() => missions.start([{ id: k, why: 'اخترته بنفسك', diff: 'normal' }])}>العب</button>
-            </div>
-          );
-        })}
+      <PageHeader title="تحدياتي" sub="ألعاب قصيرة تجربها على راحتك. هي للمتابعة الشخصية، مو قياس لصحتك." />
+      {filter === ALL && (
+        <section aria-label="تحدي مقترح للتجربة" className="feat">
+          <p className="eyebrow">جرّب هذا</p>
+          <ChallengeCard id={featured} state={s} onPlay={() => play(featured)} featured />
+        </section>
+      )}
+      <div className="filters" role="group" aria-label="فلترة حسب النوع">
+        {[ALL, ...CATEGORIES].map((c) => (
+          <button key={c} type="button" className={`flt ${filter === c ? 'on' : ''}`} aria-pressed={filter === c} onClick={() => setFilter(c)}>
+            {filter === c && <motion.span layoutId="flt-active" className="flt__pill" transition={{ type: 'spring', stiffness: 420, damping: 36 }} />}
+            <span className="flt__t">{c}</span>
+          </button>
+        ))}
+      </div>
+      <div className="cc-grid">
+        {list.map((id) => <ChallengeCard key={id} id={id} state={s} onPlay={() => play(id)} />)}
       </div>
     </>
   );

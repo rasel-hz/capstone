@@ -13,10 +13,11 @@ export default function App() {
   const done = useAppSelector((s) => s.done);
   const rm = useAppSelector((s) => s.rm);
   const theme = useAppSelector((s) => s.theme);
+  const largeText = useAppSelector((s) => s.largeText);
 
   useEffect(() => {
-    document.body.className = [done ? theme : '', rm ? 'rm' : ''].filter(Boolean).join(' ');
-  }, [rm, theme, done]);
+    document.body.className = [done ? theme : '', rm ? 'rm' : '', largeText ? 'lg' : ''].filter(Boolean).join(' ');
+  }, [rm, theme, done, largeText]);
 
   const navigate = useCallback((v: ViewId) => {
     store.update((d) => { d.view = v; });

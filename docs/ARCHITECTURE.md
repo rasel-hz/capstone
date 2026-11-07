@@ -36,11 +36,28 @@ Rules the engine enforces, with tests in `tests/engine.test.ts`:
 
 The planner is rule-based. Driving and prayer checks happen in `MissionProvider`, before any challenge can start.
 
+## Design system
+
+- **Tokens:** `styles/tokens.css` holds the brand palette from reference 3.3, derived shades, the type scale, radii and motion timing. Use these instead of new values.
+- **UI kit:** `components/ui/kit.tsx` has the page header, section title, icon badge, progress bar, empty state, segmented control, switch, setting row and dialog.
+- **Icons:** Lucide only, through `lucide-react`. No emoji; `tests/redesign.test.ts` fails if one appears in `src/`.
+- **Art:** `features/challenges/ChallengeArt.tsx` has the challenge art, journey art and oasis backdrop, all flat vector drawn from the palette.
+
+## The shared player
+
+`MissionPlayer.tsx` owns the header, intro, result and completion screens. A game only draws its play area and reports through `GameEnv`:
+
+- `env.say(mood, text)` updates the mascot and speech bubble.
+- `env.round(current, total, label)` shows progress in the header.
+- `env.paused`, `env.rm` and `env.snd` tell it about pause, reduced motion and sound.
+
+While the player or a blocking dialog is open, `MissionProvider` sets `inert` on the app behind it.
+
 ## Adding a game
 
 1. Create `src/features/challenges/games/YourGame.tsx` using the `GameProps` interface.
 2. Register it in `games/index.ts`, and in `CHALLENGES` and `INSTRUCTIONS` in `catalog.ts`.
-3. Add its ID to the `ChallengeId` type, and to any journey that should offer it.
+3. Add its ID to the `ChallengeId` type, add its art to `ChallengeArt.tsx`, and add it to any journey that should offer it.
 
 A game must:
 
@@ -48,7 +65,8 @@ A game must:
 - Respect `env.paused` for anything else that runs over time.
 - Call `onDone` only when its own completion rule is met.
 - Render user text as plain React text, never with `dangerouslySetInnerHTML`.
-- Offer a tap alternative to any drag.
+- Offer a tap alternative to any drag. `useDrag` in `games/parts.tsx` handles mouse and touch; native drag-and-drop doesn't fire on phones.
+- Set `selfReport: true` in the catalog for anything that records feelings, so it earns nothing and stays on the device.
 
 ## AI
 
@@ -58,7 +76,7 @@ See [AI.md](AI.md). `server/api.ts` is mounted inside the dev server by `vite.co
 
 Design tokens are in `styles/tokens.css`, and shared animations are in `styles/motion.css`.
 
-- CSS handles nearly everything. Motion for React is used only for the moving navigation pill and reduced-motion detection.
+- CSS handles nearly everything. Motion for React is used only for the moving navigation and filter pills, and reduced-motion detection.
 - Page changes show the new page immediately and fade it in, so a tap is never delayed.
 - Both the in-app setting (`.rm` on `body`) and the system's `prefers-reduced-motion` setting turn movement off.
 - Keep movement minimal during games. `<Mascot still />` stops continuous movement.
@@ -68,7 +86,7 @@ Design tokens are in `styles/tokens.css`, and shared animations are in `styles/m
 See [CHANGELOG.md](../CHANGELOG.md) for what changed in the refactor, and section 9 of [TASK_CATALOG.md](TASK_CATALOG.md) for open product decisions.
 
 - Crisis detection is a keyword safety net, and its wording and numbers need clinical review.
-- The daily mission barely uses the journeys someone picks.
-- The prayer time doesn't reset daily.
+- The daily mission still follows the fixed pattern in reference 10.1. Chosen journeys change its explanation and the journey screens, but barely change which challenges it picks, and none of the six new challenges enter it automatically.
+- A resumed challenge restarts instead of continuing from a checkpoint, and says so.
 - Safari, real phones and screen readers haven't been tested.
 - There are no automated browser tests; unit tests cover the rules only.

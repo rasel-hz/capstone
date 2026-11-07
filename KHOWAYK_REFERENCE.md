@@ -31,19 +31,19 @@ This file is intended for product managers, UI/UX designers, frontend engineers,
 
 | Capability | Status | Actual situation / required change |
 |---|---|---|
-| Public landing page | CURRENT | Hero, mascot, explainer, journeys, mini memory-game preview, Saudi lifestyle, sample rewards, CTAs. Improve visual craft and responsiveness. |
+| Public landing page | CURRENT | Hero, mascot, how it works, journeys, playable memory preview, Saudi lifestyle, honest positioning, CTAs. Sample rewards section removed. |
 | RTL Arabic visual system | CURRENT | IBM Plex Sans Arabic, CSS variables, sidebar/mobile bottom navigation. Improve accessibility, componentization, and polish. |
 | Animated mascot | CURRENT | SVG character with multiple expressions, hover/click reaction on landing, simple floating/glow effects. Target richer custom animation system. |
 | Onboarding | CURRENT | 5 steps for name/pronouns, chosen journeys, routine/sleep, prayer buffer, sound/motion. |
-| Home | CURRENT | Greeting, energy check-in, XP/level, generated mission, prayer manual entry, driving manual entry, context tags. |
-| Journey selection | CURRENT | 8 journey definitions, mostly mapped to same 6 challenge templates; not 8 distinct clinical programs. |
-| Challenges | CURRENT | 6 interactive types detailed in §8; some simplified implementations/limitations. |
-| Connected mission player | CURRENT | Intro, automatic challenge progression, feedback, skip/end/pause/exit, final summary. Edge cases need QA. |
+| Home | CURRENT | Greeting, energy check-in, mission timeline with reasons, progress, quick actions, «ترتيب يومك» (manual prayer time, confirmed context, schedule). The driving card moved to settings; if the user set driving, the mission is replaced by a safety notice. |
+| Journey selection | CURRENT | 8 journey definitions with a detail map of shared challenges; not 8 distinct clinical programs. |
+| Challenges | CURRENT | 12 playable types: the 6 in §8 plus `attention_scene`, `priority_board`, `breakdown`, `study_sprint`, `emotion_map` and `calm_landscape` from §9. Library has categories, real status and original art. |
+| Connected mission player | CURRENT | Focused full-screen player: intro, automatic progression, round indicator, feedback, skip/end/pause/exit, result, final summary. Mid-game state isn't restored: a resumed challenge restarts, and says so. |
 | Companion chat | CURRENT (basic) | OpenAI through a small server when a key is set and the user consents, with explicit confirmation of context. Keyword rules otherwise, labelled on screen. No tools, server-side memory or accounts yet. See `docs/AI.md`. |
 | AI conversation and reasoning | TARGET | Real AI model + tools + safety controls + structured extraction, memory consent, and evaluation. |
 | Mission personalization | CURRENT (basic) | Deterministic rule-based `genMission()`; no true AI planner or external data. |
-| Progress dashboard | CURRENT | Locally calculated completion, accuracy, 7-day chart, energy, and basic pattern statements. |
-| XP and achievements | CURRENT | Points, level = floor(XP/100)+1, achievements, lavender theme and mascot hat unlocks. |
+| Progress dashboard | CURRENT | Locally calculated completion, accuracy, week and month chart, per-challenge results (scored and unscored kept apart), self-reports, and basic pattern statements. |
+| XP and achievements | CURRENT | Points, level = floor(XP/100)+1, achievements, challenge card collection, lavender theme and mascot hat unlocks. `emotion_map` earns no XP and counts toward nothing (§14.2). |
 | External brand rewards | TARGET / EXTERNAL | No live vouchers, contracts, inventory, or redemption partners. |
 | Prayer times | CURRENT (manual) | User manually enters upcoming prayer time; configured protection interval. No automatic location/time API. |
 | Traffic, calendar, weather | TARGET / EXTERNAL | Not connected; driving hours and event context are user-entered/keyword captured. |
@@ -442,7 +442,7 @@ The concept/reference image discussed brands such as **Starbucks, Dunkin', Fitne
 
 ## 15. Technical architecture — production target
 
-**[CURRENT]** Standalone HTML + inline CSS + vanilla JavaScript; all application state stored in `localStorage` key `kw2`; no backend, authentication, LLM, network data connectors, or multi-device sync. Do not rewrite without preserving tested behavior.
+**[CURRENT]** React, TypeScript and Vite, with a small Node server for the optional OpenAI chat. All application state is stored in `localStorage` key `kw2`; no database, authentication, network data connectors, or multi-device sync. See `docs/ARCHITECTURE.md`.
 
 **[TARGET] recommended stack:**
 
@@ -584,7 +584,7 @@ Server must reject unknown challenge IDs, unavailable content, unsafe schedules,
 |---|---|---|
 | Landing | Hero, mascot, sections, preview game, CTAs | Working preview; mobile/RTL; no fake partnership |
 | Onboarding | Progressive friendly questions, mascot, stepper | Skip optional fields; save/consent; back navigation |
-| Home | Greeting, energy check-in, mission preview, prayer/driving/context, XP | Loading/empty plan, resume mission, explain recommendation |
+| Home | Greeting, energy check-in, mission timeline, progress, quick actions, day context | Loading/empty plan, resume mission, explain recommendation; driving controls live in settings |
 | Journeys | Illustrated worlds and level maps | Multiple selections; accurate level lock; no diagnosis labels |
 | Challenges | Browse/filter challenge catalog | Preview mechanics, difficulty, accessibility, solo mode |
 | Companion | Chat history, mascot, context confirmation cards | Streaming, errors, consent controls, safe response, input disabled while driving |

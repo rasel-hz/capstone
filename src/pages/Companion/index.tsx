@@ -1,10 +1,15 @@
+import { Bot, CarFront, Check, Pencil, Send, ShieldAlert, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { Mascot } from '../../components/mascot/Mascot';
 import type { MascotState } from '../../components/mascot/manifest';
 import { useMascot } from '../../components/mascot/useMascot';
 import { useAppState, useStore } from '../../context/AppStateContext';
 import { aiCompanion, isAiAvailable, ruleCompanion } from '../../services/companion';
+import type { ContextTag } from '../../types';
 import { today } from '../../utils';
+
+const TAGS: Record<ContextTag, string> = { event: 'عندك عزيمة أو مناسبة', work: 'عندك دوام أو دراسة', sleep: 'نومك كان متأخر' };
+const SUGGEST = ['نمت متأخر اليوم', 'مالي خلق اليوم', 'عندي عزيمة بالليل', 'كيف نتائجي؟'];
 
 export function Companion() {
   const s = useAppState();
@@ -14,6 +19,7 @@ export function Companion() {
   const [waiting, setWaiting] = useState(false);
   const [aiReady, setAiReady] = useState(false);
   const [fellBack, setFellBack] = useState(false);
+  const [editing, setEditing] = useState(false);
   const [supportive, setSupportive] = useState<MascotState | null>(null);
   const list = useRef<HTMLDivElement>(null);
   const driving = !!s.driving;
@@ -30,12 +36,13 @@ export function Companion() {
 
   useEffect(() => {
     if (list.current) list.current.scrollTop = list.current.scrollHeight;
-  }, [s.chat.length, waiting]);
+  }, [s.chat.length, waiting, editing]);
 
-  async function send() {
-    const v = text.trim();
+  async function send(raw: string) {
+    const v = raw.trim();
     if (!v || waiting || driving) return;
     setText('');
+    setEditing(false);
     mascot.clear();
     // The history sent to the AI shouldn't repeat this message, so it is read before saving it.
     const before = store.getState();
@@ -63,6 +70,7 @@ export function Companion() {
   }
 
   function answerCard(m: 0 | 1 | 2) {
+    setEditing(false);
     store.update((d) => {
       const p = d.pend;
       d.chat = d.chat.filter((x) => !x.card);
@@ -79,45 +87,80 @@ export function Companion() {
     });
   }
 
+  // Lets the user drop anything the companion misunderstood before it is saved.
+  function dropFact(k: ContextTag | 'low') {
+    store.update((d) => {
+      if (!d.pend) return;
+      if (k === 'low') d.pend.low = 0;
+      else d.pend.ctx = d.pend.ctx.filter((c) => c !== k);
+    });
+  }
+
+  const pend = s.pend;
+  const empty = !!pend && !pend.ctx.length && !pend.low;
+  const showSuggest = !waiting && !driving && !pend && s.chat.filter((m) => !m.b).length < 2;
+
   return (
-    <>
-      <div className="chat-head">
+    <div className="chatp">
+      <header className="chat-head">
         <Mascot state={mascot.state} size={72} label="خويّك" />
-        <h1>خويّك</h1>
-      </div>
-      <p className="note">
-        {useAi ? 'الردود من نموذج ذكاء اصطناعي (OpenAI)، وممكن يغلط. ' : 'ردود المحادثة هنا تعتمد على قواعد داخل التطبيق، مو نموذج لغوي. '}
-        أنا مو معالج ولا أشخّص، وما أحل محل أهلك وأصحابك أو المختصين.
-      </p>
+        <div className="grow">
+          <h1>خويّك</h1>
+          <span className={`status ${useAi ? 'status--ai' : ''}`}><Bot size={14} aria-hidden="true" /> {useAi ? 'ردود من نموذج ذكاء اصطناعي (OpenAI)، وممكن يغلط' : 'ردود من قواعد داخل التطبيق، مو نموذج لغوي'}</span>
+        </div>
+      </header>
+      <p className="note chat-disc">أنا مو معالج ولا أشخّص، وما أحل محل أهلك وأصحابك أو المختصين.</p>
+
       {aiReady && s.aiConsent == null && (
-        <div className="card consent">
+        <div className="panel consent">
           <h3>تبي تفعّل الردود الذكية؟</h3>
           <p>لو وافقت، رسالتك وآخر رسايل المحادثة وملخص نتائجك في التحديات تنرسل لشركة OpenAI عشان يطلع الرد. ما نرسل اسمك ولا الرحلات اللي اخترتها.</p>
           <p className="note">حسب سياسة OpenAI، بيانات الـ API ما تُستخدم للتدريب، وممكن تُحفظ عندهم لمدة تصل إلى ٣٠ يوم لمراقبة إساءة الاستخدام. ولا تكتب معلومات حساسة ما تبي تشاركها. تقدر توقفها بأي وقت من ملفي.</p>
-          <button type="button" className="btn sm" onClick={() => store.update((d) => { d.aiConsent = 1; })}>أوافق</button>{' '}
-          <button type="button" className="btn sm alt" onClick={() => store.update((d) => { d.aiConsent = 0; })}>لا، خلها بالقواعد</button>
+          <div className="row">
+            <button type="button" className="btn sm" onClick={() => store.update((d) => { d.aiConsent = 1; })}>أوافق</button>
+            <button type="button" className="btn sm alt" onClick={() => store.update((d) => { d.aiConsent = 0; })}>لا، خلها بالقواعد</button>
+          </div>
         </div>
       )}
-      <div className="card">
-        <div className="chat" ref={list} role="log" aria-live="polite">
+
+      <div className="chat-box">
+        <div className="chat" ref={list} role="log" aria-live="polite" tabIndex={0} aria-label="المحادثة">
+          {!s.chat.length && <p className="note center">قل لي عن يومك: نومك، دوامك، أو أي شي يشغل بالك.</p>}
           {s.chat.map((m, i) => (m.card ? (
-            <div key={i} className="m b">
-              {m.t}<br />
-              <button type="button" className="btn sm" onClick={() => answerCard(1)}>سجّل وخفّف الخطة</button>{' '}
-              <button type="button" className="btn sm alt" onClick={() => answerCard(2)}>سجّل بس</button>{' '}
-              <button type="button" className="btn sm alt" onClick={() => answerCard(0)}>لا</button>
+            <div key={i} className="ccard">
+              <b>{m.t}</b>
+              <p className="note flush">هذا اللي فهمته من كلامك. ما أسجل شي إلا بموافقتك.</p>
+              {pend && (
+                <ul className="ccard__facts">
+                  {pend.low ? <li><span>طاقتك قليلة اليوم</span>{editing && <button type="button" aria-label="شيل: طاقتك قليلة اليوم" onClick={() => dropFact('low')}><X size={15} /></button>}</li> : null}
+                  {pend.ctx.map((c) => <li key={c}><span>{TAGS[c]}</span>{editing && <button type="button" aria-label={`شيل: ${TAGS[c]}`} onClick={() => dropFact(c)}><X size={15} /></button>}</li>)}
+                  {empty && <li className="note">شلت كل شي، فما فيه شي أسجله.</li>}
+                </ul>
+              )}
+              <div className="row">
+                <button type="button" className="btn sm" disabled={empty} onClick={() => answerCard(1)}><Check size={15} aria-hidden="true" /> سجّل وخفّف الخطة</button>
+                <button type="button" className="btn sm alt" disabled={empty} onClick={() => answerCard(2)}>سجّل بس</button>
+                <button type="button" className="btn sm alt" aria-pressed={editing} onClick={() => setEditing(!editing)}><Pencil size={14} aria-hidden="true" /> عدّل</button>
+                <button type="button" className="btn sm alt" onClick={() => answerCard(0)}>لا</button>
+              </div>
             </div>
           ) : (
             <div key={i} className={`m ${m.b ? 'b' : 'u'}`}>{m.t}</div>
           )))}
-          {waiting && <div className="m b m--typing" aria-label="خويّك يكتب"><i /><i /><i /></div>}
+          {waiting && <div className="m b m--typing" role="status" aria-label="خويّك يكتب"><i /><i /><i /></div>}
         </div>
-        {fellBack && <p className="note" role="status">ما قدرت أوصل للرد الذكي الحين، فرديت عليك بالقواعد البسيطة، ويمكن ما فهمت كلامك زين. إذا تمر بوقت صعب أو في خطر عليك، كلّم شخص تثق فيه أو اتصل بالإسعاف 997.</p>}
-        {driving && <p className="note">🚗 وقفنا الكتابة وأنت تسوق. أول ما توصل بالسلامة ألغِ خيار القيادة من الرئيسية.</p>}
-        <div className="row">
+
+        {fellBack && <p className="alert" role="status"><ShieldAlert size={17} aria-hidden="true" /> <span>ما قدرت أوصل للرد الذكي الحين، فرديت عليك بالقواعد البسيطة، ويمكن ما فهمت كلامك زين. إذا تمر بوقت صعب أو في خطر عليك، كلّم شخص تثق فيه أو اتصل بالإسعاف 997.</span></p>}
+        {driving && <p className="alert" role="status"><CarFront size={17} aria-hidden="true" /> <span>وقفنا الكتابة لأنك حددت إنك تسوق. أول ما توصل بالسلامة غيّرها من ملفي.</span></p>}
+
+        {showSuggest && (
+          <div className="tags chat-sug" role="group" aria-label="اقتراحات">
+            {SUGGEST.map((x) => <button key={x} type="button" className="tag tag--btn" onClick={() => void send(x)}>{x}</button>)}
+          </div>
+        )}
+        <form className="chat-in" onSubmit={(e) => { e.preventDefault(); void send(text); }}>
           <input
             aria-label="رسالتك لخويّك"
-            className="grow"
             placeholder="اكتب لخويّك..."
             maxLength={1000}
             value={text}
@@ -125,11 +168,10 @@ export function Companion() {
             onChange={(e) => { setText(e.target.value); if (supportive) setSupportive(null); }}
             onFocus={() => setFocused(true)}
             onBlur={() => setFocused(false)}
-            onKeyDown={(e) => { if (e.key === 'Enter') void send(); }}
           />
-          <button type="button" className="btn" disabled={driving || waiting} onClick={() => void send()}>أرسل</button>
-        </div>
+          <button type="submit" className="btn" disabled={driving || waiting || !text.trim()} aria-label="أرسل"><Send size={17} aria-hidden="true" /><span>أرسل</span></button>
+        </form>
       </div>
-    </>
+    </div>
   );
 }

@@ -22,7 +22,7 @@ Then open http://localhost:8765.
 | `npm run build` | Type check and production build in `dist/` |
 | `npm run preview` | Serve the production build with Vite |
 | `npm start` | Serve the production build and API with Node, after `npm run build` |
-| `npm test` | Unit tests for missions, XP, saved data and crisis detection |
+| `npm test` | Unit tests for missions, XP, saved data, crisis detection, the chat server and the redesign rules |
 | `npm run typecheck` | Type check only |
 
 ## Where things are
@@ -31,8 +31,9 @@ Then open http://localhost:8765.
 |---|---|
 | `src/pages/` | One folder per screen |
 | `src/features/mission/` | Mission rules (`engine.ts`), planner and player |
-| `src/features/challenges/` | Catalog and the six games |
+| `src/features/challenges/` | Catalog, art and the 12 games |
 | `src/features/companion/` | Chat rules and crisis detection |
+| `src/components/ui/` | Shared UI kit |
 | `src/components/mascot/` | Mascot component, controller and asset manifest |
 | `src/services/` | Storage and chat services |
 | `server/` | Holds the OpenAI key, safety gates and output validation |

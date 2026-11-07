@@ -10,7 +10,7 @@ import type { ViewId } from '../../types';
 import { Mascot } from '../mascot/Mascot';
 import { NavBar } from '../navigation/NavBar';
 
-const PAGES: Record<ViewId, () => React.JSX.Element> = {
+const PAGES: Record<ViewId, (p: { onNavigate(v: ViewId): void }) => React.JSX.Element> = {
   home: Home, journeys: Journeys, chal: Challenges, chat: Companion, prog: Progress, rew: Rewards, set: Settings,
 };
 
@@ -22,11 +22,11 @@ export function AppShell({ onNavigate }: { onNavigate(v: ViewId): void }) {
       <NavBar view={view} onNavigate={onNavigate} />
       {/* The new page appears straight away and fades in, so a tap is never held up by an exit animation. */}
       <main key={view} className="page">
-        <Page />
+        <Page onNavigate={onNavigate} />
       </main>
       {view !== 'chat' && (
         <button type="button" className="fab" aria-label="افتح خويّك" onClick={() => onNavigate('chat')}>
-          <Mascot state="idle" size={56} still />
+          <Mascot state="idle" size={50} still />
         </button>
       )}
     </div>

@@ -145,12 +145,18 @@ export interface MissionSummary {
   lines: string;
   suggestion: string;
   hasRetry: boolean;
+  /** Self-report only: sharing feelings ends quietly, with no celebration. */
+  quiet: boolean;
 }
 
 export function finishMission(s: AppState): MissionSummary {
   const M = s.mission!;
   markDone(s, M);
   const its = M.items;
+  if (its.every((i) => CHALLENGES[i.id].selfReport)) {
+    const done = its.filter((i) => i.status === 'COMPLETED').length;
+    return { all: done === its.length, doneCount: done, total: its.length, xp: 0, lines: done ? 'سجلت اللي تحس فيه بكلامك أنت' : 'ما سجلنا شي', suggestion: 'إذا تبي، سولف معي، أو خذ لك بريك. وإذا الوضع ثقيل عليك، كلّم شخص تثق فيه أو مختص.', hasRetry: false, quiet: true };
+  }
   const dn = its.filter((i) => i.status === 'COMPLETED');
   const all = dn.length === its.length;
   const re = dn.filter((i) => i.retries > 0);
@@ -162,5 +168,5 @@ export function finishMission(s: AppState): MissionSummary {
   const suggestion = isLowEnergy(s) || re.length || !all ? 'بكرة نبدأ بتحديات قصيرة ونشوف كيف تحس.' : 'بكرة نقدر نجرب نسخة أصعب شوي، لو تبي.';
   const head = all ? (M.solo ? 'خلصنا التحدي!' : 'خلصنا مهمة اليوم!') : 'انتهت المهمة.';
   s.chat.push({ b: 1, t: `${head} ${lines}. ${suggestion} ودك تسولف معي شوي عن يومك؟` });
-  return { all, doneCount: dn.length, total: its.length, xp: its.reduce((n, i) => n + (i.xp || 0), 0), lines, suggestion, hasRetry: re.length > 0 };
+  return { all, doneCount: dn.length, total: its.length, xp: its.reduce((n, i) => n + (i.xp || 0), 0), lines, suggestion, hasRetry: re.length > 0, quiet: false };
 }

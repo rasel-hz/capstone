@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { Mascot } from '../../components/mascot/Mascot';
 import { Overlay } from '../../components/ui/Overlay';
 import { useStore } from '../../context/AppStateContext';
@@ -27,6 +27,14 @@ export function MissionProvider({ children, onNavigate }: { children: ReactNode;
   const store = useStore();
   const [player, setPlayer] = useState<{ start: PlayerStart; key: number } | null>(null);
   const [blocker, setBlocker] = useState<Blocker>(null);
+
+  // While the player or a dialog is open, the app behind it can't be reached by keyboard or screen reader.
+  const covered = !!player || !!blocker;
+  useEffect(() => {
+    const app = document.getElementById('app');
+    if (app) app.inert = covered;
+    return () => { if (app) app.inert = false; };
+  }, [covered]);
 
   const open = useCallback((st: PlayerStart) => setPlayer((p) => ({ start: st, key: (p?.key ?? 0) + 1 })), []);
 
@@ -83,15 +91,15 @@ export function MissionProvider({ children, onNavigate }: { children: ReactNode;
       {blocker === 'driving' && (
         <Overlay label="القيادة">
           <Mascot state="concerned" size={90} />
-          <h2>🚗 ما نلعب وأنت تسوق</h2>
-          <p>أول ما توصل بالسلامة ألغِ خيار القيادة من الرئيسية ونكمل.</p>
+          <h2>ما نلعب وأنت تسوق</h2>
+          <p>حددت في ملفك إنك تسوق الحين. أول ما توصل بالسلامة غيّرها من ملفي ونكمل.</p>
           <button type="button" className="btn" onClick={() => setBlocker(null)}>تمام</button>
         </Overlay>
       )}
       {blocker === 'prayer' && (
         <Overlay label="وقت الصلاة">
           <Mascot state="calm" size={90} />
-          <h2>🕌 وقت صلاة</h2>
+          <h2>وقت صلاة</h2>
           <p>حسب إعداداتك نأجل التحديات الحين. تقبل الله طاعتك.</p>
           <button type="button" className="btn" onClick={() => setBlocker(null)}>تمام</button>
         </Overlay>
@@ -99,9 +107,11 @@ export function MissionProvider({ children, onNavigate }: { children: ReactNode;
       {blocker && typeof blocker === 'object' && (
         <Overlay label="مهمة غير مكتملة">
           <h2>عندك مهمة غير مكتملة</h2>
-          <p>تبي تكملها أول؟</p>
-          <button type="button" className="btn" onClick={() => { setBlocker(null); resume('continue'); }}>كمّلها</button>{' '}
-          <button type="button" className="btn alt" onClick={() => { const { conflict } = blocker; setBlocker(null); begin(conflict); }}>ابدأ الجديدة</button>
+          <p>لو بديت الجديدة، المفتوحة تنلغي. محاولاتك المحفوظة تبقى. تبي تكملها أول؟</p>
+          <div className="row row--c">
+            <button type="button" className="btn" onClick={() => { setBlocker(null); resume('continue'); }}>كمّلها</button>
+            <button type="button" className="btn alt" onClick={() => { const { conflict } = blocker; setBlocker(null); begin(conflict); }}>ابدأ الجديدة</button>
+          </div>
         </Overlay>
       )}
     </Ctx.Provider>

@@ -1,6 +1,49 @@
 # Changelog
 
-## Unreleased
+## Unreleased: product redesign
+
+### Changed
+- **Design system:** type scale, spacing, shared UI kit (`components/ui/kit.tsx`), Lucide icons and original flat SVG art. No emoji anywhere in the interface; a test enforces this.
+- **Dashboard:** compact welcome and energy check-in, mission timeline as the main focus, progress, quick actions and «ترتيب يومك».
+- **Driving:** the card left the dashboard. The manual setting and hours moved to ملفي. All driving safety behaviour is unchanged: challenges are blocked and chat typing is disabled while it is on.
+- **Challenge library:** featured challenge, animated category filters, 12 illustrated cards with real status. Challenges never played say «ما جربته للحين».
+- **Shared player:** focused screen with one header (progress, round, pause, skip, end, exit, sound), intro, result and completion screens. The app behind it can't be reached by keyboard.
+- **Journeys:** illustrated cards, real progress and a detail map showing what's done and what's next.
+- **Chat:** status label, suggested messages, and confirmation cards where facts can be removed before saving.
+- **Progress:** summary tiles, week and month chart with table view, separate scored and unscored results, self-reports labelled as such, and explained observations.
+- **Rewards:** medals, unlocks and a challenge card collection.
+- **ملفي:** grouped settings, a list of what's stored, data export, deleting typed text, removing saved context, and larger text.
+- **Landing and onboarding:** redrawn hero, stepper, illustrated journey picker and skippable optional steps.
+- **Mission reasons:** each step now gives its own reason, from what the user actually said.
+
+### Six existing games
+Challenge IDs, base XP and the half-XP rule are unchanged.
+- `video`: redrawn animated scene, captions, restart, replay, hints. Clip data is separate from its player. The clip is still 24 seconds, and says so.
+- `mem`: **gameplay fix.** Options now include objects that weren't on the tray; before, the answer was simply the one you could no longer see. Normal mode grows from 4 to 6 objects over 3 rounds, and easy stays at 1 round of 4.
+- `seq`: mouse and touch drag, tap, and arrow buttons. Work, study and event examples, with the reason given when a step moves. The middle steps can still go in any order, and scoring is unchanged.
+- `time`: running time stays hidden so the estimate means something. Bars compare estimate and actual, with an optional reflection.
+- `calm`: pace choice, optional soft tone, a quiet break instead of breathing, and an option to skip the self-report.
+- `start2`: examples, a ring timer, a privacy note and a clearer reflection.
+
+### Scoring notes
+- Using a hint means that question no longer counts as right first try. Hints are new, so no earlier result changes.
+- The `mem` round count changed in normal mode, so its accuracy now moves in thirds instead of halves.
+
+### Added
+- Six new playable challenges from reference §9:
+  - `attention_scene`: spot the differences, 25 XP, scored.
+  - `priority_board`: sort into now, later and not today, 20 XP.
+  - `breakdown`: split a task into steps with a plan, 25 XP.
+  - `study_sprint`: focus timer with parked distractions, 30 XP, needs 60 active seconds.
+  - `calm_landscape`: interactive oasis break, 10 XP, needs 20 seconds.
+  - `emotion_map`: self-reported feelings. **0 XP, no achievements, no celebration, and never sent to the AI service** (reference 14.2).
+
+### Fixed
+- A manually entered prayer time no longer carries over to the next day.
+- Keyboard users could reach the page behind the player.
+- The landing demo no longer praises a 0% score.
+
+## OpenAI chat (not yet versioned)
 
 ### Added
 - OpenAI chat through a small server that holds the key, with consent, data minimisation, three crisis layers, validated model output and a labelled fallback to the rules. See `docs/AI.md`.

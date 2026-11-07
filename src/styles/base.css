@@ -1,36 +1,41 @@
 * { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
 body {
   margin: 0;
   font-family: 'IBM Plex Sans Arabic', system-ui, sans-serif;
-  font-size: 14px;
+  font-size: var(--fs-body);
+  line-height: 1.7;
   background: var(--iv);
   color: var(--ink);
   min-height: 100vh;
   padding-bottom: env(safe-area-inset-bottom, 0);
 }
-img { max-width: 100%; }
-h1 { margin: 0 0 4px; font-size: 28px; }
-h2 { font-size: 20px; margin: 22px 0 10px; }
-h3 { margin: 0; font-size: 16px; }
-p { line-height: 1.85; margin: 6px 0; }
-:focus-visible { outline: 3px solid var(--lav); outline-offset: 2px; }
+img, svg { max-width: 100%; }
+h1, h2, h3 { line-height: 1.35; margin: 0; font-weight: 700; }
+h1 { font-size: var(--fs-page); }
+h2 { font-size: var(--fs-sec); }
+h3 { font-size: var(--fs-card); font-weight: 500; }
+p { margin: 6px 0; }
+ul, ol { margin: 0; padding: 0; list-style: none; }
+b { font-weight: 700; }
+:focus-visible { outline: 3px solid var(--lav-d); outline-offset: 2px; }
+button { font-family: inherit; }
 
-#app {
-  display: flex;
-  min-height: 100vh;
-  background: radial-gradient(circle at 90% 0, var(--lil), transparent 38%), radial-gradient(circle at 0 100%, #ffe6d6, transparent 36%);
-}
-main { flex: 1; padding: 22px; max-width: 1000px; margin: 0 auto; width: 100%; min-width: 0; }
+#app { display: flex; min-height: 100vh; background: var(--iv); }
+main { flex: 1; padding: 26px 28px 96px; max-width: 1180px; margin: 0 auto; width: 100%; min-width: 0; }
 
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
 .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.row--c { justify-content: center; }
 .grow { flex: 1; min-width: 0; }
 .center { text-align: center; }
 .flush { margin: 0; }
-.note { font-size: 12.5px; color: var(--mut); }
-.emoji { font-size: 30px; }
+.note { font-size: var(--fs-meta); color: var(--mut); line-height: 1.65; }
+.note svg { vertical-align: -2px; }
+.eyebrow { font-size: var(--fs-meta); color: var(--em-d); font-weight: 500; margin: 0 0 2px; }
+.sr-only, .sr-status:empty { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.art { display: block; width: 100%; height: 100%; }
 
-@media (max-width: 760px) {
+@media (max-width: 860px) {
   #app { flex-direction: column-reverse; }
-  main { padding: 16px 14px 100px; }
+  main { padding: 16px 16px 104px; }
 }

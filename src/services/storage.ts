@@ -1,4 +1,5 @@
 import type { AppState } from '../types';
+import { today } from '../utils';
 
 // Storage sits behind this interface so a real backend can replace it later.
 export interface StateRepository {
@@ -13,7 +14,7 @@ const THREE_DAYS = 3 * 864e5;
 export const defaultState = (): AppState => ({
   started: 0, done: 0, name: '', g: 'm', needs: [], sched: 'work', pat: '', sleep: '', pp: 30, prayer: '',
   snd: 1, rm: 0, notif: 0, ctx: [], pend: null, hist: [], en: [], xp: 0, view: 'home', chat: [], mission: null,
-  pref: null, drive: 0, driving: 0, last: Date.now(), theme: '', comeback: 0, lastDaily: null, aiConsent: null,
+  pref: null, drive: 0, driving: 0, last: Date.now(), theme: '', comeback: 0, lastDaily: null, aiConsent: null, prayerDay: '', largeText: 0,
 });
 
 export const localRepository: StateRepository = {
@@ -44,5 +45,7 @@ export function hydrate(saved: Partial<AppState> | null, now = Date.now()): AppS
   const s: AppState = Object.assign(defaultState(), saved || {});
   if (s.hist.length && now - s.last > THREE_DAYS) s.comeback = 1;
   s.last = now;
+  // A prayer time is entered for one day only (reference 19.3).
+  if (s.prayer && s.prayerDay !== today()) s.prayer = '';
   return s;
 }

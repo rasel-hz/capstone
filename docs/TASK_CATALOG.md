@@ -3,7 +3,7 @@
 > **Version:** 0.1 draft, 2026-11-06
 > **Audience:** frontend (build the tasks), AI agent (choose between them), content and clinical reviewers
 > **Companion to:** [KHOWAYK_REFERENCE.md](../KHOWAYK_REFERENCE.md). `§9` means section 9 of that file; "section 4" means this file.
-> **Status:** `[PROPOSED]`. Nothing here is built yet, and all Arabic copy is a draft that needs review.
+> **Status:** `[PROPOSED]`, except these, which are built: `priority_board` and `breakdown` from the first batch, and `study_sprint` and `emotion_map` from the second. `attention_scene` and `calm_landscape` were also built, from reference §9. The first-batch order below was the original recommendation; the project owner chose this set instead. All Arabic copy is a draft that needs review.
 
 ## 1. The short version
 

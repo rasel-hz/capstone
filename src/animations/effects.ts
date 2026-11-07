@@ -1,6 +1,6 @@
 import type { SoundKey } from '../features/challenges/types';
 
-const prefersReduced = () => typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
+export const prefersReduced = () => typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 export function fireConfetti(reducedSetting: boolean) {
   if (reducedSetting || prefersReduced()) return;
@@ -36,5 +36,34 @@ export function playSound(enabled: boolean, k: SoundKey) {
     });
   } catch {
     // Sound is optional and never needed to understand a result.
+  }
+}
+
+// A soft filtered-noise bed for the calm break. Off by default, and always stopped by the caller.
+export function startAmbient(): () => void {
+  try {
+    audio = audio || new AudioContext();
+    const ctx = audio;
+    const len = ctx.sampleRate * 2;
+    const buf = ctx.createBuffer(1, len, ctx.sampleRate);
+    const ch = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) ch[i] = Math.random() * 2 - 1;
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    src.loop = true;
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.value = 500;
+    const gain = ctx.createGain();
+    gain.gain.value = 0.025;
+    src.connect(filter);
+    filter.connect(gain);
+    gain.connect(ctx.destination);
+    src.start();
+    return () => {
+      try { src.stop(); } catch { /* already stopped */ }
+    };
+  } catch {
+    return () => {};
   }
 }

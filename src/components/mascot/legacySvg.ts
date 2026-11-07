@@ -13,7 +13,7 @@ const EYES: Record<MascotState, string> = {
   thinking: eye(48, 52) + eye(78, 52),
   happy: up,
   encouraging: up,
-  celebrating: up + '<text x="90" y="30" font-size="16">✨</text><text x="14" y="34" font-size="14">✨</text>',
+  celebrating: up + '<circle cx="96" cy="26" r="3" fill="#FFD36E"/><circle cx="20" cy="30" r="2.5" fill="#FFD36E"/>',
   curious: eye(45, 57) + eye(75, 57) + brows('36 40q9-8 18-2', '66 44h18'),
   calm: down,
   resting: down + '<text x="88" y="28" font-size="14" fill="#8BCDF1">z</text>',

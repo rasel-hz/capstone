@@ -1,6 +1,6 @@
 # خويّك | Khowayk — Handoff for the next developer or AI agent
 
-Written 2026-11-07, at commit `b3ce984` on `faris-branch`.
+Written 2026-11-07, at commit `b3ce984` on `faris-branch`, and updated after the product redesign. See `CHANGELOG.md` for that work.
 
 ## Prompt to give the AI agent
 
@@ -16,10 +16,10 @@ Paste this at the start of the agent's session:
 
 | Item | State |
 |---|---|
-| Working app | React, TypeScript and Vite, with all screens and six playable games |
+| Working app | React, TypeScript and Vite, with all screens and 12 playable challenges |
 | Chat | Connected to OpenAI and checked with a real key, with keyword rules as the fallback |
 | Mascot | Component and 11 states are built, but only 1 real animation exists |
-| Tests | 56 unit tests pass; type check and build pass |
+| Tests | 72 unit tests pass; type check and build pass |
 | Data | Stored in the browser only (`localStorage` key `kw2`); no backend or accounts |
 | Public deployment | **Not safe yet**, because anyone who can reach the server can spend the API key |
 
@@ -123,7 +123,7 @@ The app works without an API key, using keyword rules and saying so on screen. T
 ### 2. React refactor (`04a37fc`)
 - Moved the single-file prototype to a modular app. `prototype/index.html` is kept as a backup.
 - **Screens:** landing, onboarding and 7 tabs (home, journeys, challenges, companion, progress, rewards, settings).
-- **Games:** `video`, `mem`, `seq`, `time`, `calm`, `start2`.
+- **Games at that point:** `video`, `mem`, `seq`, `time`, `calm`, `start2`. The redesign added six more.
 - **Mission engine:** moves through `intro → preroll → game → result → (easier offer) → next item → finish`, with pause, skip and resume.
 - **Data:** the prototype's `kw2` format still loads.
 
@@ -193,7 +193,9 @@ See `docs/AI.md` for what's sent to OpenAI and the full results of the real-mode
 | `src/features/mission/engine.ts` | Mission status and XP rules |
 | `src/features/mission/planner.ts` | Rule-based daily mission |
 | `src/features/challenges/catalog.ts` | Challenges and journeys |
-| `src/features/challenges/games/` | The six games |
+| `src/features/challenges/games/` | The 12 games |
+| `src/features/challenges/ChallengeArt.tsx` | Challenge, journey and oasis art |
+| `src/components/ui/kit.tsx` | Shared UI kit |
 | `src/components/mascot/manifest.ts` | Mascot clips, images and timings |
 | `tests/` | Mission, crisis, rules and chat tests |
 | `docs/ARCHITECTURE.md`, `docs/AI.md`, `docs/MASCOT.md`, `docs/TASK_CATALOG.md` | Detailed guides |
@@ -201,17 +203,16 @@ See `docs/AI.md` for what's sent to OpenAI and the full results of the real-mode
 ## What has and hasn't been tested
 
 **Tested**
-- Played through in the browser on the dev server: landing, onboarding, all tabs, all six games and a full daily mission.
+- Played through in the browser: landing, onboarding, all tabs, all 12 challenges and a partial daily mission, including exit and refresh mid-mission.
 - With the real OpenAI model, about 40 messages: everyday chat, feminine address, the §11.5 example, diagnosis requests, prompt injection, invented data, reassurance loops, off-topic requests and indirect distress. Results are in `docs/AI.md`.
 - In the app with the real model: consent, context confirmation and the crisis reply.
 - Server protections: cross-origin requests, bad JSON, oversized requests and path traversal.
 
 **Not tested**
 - Safari, real phones and screen readers
-- The full chat flow on the production build (`npm start`)
 - The retry against a real dropped connection (unit test only)
-- Some game paths: finishing all three breathing cycles, the video's replay button, mouse dragging in `seq`, and the `start2` timer running out
-- The system's own reduced-motion setting, level-up confetti and the backup mascot image
+- Some game paths: the `start2` and `study_sprint` timers running all the way out, and the sound options by ear
+- A mission with all three steps completed in one run after the redesign, the system's own reduced-motion setting, and the backup mascot image
 
 The real-model check was a spot check, not an evaluation. There are no automated browser tests.
 
@@ -225,11 +226,10 @@ The real-model check was a spot check, not an evaluation. There are no automated
 | Rule replies use masculine grammar | `src/features/companion/rules.ts` | Includes the "تبي أخفف مهمة اليوم؟" card. The AI path already handles gender |
 | Indirect distress can't be detected when AI is unreachable | `src/pages/Companion/index.tsx` | The notice points to help, but the reply is generic |
 | About 2 of 40 real calls failed | `server/chat.ts` | One took over 20 seconds, and one failed quickly after about a minute idle. The cause isn't confirmed. The server now logs the failure type |
-| Daily mission barely uses chosen journeys | `src/features/mission/planner.ts` | It's almost always `video`, then `mem` or `seq`, then `calm`, `start2` or `time` |
-| Prayer time doesn't reset daily | Saved state | |
+| Daily mission barely uses chosen journeys | `src/features/mission/planner.ts` | It's almost always `video`, then `mem` or `seq`, then `calm`, `start2` or `time`. The six new challenges never enter it automatically |
+| Resumed challenges restart | `MissionPlayer.tsx` | Allowed by reference Flow B, and explained on screen. No game checkpoints yet |
+| Bundle is 544 KB (173 KB gzipped) | Build | Over Vite's 500 KB warning. Works, but code splitting would help phones |
 | Browser back button doesn't move between tabs | `state.view` | React Router wasn't added on purpose |
-| §15 of the reference still calls the current app standalone HTML | `KHOWAYK_REFERENCE.md` | Needs updating |
-| Duplicate-key warnings appeared in the dev console log | Not located | May predate an earlier fix. Check for them again |
 
 ## What to do next
 
@@ -267,7 +267,7 @@ Specs are in section 5 of `docs/TASK_CATALOG.md`. Build in this order, because l
 7. `routine_builder`
 8. `social_dialogue`
 
-Then update journey mappings as in section 4.1 of the catalog. Its Arabic copy is a draft and needs review.
+`priority_board` and `breakdown` are already built, so skip those. Then update journey mappings as in section 4.1 of the catalog. Its Arabic copy is a draft and needs review.
 
 ### 4. Finish the mascot
 
