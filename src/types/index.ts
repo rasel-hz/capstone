@@ -83,6 +83,10 @@ export interface Attempt {
   d: string;
   ts: number;
   data?: unknown;
+  /** Position in the mission, which with mid makes the attempt key the server knows. Missing on older rows. */
+  i?: number;
+  /** Saved to Supabase. */
+  sy?: 1;
 }
 
 export interface EnergyCheckin {

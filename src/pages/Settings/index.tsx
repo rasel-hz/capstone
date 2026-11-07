@@ -1,5 +1,6 @@
 import { CalendarOff, CarFront, Download, Palette, ShieldCheck, Trash2, Type, UserRound, Accessibility, MapPin, Languages } from 'lucide-react';
 import { LogoutButton } from '../../features/auth/AuthViews';
+import { clearTypedRemote } from '../../services/progressSync';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Dialog, IconBadge, PageHeader, Segmented, SettingRow, Toggle } from '../../components/ui/kit';
@@ -52,10 +53,11 @@ export function Settings({ onNavigate }: { onNavigate(v: ViewId): void }) {
     flash('settings.flashExport');
   }
 
-  function clearTyped() {
+  async function clearTyped() {
     set(clearTypedText);
     setAsk(null);
-    flash('settings.flashTyped');
+    // Typed text is also saved with the account, so it is cleared there too.
+    flash((await clearTypedRemote()) ? 'settings.flashTyped' : 'settings.flashTypedFailed');
   }
 
   function wipe() {
@@ -199,7 +201,7 @@ export function Settings({ onNavigate }: { onNavigate(v: ViewId): void }) {
           <p>{t('settings.typedText')}</p>
           <div className="row row--c">
             <button type="button" className="btn alt" onClick={() => setAsk(null)}>{t('common.back')}</button>
-            <button type="button" className="btn btn--danger" onClick={clearTyped}>{t('settings.confirmDelete')}</button>
+            <button type="button" className="btn btn--danger" onClick={() => void clearTyped()}>{t('settings.confirmDelete')}</button>
           </div>
         </Dialog>
       )}

@@ -1,6 +1,6 @@
 {
   "title": "My Profile",
-  "sub": "All your data is saved only on this device. No account or server stores it.",
+  "sub": "Your data is saved in your account, with a copy on this device.",
   "flashExport": "Your data was downloaded.",
   "flashTyped": "Your typed text was deleted.",
   "flashName": "Name saved.",
@@ -73,5 +73,6 @@
   "typedText": "Your tasks, steps and notes in challenges will be deleted. Your points and results stay.",
   "cityNote": "Choose your city to protect every prayer automatically, or enter the time yourself.",
   "flashCity": "City saved. Prayer times are calculated each day.",
-  "flashManual": "Back to entering the time yourself."
+  "flashManual": "Back to entering the time yourself.",
+  "flashTypedFailed": "Deleted from this device, but we couldn’t delete it from your account. Please try again."
 }

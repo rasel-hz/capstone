@@ -11,7 +11,7 @@
     "putBack": "Put back {{item}}",
     "remove": "Remove {{item}}",
     "examples": "Examples",
-    "staysOnDevice": "What you type stays on your device.",
+    "staysOnDevice": "What you type is saved in your private account.",
     "preferNot": "I'd rather not answer",
     "trackingOnly": "Your answer is only for your own tracking, and any answer is fine.",
     "help": {
@@ -216,7 +216,7 @@
       "part": "Choose the first part"
     },
     "error": "Write the task and the step so we can start.",
-    "privacy": "What you type stays on your device and isn't sent anywhere. You can delete it in My Profile.",
+    "privacy": "What you type is saved in your private account and isn’t sent anywhere else. You can delete it in My Profile.",
     "begin": "Start the two minutes",
     "timeLeft": "{{time}} left",
     "paused": "Paused.",
@@ -436,10 +436,10 @@
     },
     "intro": "Take your time. You can skip anything.",
     "said": "You told me: {{feelings}}. Thanks for sharing.",
-    "note": "These are your words, and they stay on your device. If things feel heavy, talk to someone you trust or a professional.",
+    "note": "These are your words, saved only in your private account. If things feel heavy, talk to someone you trust or a professional.",
     "feelQ": "How do you feel right now?",
     "feelNote": "You can choose more than one. I don't guess. This is your answer.",
-    "privacy": "Your answers stay on your device, aren't sent to the AI service, and earn no points.",
+    "privacy": "Your answers are saved in your private account, are not sent to the AI service, and earn no points.",
     "strengthQ": "How strong is it? (optional)",
     "strength": "Strength",
     "helpQ": "What might help? (optional)",
@@ -470,7 +470,7 @@
       "break": "A short break after work"
     },
     "tasksQ": "What's on your plate?",
-    "tasksNote": "Add at least two things in your own words. They stay on your device.",
+    "tasksNote": "Add at least two things in your own words. They are saved in your private account.",
     "addLabel": "Add a task",
     "addPh": "For example, the course you're taking",
     "needTwo": "Add at least two to plan between them.",
@@ -578,7 +578,7 @@
       "conversation": "A conversation I'm putting off",
       "trip": "Plans that might change"
     },
-    "private": "This stays on your device and isn't sent to the AI.",
+    "private": "This is saved in your private account and is not sent to the AI.",
     "sortQ": "Where does each one fit?",
     "sortNote": "There's no right answer. It's about what's useful for you right now.",
     "buckets": {

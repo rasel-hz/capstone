@@ -61,10 +61,8 @@ export const safeUrl = (u: string) => {
 };
 
 // Reporting from the mission player. These never block or break play: without a session or a connection
-// nothing is awarded, and the app carries on.
-const key = (missionId: string, idx: number) => `${missionId}:${idx}`;
+// nothing is awarded, and the app carries on. How an attempt ended, and its points, are sent by progressSync.
 const starts = new Map<string, Promise<unknown>>();
-const completes = new Map<string, Promise<unknown>[]>();
 const listeners = new Set<() => void>();
 
 /** Lets an open rewards page refresh after points were awarded. */
@@ -72,6 +70,7 @@ export function onPointsChanged(fn: () => void) {
   listeners.add(fn);
   return () => void listeners.delete(fn);
 }
+export const notifyPointsChanged = () => listeners.forEach((fn) => fn());
 
 async function call(fn: string, args: Record<string, unknown>, tries = 3): Promise<unknown> {
   const sb = supabase;
@@ -79,35 +78,18 @@ async function call(fn: string, args: Record<string, unknown>, tries = 3): Promi
   for (let i = 0; i < tries; i++) {
     const { data, error } = await sb.rpc(fn, args);
     if (!error) return data;
-    // A refusal from the database, such as a challenge finished too fast, is final. Only network errors retry.
+    // A refusal from the database is final. Only network errors retry.
     if (error.code || !/fetch|network/i.test(error.message)) return null;
     await new Promise((r) => setTimeout(r, 800 * (i + 1)));
   }
   return null;
 }
 
+/** Records the start time on the server, so the finish can be checked before points are awarded. */
 export function reportStart(missionId: string, idx: number, challengeId: string, daily: boolean) {
-  const k = key(missionId, idx);
-  const p = call('start_challenge_attempt', { p_attempt_key: k, p_mission_key: missionId, p_challenge_id: challengeId, p_daily: daily }).catch(() => null);
-  starts.set(k, p);
+  const k = `${missionId}:${idx}`;
+  starts.set(k, call('start_challenge_attempt', { p_attempt_key: k, p_mission_key: missionId, p_challenge_id: challengeId, p_daily: daily }).catch(() => null));
 }
 
-export function reportComplete(missionId: string, idx: number) {
-  const k = key(missionId, idx);
-  const p = (async () => {
-    await starts.get(k);
-    const r = await call('complete_challenge_attempt', { p_attempt_key: k }).catch(() => null);
-    if (r) listeners.forEach((fn) => fn());
-  })();
-  completes.set(missionId, [...(completes.get(missionId) ?? []), p]);
-}
-
-export function reportDailyMissionDone(missionId: string) {
-  void (async () => {
-    // The bonus needs every completion recorded first.
-    await Promise.all(completes.get(missionId) ?? []);
-    const r = await call('claim_daily_mission_bonus', { p_mission_key: missionId }).catch(() => null);
-    completes.delete(missionId);
-    if (r) listeners.forEach((fn) => fn());
-  })();
-}
+/** Waits for that attempt's start to reach the server, if it was sent from this session. */
+export const startDone = (key: string) => starts.get(key) ?? Promise.resolve();

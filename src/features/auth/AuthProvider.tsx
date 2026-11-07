@@ -4,6 +4,7 @@ import * as auth from '../../services/auth';
 import type { Profile, RegisterInput } from '../../services/auth';
 import type { Gender } from '../../types';
 import { claimForUser, loadForUser, stashAndReset } from './localAccount';
+import { startProgressSync } from '../../services/progressSync';
 
 type Status = 'loading' | 'signedOut' | 'signedIn';
 
@@ -85,6 +86,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       sub.subscription.unsubscribe();
     };
   }, [store, signedOut]);
+
+  // While signed in, progress is sent to Supabase as it happens, including history saved before.
+  useEffect(() => (status === 'signedIn' ? startProgressSync(store) : undefined), [status, store]);
 
   const register = useCallback(async (v: RegisterInput) => {
     const r = await auth.register(v);

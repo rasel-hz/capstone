@@ -32,7 +32,7 @@ function clearPause(it: MissionItem) {
 
 function record(s: AppState, it: MissionItem, status: ItemStatus, data?: unknown) {
   s.hist.push({
-    mid: s.mission!.id, id: it.id, status, acc: it.acc, retries: it.retries, xp: it.xp || 0,
+    mid: s.mission!.id, i: s.mission!.idx, id: it.id, status, acc: it.acc, retries: it.retries, xp: it.xp || 0,
     dur: Math.round(((it.end || Date.now()) - (it.start || Date.now()) - (it.paused || 0)) / 1000),
     d: today(), ts: Date.now(), ...(data !== undefined ? { data } : {}),
   });

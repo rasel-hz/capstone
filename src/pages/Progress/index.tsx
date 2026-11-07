@@ -1,5 +1,5 @@
 import { Zap } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { EmptyState, PageHeader, Segmented } from '../../components/ui/kit';
 import { Mascot } from '../../components/mascot/Mascot';
@@ -9,9 +9,10 @@ import { ChallengeArt } from '../../features/challenges/ChallengeArt';
 import { CHALLENGES } from '../../features/challenges/catalog';
 import { fullDaysIn } from '../../features/buddy/buddy';
 import { progressStats } from '../../features/progress/stats';
+import { fetchProgress, onProgressChanged, type RemoteProgress } from '../../services/progressSync';
 import { useCountUp } from '../../hooks/useCountUp';
 import { formatDate, formatList, isRtl } from '../../i18n';
-import type { Attempt, ViewId } from '../../types';
+import type { AppState, Attempt, ViewId } from '../../types';
 import { level } from '../../utils';
 
 const dayLabel = (ts: number) => formatDate(ts, { day: 'numeric', month: 'short' });
@@ -78,9 +79,48 @@ function Spark({ values }: { values: number[] }) {
   return <svg className="spark" viewBox="0 0 100 30" preserveAspectRatio="none" role="img" aria-label={t('progress.sparkLabel', { values: values.join(t('common.listSep')) })}><polyline points={pts} fill="none" stroke="#28785B" strokeWidth="2" vectorEffect="non-scaling-stroke" /></svg>;
 }
 
+// Everything on this page comes from Supabase. The device's copy is used only for settings such as the
+// language and reduced motion, never for the numbers.
+function useRemoteProgress() {
+  const [data, setData] = useState<RemoteProgress | null>(null);
+  const [error, setError] = useState(false);
+  const load = useCallback(async () => {
+    setError(false);
+    try {
+      setData(await fetchProgress());
+    } catch {
+      setError(true);
+    }
+  }, []);
+  useEffect(() => {
+    void load();
+    return onProgressChanged(() => void load());
+  }, [load]);
+  return { data, error, load };
+}
+
 export function Progress({ onNavigate }: { onNavigate(v: ViewId): void }) {
   const { t } = useTranslation();
-  const s = useAppState();
+  const local = useAppState();
+  const { data, error, load } = useRemoteProgress();
+  if (error || !data) {
+    return (
+      <>
+        <PageHeader title={t('progress.title')} />
+        {error ? (
+          <div className="panel center" role="alert">
+            <p>{t('progress.remote.error')}</p>
+            <button type="button" className="btn sm" onClick={() => void load()}>{t('progress.remote.retry')}</button>
+          </div>
+        ) : <div className="panel center" role="status"><p className="note">{t('progress.remote.loading')}</p></div>}
+      </>
+    );
+  }
+  return <ProgressView onNavigate={onNavigate} s={{ ...local, ...data }} />;
+}
+
+function ProgressView({ onNavigate, s }: { onNavigate(v: ViewId): void; s: AppState }) {
+  const { t } = useTranslation();
   const st = progressStats(s);
   const [range, setRange] = useState<'week' | 'month'>('week');
   const mascot = useMascot(st.attempts.length ? 'idle' : 'curious');

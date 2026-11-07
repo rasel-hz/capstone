@@ -29,7 +29,8 @@ import {
   abandonItem, advance, beginItem, completeItem, exitMission, finishMission, isPastEnd, pauseItem, resumeItem,
   shouldOfferEasier, skipItem, summaryLines, summarySuggestion, type MissionSummary,
 } from './engine';
-import { reportComplete, reportDailyMissionDone, reportStart } from '../../services/points';
+import { reportStart } from '../../services/points';
+import { claimDailyBonusAfterSync } from '../../services/progressSync';
 import { MissionTimeline } from './MissionTimeline';
 
 type Phase = 'intro' | 'preroll' | 'game' | 'result' | 'easier' | 'finish';
@@ -95,7 +96,7 @@ export function MissionPlayer({ start, onClose, onNavigate }: { start: PlayerSta
     let sum: MissionSummary | null = null;
     store.update((d) => { sum = finishMission(d); });
     const r = sum as unknown as MissionSummary;
-    if (r.all && !r.solo && !r.quiet) reportDailyMissionDone(store.getState().mission!.id);
+    if (r.all && !r.solo && !r.quiet) void claimDailyBonusAfterSync(store.getState().mission!.id);
     setSummary(r);
     setPhase('finish');
     if (r.quiet) {
@@ -160,7 +161,6 @@ export function MissionPlayer({ start, onClose, onNavigate }: { start: PlayerSta
     store.update((d) => { out = completeItem(d, r); });
     const o = out as ReturnType<typeof completeItem>;
     if (!o) return;
-    reportComplete(store.getState().mission!.id, store.getState().mission!.idx);
     // The companion follows up only on what was actually chosen and saved.
     if (isPlanResult(r.data)) {
       const plan = r.data;

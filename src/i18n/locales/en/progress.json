@@ -1,6 +1,6 @@
 {
   "title": "My Progress",
-  "sub": "Your real numbers from attempts saved on your device. For your own tracking, not a diagnosis.",
+  "sub": "Your real numbers from the attempts saved in your account. For your own tracking, not a diagnosis.",
   "chartValue": "{{day}}: {{count}} completed",
   "chartHint": "Hover over or tap the bars to see the number",
   "chartLabel": "Completed challenges: {{summary}}",
@@ -63,5 +63,10 @@
     "note": "A full day means the buddy's energy reached 5 of 5. Days that didn't fill up don't count against you.",
     "dayFull": "{{day}}: full",
     "dayNot": "{{day}}"
+  },
+  "remote": {
+    "loading": "One moment, getting your progress...",
+    "error": "We couldn’t load your progress right now.",
+    "retry": "Try again"
   }
 }
