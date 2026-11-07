@@ -13,6 +13,7 @@ import { JOURNEYS } from '../../features/challenges/catalog';
 import { MemoryGame } from '../../features/challenges/games';
 import type { GameEnv } from '../../features/challenges/types';
 import { msg, type Msg } from '../../i18n';
+import { LoginDialog } from '../../features/auth/AuthViews';
 
 const MEET: MascotState[] = ['listening', 'thinking', 'encouraging', 'celebrating', 'calm', 'concerned'];
 const STEPS: [LucideIcon, string][] = [[MessageCircle, 'chat'], [ListChecks, 'mission'], [Gamepad2, 'play'], [BarChart3, 'results'], [Gift, 'rewards']];
@@ -58,6 +59,7 @@ export function Landing() {
   const store = useStore();
   const hero = useMascot('idle');
   const [cycle, setCycle] = useState(0);
+  const [login, setLogin] = useState(false);
   const root = useRef<HTMLDivElement>(null);
   const start = () => store.update((d) => { d.started = 1; });
 
@@ -100,6 +102,7 @@ export function Landing() {
                 <button type="button" className="btn btn--lg" onClick={start} onMouseEnter={() => hero.play('happy')} onFocus={() => hero.play('happy')}>{t('landing.cta')}</button>
                 <button type="button" className="btn btn--lg alt" onClick={() => document.getElementById('meet')?.scrollIntoView({ behavior: prefersReduced() ? 'auto' : 'smooth' })}>{t('landing.discover')}</button>
               </div>
+              <button type="button" className="btn-link lh__login" onClick={() => setLogin(true)}>{t('auth.login.link')}</button>
             </div>
             <div className="lh__m">
               <Mascot state={hero.state} size={230} interactive onClick={poke} label={t('landing.mascotLabel')} />
@@ -159,6 +162,7 @@ export function Landing() {
           <button type="button" className="btn btn--lg" onClick={start}>{t('landing.ctaShort')}</button>
         </section>
       </div>
+      {login && <LoginDialog onClose={() => setLogin(false)} />}
     </div>
   );
 }

@@ -1,0 +1,46 @@
+/* Accounts: the "let's get to know each other" tab, log-in, welcome back and logout. Built from the existing tokens. */
+.auth-form { display: flex; flex-direction: column; gap: 12px; max-width: 360px; margin: 14px auto 0; text-align: start; }
+.auth-form > .btn, .auth-form > .btn-link { align-self: center; }
+.auth-f { display: flex; flex-direction: column; gap: 5px; }
+.auth-f label { font-weight: 700; font-size: 14.5px; }
+.auth-f .note { font-size: 12.5px; margin: 0; }
+/* Passwords are typed left to right, so the field and its eye button follow that direction in Arabic too. */
+.auth-pw { position: relative; direction: ltr; }
+.auth-pw input { padding-inline-end: 46px; }
+.auth-pw__t {
+  position: absolute; inset-block: 0; inset-inline-end: 4px; margin-block: auto; width: 40px; height: 40px; border: 0; border-radius: 10px;
+  background: none; color: var(--ink); cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+}
+.auth-pw__t:hover { background: var(--cr); }
+.auth-err { min-height: 0; margin: 0; color: var(--ink); }
+.auth-err:empty { display: none; }
+.ob-card .auth-err { margin-top: 10px; }
+
+/* Success after creating the account, and the sparkles shared with the welcome-back popup. */
+.auth-ok { position: relative; padding: 26px 8px 8px; animation: pop .4s var(--ease); }
+.auth-ok h2 { margin: 0; }
+.auth-spark { position: absolute; color: var(--sun, #FFD36E); animation: fx-pop .5s var(--ease) both, fx-pulse 1.8s ease-in-out .5s infinite; }
+.auth-spark--a { top: 0; inset-inline-start: 18%; }
+.auth-spark--b { top: 22px; inset-inline-end: 16%; animation-delay: .15s, .7s; }
+.auth-spark--c { bottom: -6px; inset-inline-start: 30%; animation-delay: .3s, .9s; }
+
+.auth-dlg h2, .wb h2 { margin: 6px 0 4px; }
+.auth-dlg > p, .wb > p { margin: 4px 0; }
+.wb__m { position: relative; display: flex; justify-content: center; padding: 8px 0 4px; }
+.wb__m .auth-spark--a { top: 6px; inset-inline-start: 22%; }
+.wb__m .auth-spark--b { top: 34px; inset-inline-end: 22%; }
+.wb__m .auth-spark--c { bottom: 10px; inset-inline-start: 26%; }
+.wb .btn { margin-top: 12px; }
+
+.lh__login { display: inline-block; margin-top: 12px; }
+
+.auth-loading { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; }
+
+/* Logout sits right under the language switcher in the side bar and looks like it. */
+nav .lang-sw.logout-btn { margin-top: 6px; }
+.logout-btn:disabled { opacity: .6; cursor: default; }
+.logout-mobile { display: none; justify-content: center; margin: 4px 0 18px; }
+@media (max-width: 860px) { .logout-mobile { display: flex; } }
+
+@media (prefers-reduced-motion: reduce) { .auth-ok, .auth-spark { animation: none; } }
+body.rm .auth-ok, body.rm .auth-spark { animation: none; }

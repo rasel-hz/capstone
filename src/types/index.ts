@@ -199,6 +199,8 @@ export interface AppState {
   fullDays: string[];
   /** Show a warm welcome back once after a long gap. */
   missed: number;
+  /** The Supabase account this saved data belongs to. Missing before an account is created. */
+  uid?: string;
 }
 
 export interface Program {

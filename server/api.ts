@@ -1,9 +1,16 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
+import { checkUsername, passwordLogin, type AuthDeps } from './auth.ts';
 import { ChatError, handleChat, type ChatDeps } from './chat.ts';
 
 const MAX_BODY = 32 * 1024;
 const RATE_LIMIT = 20;
 const WINDOW_MS = 60000;
+// Sign-in and username checks get a tighter limit, to slow down password guessing.
+const AUTH_LIMIT = 10;
+const AUTH_ROUTES: Record<string, (body: unknown, deps: AuthDeps) => Promise<unknown>> = {
+  '/v1/auth/login': passwordLogin,
+  '/v1/auth/username': checkUsername,
+};
 
 type Next = () => void;
 
@@ -45,16 +52,17 @@ function sameOrigin(req: IncomingMessage) {
   }
 }
 
-export function createApi(deps: ChatDeps) {
+export function createApi(deps: ChatDeps & AuthDeps) {
   const hits = new Map<string, number[]>();
+  const authHits = new Map<string, number[]>();
 
-  function limited(req: IncomingMessage) {
+  function limited(req: IncomingMessage, map = hits, max = RATE_LIMIT) {
     const ip = req.socket.remoteAddress ?? 'local';
     const now = Date.now();
-    const recent = (hits.get(ip) ?? []).filter((t) => now - t < WINDOW_MS);
+    const recent = (map.get(ip) ?? []).filter((t) => now - t < WINDOW_MS);
     recent.push(now);
-    hits.set(ip, recent);
-    return recent.length > RATE_LIMIT;
+    map.set(ip, recent);
+    return recent.length > max;
   }
 
   return async function api(req: IncomingMessage, res: ServerResponse, next: Next) {
@@ -71,6 +79,21 @@ export function createApi(deps: ChatDeps) {
       return;
     }
     if (path === '/v1/health' && req.method === 'GET') return send(res, 200, { ai: !!deps.apiKey });
+    const auth = AUTH_ROUTES[path];
+    if (auth) {
+      if (req.method !== 'POST') return send(res, 405, { error: 'method_not_allowed' });
+      if (!sameOrigin(req)) return send(res, 403, { error: 'forbidden' });
+      if (!(req.headers['content-type'] ?? '').includes('application/json')) return send(res, 415, { error: 'json_required' });
+      if (limited(req, authHits, AUTH_LIMIT)) return send(res, 429, { error: 'slow_down' });
+      try {
+        return send(res, 200, await auth(JSON.parse(await readBody(req)), deps));
+      } catch (e) {
+        if (e instanceof ChatError) return send(res, e.status, { error: e.code });
+        if (e instanceof SyntaxError) return send(res, 400, { error: 'invalid_json' });
+        console.error('Auth request failed');
+        return send(res, 500, { error: 'server_error' });
+      }
+    }
     if (path !== '/v1/chat/messages') return next();
     if (req.method !== 'POST') return send(res, 405, { error: 'method_not_allowed' });
     if (!sameOrigin(req)) return send(res, 403, { error: 'forbidden' });
@@ -87,8 +110,13 @@ export function createApi(deps: ChatDeps) {
   };
 }
 
-export const depsFromEnv = (env: Record<string, string | undefined>): ChatDeps => ({
+export const depsFromEnv = (env: Record<string, string | undefined>): ChatDeps & AuthDeps => ({
   apiKey: env.OPENAI_API_KEY?.trim() || undefined,
   model: env.OPENAI_MODEL?.trim() || undefined,
   baseUrl: env.OPENAI_BASE_URL?.trim() || undefined,
+  // The project URL and anon key are public by design; the browser uses the same two values.
+  supabaseUrl: (env.VITE_SUPABASE_URL || env.SUPABASE_URL)?.trim() || undefined,
+  supabaseAnonKey: (env.VITE_SUPABASE_ANON_KEY || env.SUPABASE_ANON_KEY)?.trim() || undefined,
+  // Server only. Never give this a VITE_ prefix.
+  databaseUrl: (env.DATABASE_URL || env.DataBase_URL)?.trim() || undefined,
 });

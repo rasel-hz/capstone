@@ -1,4 +1,5 @@
 import { CalendarOff, CarFront, Download, Palette, ShieldCheck, Trash2, Type, UserRound, Accessibility, MapPin, Languages } from 'lucide-react';
+import { LogoutButton } from '../../features/auth/AuthViews';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Dialog, IconBadge, PageHeader, Segmented, SettingRow, Toggle } from '../../components/ui/kit';
@@ -178,6 +179,9 @@ export function Settings({ onNavigate }: { onNavigate(v: ViewId): void }) {
         </SettingRow>
         <SettingRow title={t('settings.notifications')} note={t('settings.notificationsNote')}><span className="tag tag--soft">{t('settings.soon')}</span></SettingRow>
       </Group>
+
+      {/* On phones the side bar's logout is hidden with the language switcher, so it appears here instead. */}
+      <div className="logout-mobile"><LogoutButton /></div>
 
       {ask === 'wipe' && (
         <Dialog label={t('settings.wipeLabel')}>
