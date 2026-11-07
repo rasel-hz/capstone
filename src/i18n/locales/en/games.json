@@ -1,0 +1,463 @@
+{
+  "common": {
+    "hint": "Hint",
+    "hintUsed": "Hint used",
+    "question": "Question",
+    "round": "Round",
+    "scene": "Scene",
+    "step": "Step",
+    "moveUp": "{{item}}: move up",
+    "moveDown": "{{item}}: move down",
+    "putBack": "Put back {{item}}",
+    "remove": "Remove {{item}}",
+    "examples": "Examples",
+    "staysOnDevice": "What you type stays on your device.",
+    "preferNot": "I'd rather not answer",
+    "trackingOnly": "Your answer is only for your own tracking, and any answer is fine.",
+    "help": {
+      "y": "I feel better",
+      "s": "A little",
+      "n": "No difference"
+    }
+  },
+  "colors": {
+    "coral": "coral",
+    "yellow": "yellow",
+    "sky": "sky blue",
+    "lavender": "lavender",
+    "green": "green",
+    "peach": "peach"
+  },
+  "shapes": {
+    "circle": "circle",
+    "square": "square",
+    "tri": "triangle",
+    "star": "star",
+    "heart": "heart",
+    "moon": "crescent",
+    "drop": "drop",
+    "leaf": "leaf"
+  },
+  "video": {
+    "sceneLabel": "An animated oasis scene with rising balloons and passing birds",
+    "captions": {
+      "calm": "A calm day at the oasis",
+      "b1": "A balloon rises into the sky",
+      "r1": "A bird passes",
+      "b2": "A second balloon",
+      "b3": "A third balloon",
+      "r2": "Another bird passes",
+      "end": "End of the scene"
+    },
+    "pause": "Pause the scene",
+    "play": "Play the scene",
+    "restart": "From the start",
+    "captionsToggle": "Captions",
+    "clipNote": "A short 24-second animated scene. Watch the balloons and birds.",
+    "intro_m": "Watch the scene closely, and then I'll ask you a few things.",
+    "intro_f": "Watch the scene closely, and then I'll ask you a few things.",
+    "askIntro": "Let's see what you caught.",
+    "rightAfterRetry": "There it is! You tried again and got it.",
+    "right": "Nice work! You got it!",
+    "wrong_m": "No worries, take your time. Think back to what you saw and try again.",
+    "wrong_f": "No worries, take your time. Think back to what you saw and try again.",
+    "replay": "Watch the scene again",
+    "questions": {
+      "balloons": {
+        "q": "How many balloons rose into the sky?",
+        "hint": "Count the colored balloons that rose."
+      },
+      "lastColor": {
+        "q": "What color was the last balloon?",
+        "hint": "The last balloon matched the sky."
+      },
+      "birds": {
+        "q": "How many times did a bird pass?",
+        "hint": "One bird passed early in the scene, and another came later."
+      }
+    }
+  },
+  "mem": {
+    "object": "{{color}} {{shape}}",
+    "focus": "Focus. You have 5 seconds.",
+    "ask": "What vanished?",
+    "rightAfterRetry": "You got there! Nice.",
+    "right": "Nice work! You got it!",
+    "wasThis": "No worries, let's try a different approach. It was a {{object}}.",
+    "colorHint": "Close! Hint: it was {{color}}.",
+    "memorize": "Memorize the shapes and colors",
+    "whichMissing": "What vanished from its place?",
+    "shown": "The shapes: {{list}}",
+    "remaining": "Still here: {{list}}",
+    "hint": "It was in space {{slot}}, and its color was {{color}}."
+  },
+  "seq": {
+    "whyLast": "because leaving comes after you finish getting ready",
+    "scenes": {
+      "event": {
+        "title": "Example: getting ready for a gathering",
+        "note": "Because you saved that you have an event.",
+        "whyFirst": "because knowing the time shapes the other steps",
+        "steps": {
+          "confirm": "Check the time",
+          "gift": "Prepare the gift",
+          "dress": "Shower and get dressed",
+          "leave": "Leave early for traffic"
+        }
+      },
+      "work": {
+        "title": "Example: a morning before work",
+        "note": "A general example, not from your schedule.",
+        "whyFirst": "because the other steps come after you wake up",
+        "steps": {
+          "wake": "Wake up and get ready",
+          "schedule": "Check today's schedule",
+          "breakfast": "Have a light breakfast",
+          "leave": "Leave for work"
+        }
+      },
+      "study": {
+        "title": "Example: a morning before university",
+        "note": "A general example, not from your schedule.",
+        "whyFirst": "because your timetable decides what you need to prepare",
+        "steps": {
+          "timetable": "Check my lecture timetable",
+          "laptop": "Pack my laptop and papers",
+          "coffee": "Get my coffee",
+          "leave": "Head to university"
+        }
+      }
+    },
+    "guide": "Drag a card, or tap it to send it to the first empty space.",
+    "right": "Nice! That order works.",
+    "rightNote": "That makes sense. You can swap the middle steps however suits you.",
+    "moveFirst": "How about starting with \"{{step}}\", {{why}}?",
+    "moveLast": "How about leaving \"{{step}}\" until last, {{why}}?",
+    "almost": "Good! There's just one step I'd move.",
+    "finalNote": "This is your final order, and what matters is that you tried.",
+    "finalSay": "No worries, what matters is that you tried.",
+    "slot": "Step {{n}}",
+    "allPlaced": "You've placed every step.",
+    "ready": "Done"
+  },
+  "time": {
+    "intro": "Estimate the time first.",
+    "over": "That took a bit longer than you guessed. No problem, time flies.",
+    "under": "You finished sooner than you guessed.",
+    "exact": "That matched your guess exactly.",
+    "goodEstimate": "Nice estimate.",
+    "note": "You estimated {{est}}, and it took {{act}}. The difference was {{err}}.",
+    "question": "How many seconds do you think it takes to quietly count from 1 to 10?",
+    "diff": "The difference: {{err}}",
+    "compareLabel": "You estimated {{est}}, and it took {{act}}",
+    "estimate": "Estimate",
+    "actual": "Actual",
+    "explain": "The difference is the gap between your estimate and the actual time. It's only for tracking, not a health measure.",
+    "reflect": "How did the time feel? (optional)",
+    "reflections": {
+      "fast": "It went fast",
+      "slow": "It felt long",
+      "same": "As I expected"
+    },
+    "yourEstimate": "Your estimate: {{est}}",
+    "countNow": "Count from 1 to 10 now, and press stop as soon as you finish.",
+    "pressStart": "Press start, count from 1 to 10, then stop.",
+    "stop": "Stop",
+    "quiet": "I'll stay quiet while you count..."
+  },
+  "calm": {
+    "intro": "Take it easy. Choose what suits you, and you can stop any time.",
+    "breathGuide": "Breathe in through your nose and out through your mouth.",
+    "quietGuide": "No guided breathing. Just take half a minute of quiet.",
+    "done": "You took it at your own pace.",
+    "how": "How would you like it today?",
+    "pace": "Breathing pace",
+    "paces": {
+      "fast": "Faster",
+      "normal": "Normal",
+      "slow": "Slower"
+    },
+    "tone": "A soft tone with each breath",
+    "startBreathing": "Start breathing",
+    "noBreathing": "I don't like breathing exercises",
+    "disclaimer": "A relaxation exercise, with no promised result. If it bothers you, stop it from the top.",
+    "feel": "How do you feel?",
+    "phases": {
+      "ready": "Get ready",
+      "in": "Breathe in",
+      "out": "Breathe out",
+      "quiet": "Quiet"
+    },
+    "left": "{{time}} left",
+    "breathOf": "Breath {{n}} of {{total}}"
+  },
+  "start": {
+    "intro": "We'll start with just one small step.",
+    "whatHappened": "How did it go?",
+    "withYou": "I'm here, quietly.",
+    "notStarted": "That's okay, you tried. We can come back to it when it suits you.",
+    "started": "Nice! You actually started.",
+    "taskQ": "What task have you been putting off?",
+    "taskPh": "Write it in your own words",
+    "taskExamples": "Task examples",
+    "tasks": {
+      "message": "Reply to a message",
+      "study": "Start studying",
+      "desk": "Tidy my desk",
+      "errand": "Finish some paperwork"
+    },
+    "stepQ": "What's the smallest first step? Just two minutes.",
+    "stepPh": "A small, clear step",
+    "stepExamples": "Step examples",
+    "steps": {
+      "open": "Open the file or message",
+      "line": "Write the first line",
+      "prepare": "Get what I need ready",
+      "part": "Choose the first part"
+    },
+    "error": "Write the task and the step so we can start.",
+    "privacy": "What you type stays on your device and isn't sent anywhere. You can delete it in My Profile.",
+    "begin": "Start the two minutes",
+    "timeLeft": "{{time}} left",
+    "paused": "Paused.",
+    "goDoIt": "Go do it while the clock runs here. You can pause it from the top.",
+    "stoppedEarly": "I stopped early",
+    "how": "How did it go?",
+    "outcomes": {
+      "started": "I started it",
+      "partial": "I started, then stopped",
+      "not": "I didn't start"
+    },
+    "honest": "The timer ending doesn't mean the task is done. Choose what really happened. Any answer is fine."
+  },
+  "attention": {
+    "objects": {
+      "sun": "The sun",
+      "cloud": "The cloud",
+      "palm": "The palm tree",
+      "tent": "The tent",
+      "bird": "The bird",
+      "flower": "The flower",
+      "rock": "The rock",
+      "dallah": "The coffee pot",
+      "cup": "The cup",
+      "dates": "The plate of dates",
+      "lamp": "The lantern",
+      "cushion": "The cushion",
+      "frame": "The picture",
+      "plant": "The plant"
+    },
+    "scenes": {
+      "oasis": "The oasis",
+      "majlis": "The majlis"
+    },
+    "intro_one": "There's {{count}} difference. Take your time, there's no timer.",
+    "intro_other": "There are {{count}} differences. Take your time, there's no timer.",
+    "allFound": "Nice! You found them all.",
+    "note": "You found {{found}} differences, with {{misses}} taps on something that stayed the same.",
+    "left_one": "There you go! {{count}} left.",
+    "left_other": "There you go! {{count}} left.",
+    "same": "{{item}} didn't change. Compare with the first scene.",
+    "hints": {
+      "right_top": "Check the top right of the scene.",
+      "right_bottom": "Check the bottom right of the scene.",
+      "left_top": "Check the top left of the scene.",
+      "left_bottom": "Check the bottom left of the scene."
+    },
+    "first": "First scene",
+    "second": "Second scene: tap here",
+    "foundLabel": "{{item}}, difference found",
+    "progress": "Found {{found}} of {{total}}.",
+    "explain": "A difference can be a new color, something that moved, or something missing. If it's missing, tap where it was."
+  },
+  "priority": {
+    "seeds": {
+      "message": "Reply to an important message",
+      "clothes": "Lay out tomorrow's clothes",
+      "desk": "Tidy my desk",
+      "work": "Finish a work or study task",
+      "family": "Call my family",
+      "appointment": "Book an appointment",
+      "walk": "Go for a walk",
+      "bill": "Pay a bill"
+    },
+    "cols": {
+      "now": {
+        "title": "Now",
+        "note": "What deserves today first"
+      },
+      "later": {
+        "title": "Later",
+        "note": "Important, but it can wait"
+      },
+      "notToday": {
+        "title": "Not today",
+        "note": "We'll leave it for another time"
+      }
+    },
+    "intro": "Put each task where it belongs. There's no wrong answer.",
+    "whatToDelay": "What can wait?",
+    "firstQ": "From \"Now\": what comes first?",
+    "firstSay": "Okay, first up: {{item}}.",
+    "firstAsk": "What comes first?",
+    "note": "You chose to start with: {{item}}. You have {{later}} for later and {{notToday}} for another day.",
+    "editLists": "I want to edit the lists",
+    "allPlaced": "You've placed every card.",
+    "addLabel": "Add your own task",
+    "addPh": "Add a task of your own",
+    "full_one": "\"Now\" only has {{count}} space. What can wait?",
+    "full_other": "\"Now\" only has {{count}} spaces. What can wait?",
+    "chooseList": "Choose a list for \"{{item}}\"",
+    "guide": "Drag a card, or tap it and then tap a list.",
+    "nowCount": "{{n}} of {{limit}}",
+    "needOne": "Put at least one thing in \"Now\"."
+  },
+  "breakdown": {
+    "seeds": {
+      "exam": {
+        "task": "Study for the exam",
+        "steps": {
+          "a": "List the lessons I need",
+          "b": "Gather my notes",
+          "c": "Study the first lesson for 25 minutes",
+          "d": "Do some short questions"
+        }
+      },
+      "talk": {
+        "task": "Prepare the presentation",
+        "steps": {
+          "a": "Write the main idea",
+          "b": "Choose 3 points",
+          "c": "Make the first slide",
+          "d": "Practice once"
+        }
+      },
+      "room": {
+        "task": "Tidy the room",
+        "steps": {
+          "a": "Gather the clothes",
+          "b": "Throw out the trash",
+          "c": "Tidy the desk",
+          "d": "Sweep the floor"
+        }
+      },
+      "paperwork": {
+        "task": "Finish the paperwork",
+        "steps": {
+          "a": "List the documents needed",
+          "b": "Scan the documents",
+          "c": "Upload them to the site",
+          "d": "Follow up on the request"
+        }
+      }
+    },
+    "when": {
+      "prayer": "After prayer",
+      "coffee": "After coffee",
+      "home": "As soon as I get home",
+      "lunch": "After lunch"
+    },
+    "say1": "What's the big thing weighing on you?",
+    "say2": "Split it into small steps.",
+    "say3": "When will you start the first step?",
+    "taskQ": "What's the big task?",
+    "taskPh": "Write it in your own words, or pick an example",
+    "title": "Break down:",
+    "noSteps": "No steps yet. Keep them small enough to start without much thought.",
+    "newStep": "New step",
+    "stepPh": "Add a small step",
+    "addStep": "Add the step",
+    "oneEnough": "One step is enough for this version.",
+    "fiveEnough": "That's enough, 5 steps will cover it.",
+    "planTitle": "Make a plan",
+    "planLine": "{{when}}, I will: {{step}}",
+    "whenLabel": "When?",
+    "orType": "Or type a time that suits you",
+    "whenPh": "For example: 5 pm",
+    "done": "There, that feels lighter.",
+    "note": "Your plan: {{when}}, you will: {{step}}. The points are for the plan, not for doing it, because we can't verify that.",
+    "finish": "Finish the plan"
+  },
+  "study": {
+    "intro": "A short session at your pace.",
+    "timeUp": "Time's up. How did it go?",
+    "doneNo": "That's okay, some sessions go that way.",
+    "doneGood": "Nice. Another session whenever it suits you.",
+    "note": "You studied for {{time}}.",
+    "noteParked_one": "You studied for {{time}} and parked {{count}} distraction.",
+    "noteParked_other": "You studied for {{time}} and parked {{count}} distractions.",
+    "topicQ": "What are you studying? (optional)",
+    "topicPh": "For example: chapter three",
+    "lengthQ": "What length suits you?",
+    "length": "Length",
+    "noTimer": "No timer",
+    "quiet": "I'll stay quiet. Note down anything distracting.",
+    "how": "How did the session go?",
+    "howShort": "How did it go?",
+    "reflections": {
+      "good": "It went well",
+      "some": "Somewhat",
+      "no": "It didn't go well"
+    },
+    "parked": "What you parked",
+    "parkLabel": "A distraction to park for later",
+    "parkPh": "Distracted? Note it here and come back",
+    "park": "Park it",
+    "parkedCount_one": "You've parked {{count}}. We'll come back to it after the session.",
+    "parkedCount_other": "You've parked {{count}}. We'll come back to them after the session.",
+    "finished": "I'm done",
+    "minNote": "You can finish after the first minute. If this isn't working, use \"End\" at the top."
+  },
+  "emotion": {
+    "feelings": {
+      "calm": "Calm",
+      "happy": "Happy",
+      "excited": "Excited",
+      "tired": "Tired",
+      "tense": "Tense",
+      "upset": "Upset",
+      "lost": "A bit lost",
+      "unsure": "Not sure"
+    },
+    "helps": {
+      "walk": "A short walk",
+      "talk": "Talking to someone I trust",
+      "break": "Taking a rest",
+      "small": "Doing something small",
+      "breath": "Calming down a little",
+      "unsure": "Not sure"
+    },
+    "levels": {
+      "1": "Slight",
+      "2": "A little",
+      "3": "Medium",
+      "4": "Clear",
+      "5": "Strong"
+    },
+    "intro": "Take your time. You can skip anything.",
+    "said": "You told me: {{feelings}}. Thanks for sharing.",
+    "note": "These are your words, and they stay on your device. If things feel heavy, talk to someone you trust or a professional.",
+    "feelQ": "How do you feel right now?",
+    "feelNote": "You can choose more than one. I don't guess. This is your answer.",
+    "privacy": "Your answers stay on your device, aren't sent to the AI service, and earn no points.",
+    "strengthQ": "How strong is it? (optional)",
+    "strength": "Strength",
+    "helpQ": "What might help? (optional)",
+    "finish": "Done"
+  },
+  "landscape": {
+    "intro": "Take a moment. There's nothing you have to do.",
+    "done": "Hope that helped.",
+    "how": "How was the break?",
+    "sceneLabel": "A calm oasis with lanterns, palm trees and water",
+    "lantern": "Lantern {{n}}",
+    "water": "The water",
+    "palm": "The palm tree",
+    "day": "Day",
+    "evening": "Evening",
+    "sound": "Soft sound",
+    "end": "End my break",
+    "ready": "Take your time, and come back when you're ready.",
+    "guide": "Tap the lanterns, water or palm tree, or just look. The end button will be ready shortly."
+  }
+}

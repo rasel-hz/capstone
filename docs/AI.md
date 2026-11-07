@@ -44,13 +44,17 @@ The model can't start missions, award XP, change plans or save anything.
 Only after the user consents, which they can withdraw in **ملفي**:
 
 - The current message and up to 8 recent chat messages, leaving out crisis exchanges
-- Form of address (male or female)
+- Form of address (male or female) and the selected language
 - Whether low energy was reported today, and confirmed context tags
 - Result summary: attempts, completions, accuracy, and counts per challenge
 
 **Not sent:** the user's name, chosen journeys, text typed into games, or the API key.
 
 OpenAI's documentation says API data isn't used for training by default, and abuse-monitoring logs are kept for up to 30 days. Requests set `store: false`. The docs don't fully confirm what `store: false` changes for standard requests, so don't promise more than this. Check their [data policy](https://developers.openai.com/api/docs/guides/your-data) before any public launch.
+
+## Languages
+
+The server tells the model which language the app is showing, and the model replies in it, unless the person clearly writes in the other one. Crisis wording is checked in both languages, and the support message follows the selected language. A real-model spot check of 10 messages on 2026-11-07 covered English chat, Arabic and English mixed, a diagnosis request, indirect distress and an idiom. It also found that the diagnosis filter was catching honest refusals, so sentences that refuse or only ask are now allowed through.
 
 ## Protections on the server
 

@@ -4,7 +4,7 @@ export type JourneyId = 'adhd' | 'anx' | 'ocd' | 'mood' | 'sleep' | 'soc' | 'aut
 export type ChallengeId =
   | 'video' | 'mem' | 'seq' | 'time' | 'calm' | 'start2'
   | 'attention_scene' | 'priority_board' | 'breakdown' | 'study_sprint' | 'emotion_map' | 'calm_landscape';
-export type ChallengeCategory = 'تركيز' | 'ذاكرة' | 'تخطيط' | 'وعي بالوقت' | 'استرخاء' | 'مهمة حقيقية';
+export type ChallengeCategory = 'focus' | 'memory' | 'planning' | 'time' | 'relax' | 'real';
 export type Difficulty = 'easy' | 'normal';
 export type ContextTag = 'event' | 'work' | 'sleep';
 export type EnergyLevel = 'high' | 'mid' | 'low';
@@ -14,15 +14,10 @@ export type ItemStatus = 'NOT_STARTED' | 'IN_PROGRESS' | 'PAUSED' | 'COMPLETED' 
 export type MissionStatus = 'IN_PROGRESS' | 'PAUSED' | 'DONE';
 
 export interface Challenge {
-  t: string;
   cat: ChallengeCategory;
   min: number;
   xp: number;
   k: string;
-  /** One line for cards. */
-  desc: string;
-  /** Why someone might pick it. Never a health claim. */
-  purpose: string;
   /** Has a real easier version. */
   hasEasy: boolean;
   /** Produces a first-try accuracy score. Unscored challenges are never compared with scored ones. */
@@ -33,15 +28,20 @@ export interface Challenge {
 
 export interface Journey {
   id: JourneyId;
-  n: string;
   a: ChallengeId[];
-  d: string;
-  g: string;
 }
+
+// A reason code, turned into text only when shown (planner.whyText). A plain string is an older saved reason.
+export interface WhyPart {
+  k: string;
+  acc?: number;
+  journey?: JourneyId;
+}
+export type Why = string | WhyPart[];
 
 export interface PlannedItem {
   id: ChallengeId;
-  why: string;
+  why: Why;
   diff: Difficulty;
 }
 
@@ -132,13 +132,15 @@ export interface AppState {
   prayerDay: string;
   /** Larger text setting. */
   largeText: number;
+  /** Interface language. */
+  lang: 'ar-SA' | 'en';
 }
 
 export interface GameResult {
   acc: number | null;
   retries: number;
-  say?: string;
+  say?: import('../i18n').Msg;
   mood?: import('../components/mascot/manifest').MascotState;
-  note?: string;
+  note?: import('../i18n').Msg;
   data?: unknown;
 }

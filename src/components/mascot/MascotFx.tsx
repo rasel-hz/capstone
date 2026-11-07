@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { MascotState } from './manifest';
 
 const star = (x: number, y: number, r: number, fill: string) => (
@@ -11,6 +12,12 @@ const INK = '#263D37';
 
 // Small effects drawn around the character, so moods read differently while the artwork stays one flat image.
 // They sit beside the mascot and never touch the approved art. A state with its own clip doesn't use them.
+// A component, because FX is built once and this has to follow the language.
+function QuestionMark() {
+  const { t } = useTranslation();
+  return <>{t('common.questionMark')}</>;
+}
+
 const FX: Partial<Record<MascotState, ReactNode>> = {
   greeting: (
     <g className="fx-pop" fill="none" stroke="#FFD36E" strokeWidth="3" strokeLinecap="round">
@@ -33,7 +40,7 @@ const FX: Partial<Record<MascotState, ReactNode>> = {
   happy: <>{star(14, 28, 6, '#FFD36E')}{star(88, 22, 5, '#FF8E83')}</>,
   celebrating: <>{star(10, 22, 8, '#FFD36E')}{star(90, 16, 7, '#FF8E83')}{star(6, 56, 5, '#8BCDF1')}{star(94, 52, 6, '#A78BFA')}{star(24, 8, 4, '#A78BFA')}</>,
   encouraging: <>{heart(88, 26, 1, '#FF8E83')}{star(12, 32, 5, '#FFD36E')}</>,
-  curious: <text className="fx-pop" x="82" y="30" fontSize="26" fontWeight="700" fill="#A78BFA" fontFamily="inherit">؟</text>,
+  curious: <text className="fx-pop" x="82" y="30" fontSize="26" fontWeight="700" fill="#A78BFA" fontFamily="inherit"><QuestionMark /></text>,
   calm: (
     <g className="fx-ring" fill="none" stroke="#8BCDF1" strokeWidth="2">
       <circle cx="50" cy="52" r="46" />

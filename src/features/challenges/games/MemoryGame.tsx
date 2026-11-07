@@ -1,14 +1,17 @@
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTimers } from '../../../hooks/useTimers';
+import { tr } from '../../../i18n';
 import { shuffled } from '../../../utils';
-import { COLOR_NAMES, COLORS, SHAPE_NAMES, SHAPES } from '../catalog';
+import { COLOR_IDS, COLORS, SHAPES } from '../catalog';
 import type { GameProps } from '../types';
 import { HintButton } from './parts';
 
 interface Obj { k: string; c: number }
 const SHOW_MS = 5000;
 const same = (a: Obj, b: Obj) => a.k === b.k && a.c === b.c;
-const describe = (o: Obj) => `${SHAPE_NAMES[o.k]} ${COLOR_NAMES[o.c]}`;
+const colorName = (c: number) => tr(`games.colors.${COLOR_IDS[c]}`);
+const describe = (o: Obj) => tr('games.mem.object', { shape: tr(`games.shapes.${o.k}`), color: colorName(o.c) });
 
 // The answer options include objects that weren't on the tray: the same shape in another color and
 // another shape in the same color. Otherwise the answer is just the one you can't see any more.
@@ -32,6 +35,7 @@ const Shape = ({ o, s }: { o: Obj; s: number }) => (
 );
 
 export function MemoryGame({ diff, env, onDone }: GameProps) {
+  const { t } = useTranslation();
   const easy = diff === 'easy';
   // Normal mode grows by one object each round. Easy stays small.
   const plan = easy ? [4] : [4, 5, 6];
@@ -50,19 +54,19 @@ export function MemoryGame({ diff, env, onDone }: GameProps) {
   const answerIdx = round.options.findIndex((o) => same(o, answer));
 
   useEffect(() => {
-    env.round(idx + 1, plan.length, 'الجولة');
+    env.round(idx + 1, plan.length, 'games.common.round');
     setPhase('show');
     setBad([]);
     setOk(null);
     setHint(false);
     setLeft(5);
     wrong.current = 0;
-    env.say('curious', 'ركّز، عندك ٥ ثواني.');
-    const t = timers.after(() => {
+    env.say('curious', 'games.mem.focus');
+    const id = timers.after(() => {
       setPhase('ask');
-      env.say('listening', 'وش اختفى؟');
+      env.say('listening', 'games.mem.ask');
     }, SHOW_MS);
-    return () => timers.cancel(t);
+    return () => timers.cancel(id);
     // Runs once per round. env.say and timers are stable.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [round]);
@@ -79,7 +83,7 @@ export function MemoryGame({ diff, env, onDone }: GameProps) {
       setOk(i);
       env.sfx('ok');
       if (!wrong.current && !hint) firstTry.current++;
-      env.say('happy', wrong.current ? 'قربت وجبتها! كذا.' : 'يا سلام عليك! والله إنك كفو!');
+      env.say('happy', wrong.current ? 'games.mem.rightAfterRetry' : 'games.mem.right');
       timers.after(() => {
         if (idx + 1 < plan.length) {
           setIdx(idx + 1);
@@ -94,17 +98,17 @@ export function MemoryGame({ diff, env, onDone }: GameProps) {
     tries.current++;
     setBad((b) => [...b, i]);
     env.sfx('bad');
-    env.say('encouraging', wrong.current > 1 ? `عوافي، نغير الطريقة شوي. كان ${describe(answer)}.` : `قربت! تلميح: لونه ${COLOR_NAMES[answer.c]}.`);
+    env.say('encouraging', wrong.current > 1 ? () => tr('games.mem.wasThis', { object: describe(answer) }) : () => tr('games.mem.colorHint', { color: colorName(answer.c) }));
     if (wrong.current >= 3) choose(answerIdx);
   }
 
   return (
     <div className="scene mem">
-      <h2 className="q__t">{phase === 'show' ? 'احفظ الأشكال وألوانها' : 'وش اللي اختفى من مكانه؟'}</h2>
-      <div className={`tray tray--${round.items.length}`} role="img" aria-label={phase === 'show' ? `الأشكال: ${round.items.map(describe).join('، ')}` : `الباقي: ${round.items.filter((_, i) => i !== round.miss).map(describe).join('، ')}`}>
+      <h2 className="q__t">{t(phase === 'show' ? 'games.mem.memorize' : 'games.mem.whichMissing')}</h2>
+      <div className={`tray tray--${round.items.length}`} role="img" aria-label={phase === 'show' ? t('games.mem.shown', { list: round.items.map(describe).join(t('common.listSep')) }) : t('games.mem.remaining', { list: round.items.filter((_, i) => i !== round.miss).map(describe).join(t('common.listSep')) })}>
         {round.items.map((x, i) => (
           <div key={x.k} className="tray__c" style={{ animationDelay: `${i * 60}ms` }}>
-            {phase === 'ask' && i === round.miss ? <span className="tray__gap">؟</span> : <Shape o={x} s={58} />}
+            {phase === 'ask' && i === round.miss ? <span className="tray__gap">{t('common.questionMark')}</span> : <Shape o={x} s={58} />}
           </div>
         ))}
       </div>
@@ -122,7 +126,7 @@ export function MemoryGame({ diff, env, onDone }: GameProps) {
               </button>
             ))}
           </div>
-          <p className="hint" role="status">{hint ? `مكانه كان في الخانة ${round.miss + 1}، ولونه ${COLOR_NAMES[answer.c]}.` : ''}</p>
+          <p className="hint" role="status">{hint ? t('games.mem.hint', { slot: round.miss + 1, color: colorName(answer.c) }) : ''}</p>
           <div className="row row--c"><HintButton used={hint} disabled={ok != null} onClick={() => setHint(true)} /></div>
         </>
       )}

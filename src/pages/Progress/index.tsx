@@ -1,19 +1,18 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { EmptyState, PageHeader, Segmented } from '../../components/ui/kit';
 import { Mascot } from '../../components/mascot/Mascot';
 import { useMascot } from '../../components/mascot/useMascot';
 import { useAppState } from '../../context/AppStateContext';
 import { ChallengeArt } from '../../features/challenges/ChallengeArt';
 import { CHALLENGES } from '../../features/challenges/catalog';
-import { FEELINGS } from '../../features/challenges/games/EmotionMapGame';
 import { progressStats } from '../../features/progress/stats';
 import { useCountUp } from '../../hooks/useCountUp';
+import { formatDate, formatList, isRtl } from '../../i18n';
 import type { Attempt, ViewId } from '../../types';
 import { level } from '../../utils';
 
-const ENERGY = { high: 'عالية', mid: 'عادي', low: 'قليلة' };
-const HELP: Record<string, string> = { y: 'ارتحت', s: 'شوي', n: 'ما فرق' };
-const OUTCOME: Record<string, string> = { started: 'بديت فيها', partial: 'بديت شوي', not: 'ما بديت' };
+const dayLabel = (ts: number) => formatDate(ts, { day: 'numeric', month: 'short' });
 
 const Stat = ({ title, value, suffix = '', note }: { title: string; value: number; suffix?: string; note?: string }) => (
   <div className="tile"><span className="tile__t">{title}</span><b className="tile__v">{useCountUp(value)}{suffix}</b>{note && <span className="note">{note}</span>}</div>
@@ -21,6 +20,7 @@ const Stat = ({ title, value, suffix = '', note }: { title: string; value: numbe
 
 // One series, so one hue. Thin rounded bars from a shared baseline, with a value on hover and focus.
 function ActivityChart({ rows, max }: { rows: { label: string; full: string; count: number }[]; max: number }) {
+  const { t } = useTranslation();
   const [hover, setHover] = useState<number | null>(null);
   const H = 110;
   const W = 320;
@@ -28,14 +28,16 @@ function ActivityChart({ rows, max }: { rows: { label: string; full: string; cou
   const barW = Math.max(3, Math.min(22, step - 2));
   const y = (v: number) => (v / max) * H;
   const shown = hover != null ? rows[hover] : null;
+  const rtl = isRtl();
+  const summary = rows.filter((r) => r.count).map((r) => `${r.full}: ${r.count}`).join(t('common.listSep'));
   return (
     <div className="chart">
-      <p className="chart__tip" aria-live="polite">{shown ? `${shown.full}: ${shown.count} مكتملة` : 'مرّر على الأعمدة أو اضغطها لتشوف الرقم'}</p>
-      <svg viewBox={`0 0 ${W} ${H + 24}`} role="img" aria-label={`التحديات المكتملة: ${rows.filter((r) => r.count).map((r) => `${r.full} ${r.count}`).join('، ') || 'ما فيه'}`}>
+      <p className="chart__tip" aria-live="polite">{shown ? t('progress.chartValue', { day: shown.full, count: shown.count }) : t('progress.chartHint')}</p>
+      <svg viewBox={`0 0 ${W} ${H + 24}`} role="img" aria-label={t('progress.chartLabel', { summary: summary || t('progress.none') })}>
         <line x1="0" x2={W} y1={H} y2={H} stroke="#263D37" strokeOpacity=".15" />
         {rows.map((r, i) => {
-          // Time runs right to left, matching the reading direction, so the oldest day is on the right.
-          const x = W - (i + 1) * step;
+          // Time follows the reading direction, so the oldest day starts where a line of text starts.
+          const x = rtl ? W - (i + 1) * step : i * step;
           const h = r.count ? Math.max(4, y(r.count)) : 0;
           return (
             <g key={i}>
@@ -47,9 +49,9 @@ function ActivityChart({ rows, max }: { rows: { label: string; full: string; cou
         })}
       </svg>
       <details className="chart__t">
-        <summary>شوفها كجدول</summary>
+        <summary>{t('progress.asTable')}</summary>
         <table>
-          <thead><tr><th>اليوم</th><th>مكتملة</th></tr></thead>
+          <thead><tr><th>{t('progress.day')}</th><th>{t('progress.completed')}</th></tr></thead>
           <tbody>{rows.map((r, i) => <tr key={i}><td>{r.full}</td><td>{r.count}</td></tr>)}</tbody>
         </table>
       </details>
@@ -64,12 +66,18 @@ const median = (a: number[]) => {
 };
 
 function Spark({ values }: { values: number[] }) {
+  const { t } = useTranslation();
   if (values.length < 2) return null;
-  const pts = values.map((v, i) => `${100 - (i / (values.length - 1)) * 100},${28 - (v / 100) * 24}`).join(' ');
-  return <svg className="spark" viewBox="0 0 100 30" preserveAspectRatio="none" role="img" aria-label={`آخر النتائج: ${[...values].join('، ')}٪`}><polyline points={pts} fill="none" stroke="#28785B" strokeWidth="2" vectorEffect="non-scaling-stroke" /></svg>;
+  const rtl = isRtl();
+  const pts = values.map((v, i) => {
+    const p = (i / (values.length - 1)) * 100;
+    return `${rtl ? 100 - p : p},${28 - (v / 100) * 24}`;
+  }).join(' ');
+  return <svg className="spark" viewBox="0 0 100 30" preserveAspectRatio="none" role="img" aria-label={t('progress.sparkLabel', { values: values.join(t('common.listSep')) })}><polyline points={pts} fill="none" stroke="#28785B" strokeWidth="2" vectorEffect="non-scaling-stroke" /></svg>;
 }
 
 export function Progress({ onNavigate }: { onNavigate(v: ViewId): void }) {
+  const { t } = useTranslation();
   const s = useAppState();
   const st = progressStats(s);
   const [range, setRange] = useState<'week' | 'month'>('week');
@@ -83,10 +91,10 @@ export function Progress({ onNavigate }: { onNavigate(v: ViewId): void }) {
   if (!st.attempts.length) {
     return (
       <>
-        <PageHeader title="تطوري" />
+        <PageHeader title={t('progress.title')} />
         <div className="panel">
-          <EmptyState art={<Mascot state={mascot.state} size={110} />} title="ما فيه بيانات للحين" text="أول ما تخلص تحدي، تطلع أرقامك الحقيقية هنا. ما نعرض أرقام تجريبية.">
-            <button type="button" className="btn" onClick={() => onNavigate('home')}>ابدأ مهمة اليوم</button>
+          <EmptyState art={<Mascot state={mascot.state} size={110} />} title={t('progress.emptyTitle')} text={t('progress.emptyText')}>
+            <button type="button" className="btn" onClick={() => onNavigate('home')}>{t('progress.emptyAction')}</button>
           </EmptyState>
         </div>
       </>
@@ -103,40 +111,40 @@ export function Progress({ onNavigate }: { onNavigate(v: ViewId): void }) {
 
   return (
     <>
-      <PageHeader title="تطوري" sub="أرقامك الفعلية من المحاولات المحفوظة على جهازك. للمتابعة الشخصية، مو تشخيص.">
+      <PageHeader title={t('progress.title')} sub={t('progress.sub')}>
         <Mascot state={mascot.state} size={72} />
       </PageHeader>
 
       <div className="tiles">
-        <Stat title="تحديات مكتملة" value={st.completed.length} note={`من ${st.attempts.length} محاولة`} />
-        <Stat title="المستوى" value={level(s)} note={`${s.xp} نقطة`} />
-        <Stat title="نسبة الإكمال" value={st.completionRate ?? 0} suffix="%" note="مكتملة ÷ كل المحاولات المسجلة" />
+        <Stat title={t('progress.tileCompleted')} value={st.completed.length} note={t('progress.ofAttempts', { count: st.attempts.length })} />
+        <Stat title={t('common.level')} value={level(s)} note={t('common.points', { count: s.xp })} />
+        <Stat title={t('progress.tileRate')} value={st.completionRate ?? 0} suffix="%" note={t('progress.rateNote')} />
         {st.avgAccuracy == null
-          ? <div className="tile"><span className="tile__t">متوسط الدقة</span><b className="tile__v">-</b><span className="note">ما لعبت تحدي فيه دقة</span></div>
-          : <Stat title="متوسط الدقة" value={st.avgAccuracy} suffix="%" note="من التحديات اللي فيها دقة" />}
+          ? <div className="tile"><span className="tile__t">{t('progress.tileAccuracy')}</span><b className="tile__v">-</b><span className="note">{t('progress.noAccuracy')}</span></div>
+          : <Stat title={t('progress.tileAccuracy')} value={st.avgAccuracy} suffix="%" note={t('progress.accuracyNote')} />}
       </div>
 
       <section className="panel">
         <div className="panel__h">
-          <h2>نشاطك</h2>
+          <h2>{t('progress.activity')}</h2>
           {st.hasMonth
-            ? <Segmented<'week' | 'month'> label="المدة" value={range} options={[{ value: 'week', label: 'أسبوع' }, { value: 'month', label: 'شهر' }]} onChange={setRange} />
-            : <span className="note">عرض الشهر يظهر لما يصير عندك أكثر من أسبوع.</span>}
+            ? <Segmented<'week' | 'month'> label={t('progress.range')} value={range} options={[{ value: 'week', label: t('progress.week') }, { value: 'month', label: t('progress.month') }]} onChange={setRange} />
+            : <span className="note">{t('progress.monthLater')}</span>}
         </div>
         <ActivityChart rows={range === 'month' && st.hasMonth ? st.month : st.days} max={range === 'month' && st.hasMonth ? st.maxMonth : st.maxDay} />
       </section>
 
       {scored.length > 0 && (
         <section className="panel">
-          <h2>التحديات اللي فيها دقة</h2>
-          <p className="note">كل تحدي يحسب الدقة بطريقته، فقارن التحدي بنفسه مو بغيره.</p>
+          <h2>{t('progress.scoredTitle')}</h2>
+          <p className="note">{t('progress.scoredNote')}</p>
           <ul className="perf">
             {scored.map(([id, a]) => {
               const vals = a.filter((h) => h.acc != null).map((h) => h.acc as number);
               return (
                 <li key={id}>
                   <div className="perf__art"><ChallengeArt id={id} /></div>
-                  <div className="grow"><b>{CHALLENGES[id].t}</b><p className="note flush">{a.length} مرة · متوسط {avg(vals)}% · آخر مرة {vals[vals.length - 1]}%</p></div>
+                  <div className="grow"><b>{t(`challenges.items.${id}.name`)}</b><p className="note flush">{t('progress.scoredRow', { times: t('challenges.times', { count: a.length }), avg: avg(vals), last: vals[vals.length - 1] })}</p></div>
                   <Spark values={vals.slice(-8)} />
                 </li>
               );
@@ -147,13 +155,13 @@ export function Progress({ onNavigate }: { onNavigate(v: ViewId): void }) {
 
       {unscored.length > 0 && (
         <section className="panel">
-          <h2>التحديات اللي بدون دقة</h2>
-          <p className="note">هذي ما فيها إجابة صحيحة، فما نقارنها بالتحديات اللي فوق.</p>
+          <h2>{t('progress.unscoredTitle')}</h2>
+          <p className="note">{t('progress.unscoredNote')}</p>
           <ul className="perf">
             {unscored.map(([id, a]) => (
               <li key={id}>
                 <div className="perf__art"><ChallengeArt id={id} /></div>
-                <div className="grow"><b>{CHALLENGES[id].t}</b><p className="note flush">{a.length} مرة · وقت معتاد {row(a)} ثانية</p></div>
+                <div className="grow"><b>{t(`challenges.items.${id}.name`)}</b><p className="note flush">{t('progress.unscoredRow', { times: t('challenges.times', { count: a.length }), time: t('common.seconds', { count: row(a) }) })}</p></div>
               </li>
             ))}
           </ul>
@@ -161,46 +169,46 @@ export function Progress({ onNavigate }: { onNavigate(v: ViewId): void }) {
       )}
 
       <section className="panel">
-        <h2>من كلامك أنت</h2>
-        <p className="note">هذا اللي سجلته بنفسك، مو استنتاج مني.</p>
-        <h3>الطاقة</h3>
-        {s.en.length ? <div className="tags">{s.en.slice(-7).map((e) => <span key={e.ts} className="tag">{new Date(e.ts).toLocaleDateString('ar-SA-u-ca-gregory', { day: 'numeric', month: 'short' })} · {ENERGY[e.e]}</span>)}</div> : <p className="note">ما سجلت طاقتك للحين.</p>}
+        <h2>{t('progress.selfTitle')}</h2>
+        <p className="note">{t('progress.selfNote')}</p>
+        <h3>{t('progress.energy')}</h3>
+        {s.en.length ? <div className="tags">{s.en.slice(-7).map((e) => <span key={e.ts} className="tag">{t('progress.energyEntry', { day: dayLabel(e.ts), level: t(`progress.energyLevels.${e.e}`) })}</span>)}</div> : <p className="note">{t('progress.energyEmpty')}</p>}
         {reflections.length > 0 && (
           <>
-            <h3>بعد وقفات الهدوء</h3>
-            <div className="tags">{Object.entries(HELP).filter(([k]) => helpCount(k)).map(([k, l]) => <span key={k} className="tag">{l}: {helpCount(k)}</span>)}</div>
+            <h3>{t('progress.afterCalm')}</h3>
+            <div className="tags">{['y', 's', 'n'].filter(helpCount).map((k) => <span key={k} className="tag">{t(`games.common.help.${k}`)}: {helpCount(k)}</span>)}</div>
           </>
         )}
         {moods.length > 0 && (
           <>
-            <h3>وش جوّك</h3>
+            <h3>{t('challenges.items.emotion_map.name')}</h3>
             <ul className="plain">{moods.map((h) => {
               const f = (h.data as { feelings?: string[] } | undefined)?.feelings ?? [];
-              return <li key={h.ts}><span className="note">{new Date(h.ts).toLocaleDateString('ar-SA-u-ca-gregory', { day: 'numeric', month: 'short' })}</span> {FEELINGS.filter(([k]) => f.includes(k)).map(([, l]) => l).join('، ')}</li>;
+              return <li key={h.ts}><span className="note">{dayLabel(h.ts)}</span> {formatList(f.map((k) => t(`games.emotion.feelings.${k}`)))}</li>;
             })}</ul>
           </>
         )}
         {starts.length > 0 && (
           <>
-            <h3>مهام بديت فيها</h3>
+            <h3>{t('progress.tasksStarted')}</h3>
             <ul className="plain">{starts.map((h) => {
               const d = h.data as { step?: string; outcome?: string } | undefined;
-              return <li key={h.ts}>{d?.step} <span className="note">· {OUTCOME[d?.outcome ?? ''] ?? ''}</span></li>;
+              return <li key={h.ts}><bdi>{d?.step}</bdi> {d?.outcome && <span className="note">· {t(`games.start.outcomes.${d.outcome}`)}</span>}</li>;
             })}</ul>
           </>
         )}
       </section>
 
       <section className="panel insight-box">
-        <h2>ملاحظات خويّك</h2>
-        <p><b>معلوم:</b> كمّلت {st.completed.length} من {st.attempts.length} محاولات.</p>
+        <h2>{t('progress.notesTitle')}</h2>
+        <p><b>{t('progress.known')}</b> {t('progress.knownText', { done: st.completed.length, total: st.attempts.length })}</p>
         {st.attempts.length >= 4 ? (
           <>
-            <p><b>لاحظت من محاولاتك:</b> {st.shortCount} من {st.completed.length} تحديات مكتملة أخذت دقيقة أو أقل.</p>
-            <p><b>يمكن:</b> التحديات القصيرة تناسبك أكثر. هذي فرضية، وأنت اللي تقرر.</p>
+            <p><b>{t('progress.noticed')}</b> {t('progress.noticedText', { short: st.shortCount, total: st.completed.length })}</p>
+            <p><b>{t('progress.maybe')}</b> {t('progress.maybeText')}</p>
           </>
-        ) : <p className="note">أحتاج ٤ محاولات على الأقل قبل ما أذكر أي نمط.</p>}
-        <p className="note">نتائج الألعاب للمتابعة الشخصية، وما تدل على تحسن علاجي أو تشخيص.</p>
+        ) : <p className="note">{t('progress.needMore')}</p>}
+        <p className="note">{t('progress.disclaimer')}</p>
       </section>
     </>
   );

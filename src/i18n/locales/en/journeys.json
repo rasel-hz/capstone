@@ -1,0 +1,58 @@
+{
+  "title": "My Journeys",
+  "sub": "Pick one or more. No diagnosis needed. These are for support and practice, not treatment.",
+  "all": "All journeys",
+  "progressLabel": "Journey challenges completed",
+  "doneOf": "You've completed {{n}} of {{total}} challenges in this journey.",
+  "notStartedOf_one": "Not started yet. It has {{count}} challenge.",
+  "notStartedOf_other": "Not started yet. It has {{count}} challenges.",
+  "activeBtn": "Active journey",
+  "addLong": "Add to my journeys",
+  "disclaimerDetail": "This is a journey for support and practice, not a treatment program or a diagnosis. It shares challenges with other journeys.",
+  "tagDone": "Completed",
+  "tagNext": "Next",
+  "allDone": "You've tried every challenge in this journey",
+  "allDoneNote": "You can replay any of them, and more challenges will be added over time.",
+  "exploreName": "Explore {{name}}",
+  "active": "Active",
+  "cardProgress": "{{name}}: completed challenges",
+  "ofTotal": "{{n}} of {{total}}",
+  "notStarted": "Not started yet",
+  "explore": "Explore",
+  "remove": "Remove",
+  "add": "Add",
+  "items": {
+    "adhd": {
+      "name": "Focus & Organization",
+      "desc": "Starting tasks, setting priorities and estimating time"
+    },
+    "anx": {
+      "name": "Calm & Anxiety Support",
+      "desc": "Quiet pauses and gentle choices, which you can skip"
+    },
+    "ocd": {
+      "name": "Navigating Uncertainty",
+      "desc": "Educational content only. Any treatment program belongs with a professional"
+    },
+    "mood": {
+      "name": "Mood & Motivation",
+      "desc": "Small, doable steps with no pressure"
+    },
+    "sleep": {
+      "name": "Sleep & Routine",
+      "desc": "Winding down and arranging your routine"
+    },
+    "soc": {
+      "name": "Social Confidence",
+      "desc": "Getting ready for gatherings. Conversation challenges aren't built yet"
+    },
+    "aut": {
+      "name": "Comfortable Routines",
+      "desc": "A clear schedule, with motion and sound as you choose"
+    },
+    "gen": {
+      "name": "General Wellbeing",
+      "desc": "A bit of everything"
+    }
+  }
+}

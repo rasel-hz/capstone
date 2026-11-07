@@ -1,5 +1,37 @@
 # Changelog
 
+## Unreleased: mascot animations
+
+### Added
+- Clips for the 10 remaining mascot states, so all 11 now have their own animation.
+
+### Changed
+- Reactions now last the length of their clips, 3 seconds instead of about 1, and also play during games.
+- Clips are fetched ahead of time when the page is idle, unless someone has asked to save data or reduce motion. This adds about 3.6 MB.
+
+### Fixed
+- Switching clips no longer shows a blank frame.
+- CSS movement no longer plays on top of a clip.
+
+## Unreleased: English and Arabic
+
+### Added
+- A full English interface alongside Saudi Arabic, using `i18next` and `react-i18next`: landing, onboarding, all 7 tabs, all 12 challenges, the player, dialogs and the companion. See `docs/I18N.md`.
+- A language switcher in the sidebar, landing, onboarding, the game header, the summary screen and ملفي. The choice is saved in the `kw2` data, and older data opens in Arabic with progress unchanged.
+- Right-to-left and left-to-right layouts, set before the first paint so nothing flashes.
+- Switching mid-game keeps the round, objects, timers, score and typed text, without a reload.
+- Crisis detection and the support message in English. Crisis wording is checked in both languages whichever is showing.
+- The AI companion replies in the selected language, and rule replies understand both.
+- `tests/i18n.test.ts`: matching keys and variables, the agreed glossary, keys used in code, no hardcoded Arabic, plurals and server language.
+
+### Changed
+- Challenge and journey text moved from `catalog.ts` to locale files. Categories, sequence cards and answers now use stable IDs, so language can't affect validation.
+- Mission reasons and summaries are saved as codes and facts, and written out when shown. Older saved reasons appear as they were written.
+- The diagnosis filter no longer rejects honest refusals such as "I can't tell you if you have ADHD".
+
+### Not changed
+- Colors, art, animation, scoring, XP, levels, the mascot and saved progress.
+
 ## Unreleased: product redesign
 
 ### Changed

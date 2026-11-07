@@ -1,4 +1,5 @@
-import type { AppState, GameResult, ItemStatus, Mission, MissionItem, PlannedItem } from '../../types';
+import type { AppState, ChallengeId, GameResult, ItemStatus, Mission, MissionItem, PlannedItem } from '../../types';
+import { tr } from '../../i18n';
 import { level, today } from '../../utils';
 import { CHALLENGES } from '../challenges/catalog';
 import { isLowEnergy } from './planner';
@@ -137,36 +138,55 @@ export function shouldOfferEasier(it: MissionItem, next?: MissionItem): boolean 
   return !!next && (it.retries > 0 || (it.acc != null && it.acc < 60)) && next.diff !== 'easy' && next.id !== 'calm';
 }
 
+// Facts only. The words are produced when shown, so a language switch on the summary screen works.
 export interface MissionSummary {
   all: boolean;
   doneCount: number;
   total: number;
   xp: number;
-  lines: string;
-  suggestion: string;
-  hasRetry: boolean;
+  retryId: ChallengeId | null;
+  avgAcc: number | null;
+  /** Which suggestion to offer: a lighter day, or optionally a harder one. */
+  suggestion: 'lighter' | 'harder' | 'quiet';
   /** Self-report only: sharing feelings ends quietly, with no celebration. */
   quiet: boolean;
+  solo: boolean;
 }
+
+export function summaryLines(m: MissionSummary): string {
+  if (m.quiet) return tr(m.doneCount ? 'player.summary.quietDone' : 'player.summary.quietNone');
+  const parts = [tr('player.summary.completed', { done: m.doneCount, total: m.total })];
+  if (m.retryId) parts.push(tr('player.summary.retried', { name: tr(`challenges.items.${m.retryId}.name`) }));
+  if (m.avgAcc != null) parts.push(tr('player.summary.accuracy', { acc: m.avgAcc }));
+  return parts.join(tr('common.clauseSep'));
+}
+
+export const summarySuggestion = (m: MissionSummary) => tr(`player.summary.suggest.${m.suggestion}`);
 
 export function finishMission(s: AppState): MissionSummary {
   const M = s.mission!;
   markDone(s, M);
   const its = M.items;
-  if (its.every((i) => CHALLENGES[i.id].selfReport)) {
-    const done = its.filter((i) => i.status === 'COMPLETED').length;
-    return { all: done === its.length, doneCount: done, total: its.length, xp: 0, lines: done ? 'سجلت اللي تحس فيه بكلامك أنت' : 'ما سجلنا شي', suggestion: 'إذا تبي، سولف معي، أو خذ لك بريك. وإذا الوضع ثقيل عليك، كلّم شخص تثق فيه أو مختص.', hasRetry: false, quiet: true };
-  }
   const dn = its.filter((i) => i.status === 'COMPLETED');
   const all = dn.length === its.length;
+  if (its.every((i) => CHALLENGES[i.id].selfReport)) {
+    return { all, doneCount: dn.length, total: its.length, xp: 0, retryId: null, avgAcc: null, suggestion: 'quiet', quiet: true, solo: M.solo };
+  }
   const re = dn.filter((i) => i.retries > 0);
-  const a = [`أكملت ${dn.length} من ${its.length} تحديات`];
-  if (re.length) a.push(`وفي "${CHALLENGES[re[0].id].t}" رجعت وحاولت مرة ثانية`);
   const ac = dn.filter((i) => i.acc != null);
-  if (ac.length) a.push(`ومتوسط دقتك ${Math.round(ac.reduce((n, i) => n + (i.acc as number), 0) / ac.length)}%`);
-  const lines = a.join('، ');
-  const suggestion = isLowEnergy(s) || re.length || !all ? 'بكرة نبدأ بتحديات قصيرة ونشوف كيف تحس.' : 'بكرة نقدر نجرب نسخة أصعب شوي، لو تبي.';
-  const head = all ? (M.solo ? 'خلصنا التحدي!' : 'خلصنا مهمة اليوم!') : 'انتهت المهمة.';
-  s.chat.push({ b: 1, t: `${head} ${lines}. ${suggestion} ودك تسولف معي شوي عن يومك؟` });
-  return { all, doneCount: dn.length, total: its.length, xp: its.reduce((n, i) => n + (i.xp || 0), 0), lines, suggestion, hasRetry: re.length > 0, quiet: false };
+  const sum: MissionSummary = {
+    all,
+    doneCount: dn.length,
+    total: its.length,
+    xp: its.reduce((n, i) => n + (i.xp || 0), 0),
+    retryId: re[0]?.id ?? null,
+    avgAcc: ac.length ? Math.round(ac.reduce((n, i) => n + (i.acc as number), 0) / ac.length) : null,
+    suggestion: isLowEnergy(s) || re.length || !all ? 'lighter' : 'harder',
+    quiet: false,
+    solo: M.solo,
+  };
+  const head = tr(all ? (M.solo ? 'player.summary.headSolo' : 'player.summary.headDaily') : 'player.summary.headPartial');
+  // A chat message is a saved record, so it stays in the language it was written in.
+  s.chat.push({ b: 1, t: tr('player.summary.chat', { head, lines: summaryLines(sum), suggestion: summarySuggestion(sum) }) });
+  return sum;
 }

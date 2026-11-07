@@ -1,5 +1,6 @@
 import { Lightbulb } from 'lucide-react';
 import { useCallback, useEffect, useRef, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 
 // A circular progress ring for timers.
 export function Ring({ value, size = 200, stroke = 12, children, tone = 'var(--em)' }: { value: number; size?: number; stroke?: number; children?: ReactNode; tone?: string }) {
@@ -17,9 +18,10 @@ export function Ring({ value, size = 200, stroke = 12, children, tone = 'var(--e
 }
 
 export function HintButton({ used, onClick, disabled }: { used?: boolean; onClick(): void; disabled?: boolean }) {
+  const { t } = useTranslation();
   return (
     <button type="button" className="btn sm alt" disabled={disabled || used} onClick={onClick}>
-      <Lightbulb size={15} aria-hidden="true" /> {used ? 'أخذت التلميح' : 'تلميح'}
+      <Lightbulb size={15} aria-hidden="true" /> {t(used ? 'games.common.hintUsed' : 'games.common.hint')}
     </button>
   );
 }

@@ -1,43 +1,34 @@
 import { BookOpen, CarFront, CloudSun, Moon, Users, type LucideIcon, Landmark, MessageCircle, ListChecks, Gamepad2, BarChart3, Gift, ShieldCheck } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { playSound, prefersReduced } from '../../animations/effects';
 import { Mascot } from '../../components/mascot/Mascot';
 import { isOneShot, type MascotState } from '../../components/mascot/manifest';
 import { useMascot } from '../../components/mascot/useMascot';
 import { IconBadge } from '../../components/ui/kit';
+import { LanguageSwitcher } from '../../components/ui/LanguageSwitcher';
 import { useAppState, useStore } from '../../context/AppStateContext';
 import { JourneyArt, OasisBackdrop } from '../../features/challenges/ChallengeArt';
 import { JOURNEYS } from '../../features/challenges/catalog';
 import { MemoryGame } from '../../features/challenges/games';
 import type { GameEnv } from '../../features/challenges/types';
+import { msg, type Msg } from '../../i18n';
 
-const MEET: [MascotState, string][] = [['listening', 'يسمعك'], ['thinking', 'يفكر معك'], ['encouraging', 'يشجعك'], ['celebrating', 'يحتفل معك'], ['calm', 'يهدّيك'], ['concerned', 'يهتم لو تعبت']];
-const STEPS: [LucideIcon, string, string][] = [
-  [MessageCircle, 'تسولف معه', 'تقول له عن يومك، وهو يسألك قبل ما يسجل أي شي.'],
-  [ListChecks, 'يجهز لك مهمة', 'ثلاث خطوات قصيرة، مع سبب كل وحدة.'],
-  [Gamepad2, 'تلعب وتتفاعل', 'تبدأها مرة وحدة، وتنتقل بين التحديات تلقائيًا.'],
-  [BarChart3, 'تشوف نتائجك', 'أرقام حقيقية من محاولاتك، بدون تشخيص.'],
-  [Gift, 'تفتح مكافآت', 'نقاط وإنجازات داخل التطبيق، وبدون سلاسل أيام.'],
-];
-const SAUDI: [LucideIcon, string, string][] = [
-  [Landmark, 'وقت الصلاة', 'تدخل الوقت وتختار مدة الحماية، ونأجل التحديات.'],
-  [CarFront, 'القيادة', 'حدد قبل ما تتحرك، وما يظهر لك أي تحدي. عيونك على الطريق.'],
-  [Users, 'العزائم وجمعة الأهل', 'تقول له عن مناسبتك، ويخفف مهمتك بموافقتك.'],
-  [Moon, 'رمضان والعيد', 'تعدّل روتينك بنفسك، بدون افتراضات.'],
-  [BookOpen, 'الدوام والدراسة', 'تحديات وأمثلة تناسب جدولك.'],
-  [CloudSun, 'الطقس', 'غير مربوط حاليًا، وما ندّعي غير كذا.'],
-];
+const MEET: MascotState[] = ['listening', 'thinking', 'encouraging', 'celebrating', 'calm', 'concerned'];
+const STEPS: [LucideIcon, string][] = [[MessageCircle, 'chat'], [ListChecks, 'mission'], [Gamepad2, 'play'], [BarChart3, 'results'], [Gift, 'rewards']];
+const SAUDI: [LucideIcon, string][] = [[Landmark, 'prayer'], [CarFront, 'driving'], [Users, 'family'], [Moon, 'ramadan'], [BookOpen, 'work'], [CloudSun, 'weather']];
 const CYCLE: MascotState[] = ['curious', 'happy', 'celebrating', 'greeting', 'encouraging'];
 
 function PreviewGame({ onStart }: { onStart(): void }) {
+  const { t } = useTranslation();
   const s = useAppState();
   const [phase, setPhase] = useState<'idle' | 'play' | 'done'>('idle');
   const [acc, setAcc] = useState(0);
   const [mood, setMood] = useState<MascotState>('curious');
-  const [bubble, setBubble] = useState('جرّب تحدي صغير، بدون تسجيل.');
+  const [bubble, setBubble] = useState<Msg>('landing.demoIntro');
   const mascot = useMascot(mood);
-  const say = useCallback((m: MascotState, t?: string) => {
-    if (t != null) setBubble(t);
+  const say = useCallback((m: MascotState, text?: Msg) => {
+    if (text != null) setBubble(() => text);
     if (isOneShot(m)) mascot.play(m);
     else setMood(m);
   }, [mascot.play]);
@@ -46,16 +37,16 @@ function PreviewGame({ onStart }: { onStart(): void }) {
     <div className="preview">
       <div className="cb">
         <Mascot state={mascot.state} size={72} still={phase === 'play'} />
-        <div className="bub" aria-live="polite">{bubble}</div>
+        <div className="bub" aria-live="polite">{msg(bubble)}</div>
       </div>
-      {phase === 'idle' && <div className="center"><button type="button" className="btn btn--lg" onClick={() => setPhase('play')}>يلا نلعب</button></div>}
+      {phase === 'idle' && <div className="center"><button type="button" className="btn btn--lg" onClick={() => setPhase('play')}>{t('landing.demoStart')}</button></div>}
       {phase === 'play' && (
-        <MemoryGame diff="easy" env={env} onDone={(r) => { setAcc(r.acc ?? 0); setPhase('done'); say(r.acc ? 'happy' : 'encouraging', r.acc ? 'يا سلام! تبي نكمل؟' : 'عوافي، هذي بس عينة. تبي نكمل؟'); }} />
+        <MemoryGame diff="easy" env={env} onDone={(r) => { setAcc(r.acc ?? 0); setPhase('done'); say(r.acc ? 'happy' : 'encouraging', r.acc ? 'landing.demoGood' : 'landing.demoSample'); }} />
       )}
       {phase === 'done' && (
         <div className="center">
-          <p>دقتك من أول محاولة: <b>{acc}%</b>. هذي عينة، وما انحفظت.</p>
-          <button type="button" className="btn btn--lg" onClick={onStart}>يلا نبدأ رحلتنا</button>
+          <p>{t('landing.demoResult', { acc })}</p>
+          <button type="button" className="btn btn--lg" onClick={onStart}>{t('landing.cta')}</button>
         </div>
       )}
     </div>
@@ -63,6 +54,7 @@ function PreviewGame({ onStart }: { onStart(): void }) {
 }
 
 export function Landing() {
+  const { t } = useTranslation();
   const store = useStore();
   const hero = useMascot('idle');
   const [cycle, setCycle] = useState(0);
@@ -90,34 +82,37 @@ export function Landing() {
     <div id="app">
       <div className="lp" ref={root}>
         <header className="lt">
-          <b className="brand">خويّك</b>
-          <button type="button" className="btn sm" onClick={start}>يلا نبدأ</button>
+          <b className="brand">{t('common.brand')}</b>
+          <div className="lt__end">
+            <LanguageSwitcher />
+            <button type="button" className="btn sm" onClick={start}>{t('landing.ctaShort')}</button>
+          </div>
         </header>
 
         <section className="lh">
           <OasisBackdrop className="lh__bg" />
           <div className="lh__in">
             <div className="lh__txt">
-              <p className="eyebrow">رفيق سعودي ليومك</p>
-              <h1>كل يوم له جوّه، وخويّك يعرف كيف يمشي معك</h1>
-              <p className="lh__p">يسولف معك بلهجتك، يجهز لك مهمة قصيرة على قد طاقتك، وتلعب تحديات تساعدك ترتب يومك. وما يشخّص ولا يعالج.</p>
+              <p className="eyebrow">{t('landing.eyebrow')}</p>
+              <h1>{t('landing.heroTitle')}</h1>
+              <p className="lh__p">{t('landing.heroText')}</p>
               <div className="row">
-                <button type="button" className="btn btn--lg" onClick={start} onMouseEnter={() => hero.play('happy')} onFocus={() => hero.play('happy')}>يلا نبدأ رحلتنا</button>
-                <button type="button" className="btn btn--lg alt" onClick={() => document.getElementById('meet')?.scrollIntoView({ behavior: prefersReduced() ? 'auto' : 'smooth' })}>اكتشف خويّك</button>
+                <button type="button" className="btn btn--lg" onClick={start} onMouseEnter={() => hero.play('happy')} onFocus={() => hero.play('happy')}>{t('landing.cta')}</button>
+                <button type="button" className="btn btn--lg alt" onClick={() => document.getElementById('meet')?.scrollIntoView({ behavior: prefersReduced() ? 'auto' : 'smooth' })}>{t('landing.discover')}</button>
               </div>
             </div>
             <div className="lh__m">
-              <Mascot state={hero.state} size={230} interactive onClick={poke} label="خويّك، اضغط عليه يتفاعل" />
-              <p className="note center">جرّب تضغط عليه</p>
+              <Mascot state={hero.state} size={230} interactive onClick={poke} label={t('landing.mascotLabel')} />
+              <p className="note center">{t('landing.tapHint')}</p>
             </div>
           </div>
         </section>
 
         <section className="ls rv">
-          <h2 className="ls__t">كيف يشتغل؟</h2>
+          <h2 className="ls__t">{t('landing.howTitle')}</h2>
           <ol className="flow">
-            {STEPS.map(([Icon, t, d], i) => (
-              <li key={t}><span className="flow__n" aria-hidden="true">{i + 1}</span><IconBadge icon={Icon} tone="lil" size={20} /><h3>{t}</h3><p className="note flush">{d}</p></li>
+            {STEPS.map(([Icon, k], i) => (
+              <li key={k}><span className="flow__n" aria-hidden="true">{i + 1}</span><IconBadge icon={Icon} tone="lil" size={20} /><h3>{t(`landing.steps.${k}.title`)}</h3><p className="note flush">{t(`landing.steps.${k}.text`)}</p></li>
             ))}
           </ol>
         </section>
@@ -125,43 +120,43 @@ export function Landing() {
         <section id="meet" className="ls rv">
           <div className="ls__split">
             <div>
-              <h2 className="ls__t">تعرّف على خويّك</h2>
-              <p>رفيق صغير يتفاعل مع اللحظة: يسمعك، يفكر معك، ويفرح لما تنجز. هو مو معالج نفسي، ولا بديل عن أهلك وأصحابك أو المختصين.</p>
+              <h2 className="ls__t">{t('landing.meetTitle')}</h2>
+              <p>{t('landing.meetText')}</p>
             </div>
-            <ul className="meet">{MEET.map(([m, l]) => <li key={m}><Mascot state={m} size={78} interactive /><span>{l}</span></li>)}</ul>
+            <ul className="meet">{MEET.map((m) => <li key={m}><Mascot state={m} size={78} interactive /><span>{t(`landing.meet.${m}`)}</span></li>)}</ul>
           </div>
         </section>
 
         <section className="ls rv">
-          <h2 className="ls__t">جرّب تحدي الحين</h2>
+          <h2 className="ls__t">{t('landing.demoTitle')}</h2>
           <PreviewGame onStart={start} />
         </section>
 
         <section className="ls rv">
-          <h2 className="ls__t">رحلات تختارها أنت</h2>
-          <p className="note">رحلات دعم وتدريب، مو برامج علاجية. تقدر تختار أكثر من وحدة، وما نطلب تشخيص.</p>
-          <div className="lj">{JOURNEYS.map((j) => <div key={j.id} className="lj__c"><div className="lj__art"><JourneyArt id={j.id} /></div><b>{j.n}</b></div>)}</div>
+          <h2 className="ls__t">{t('landing.journeysTitle')}</h2>
+          <p className="note">{t('landing.journeysNote')}</p>
+          <div className="lj">{JOURNEYS.map((j) => <div key={j.id} className="lj__c"><div className="lj__art"><JourneyArt id={j.id} /></div><b>{t(`journeys.items.${j.id}.name`)}</b></div>)}</div>
         </section>
 
         <section className="ls rv">
-          <h2 className="ls__t">على قد يومك السعودي</h2>
-          <div className="saudi">{SAUDI.map(([Icon, t, d]) => <div key={t}><IconBadge icon={Icon} tone="sage" size={20} /><div><h3>{t}</h3><p className="note flush">{d}</p></div></div>)}</div>
+          <h2 className="ls__t">{t('landing.saudiTitle')}</h2>
+          <div className="saudi">{SAUDI.map(([Icon, k]) => <div key={k}><IconBadge icon={Icon} tone="sage" size={20} /><div><h3>{t(`landing.saudi.${k}.title`)}</h3><p className="note flush">{t(`landing.saudi.${k}.text`)}</p></div></div>)}</div>
         </section>
 
         <section className="ls rv">
           <div className="honest">
             <IconBadge icon={ShieldCheck} tone="em" size={22} />
             <div>
-              <h2>بصراحة</h2>
-              <p>خويّك منصة عافية، مو جهة تشخيص أو علاج. بياناتك محفوظة على جهازك، والردود الذكية ما تشتغل إلا بموافقتك. ما عندنا شركاء ولا قسائم حاليًا. إذا تمر بوقت صعب، كلّم شخص تثق فيه أو مختص.</p>
+              <h2>{t('landing.honestTitle')}</h2>
+              <p>{t('landing.honestText')}</p>
             </div>
           </div>
         </section>
 
         <section className="ls rv center closing">
           <Mascot state="happy" size={130} />
-          <h2>جاهز تبدأ؟ خويّك بانتظارك.</h2>
-          <button type="button" className="btn btn--lg" onClick={start}>يلا نبدأ</button>
+          <h2>{t('landing.closing')}</h2>
+          <button type="button" className="btn btn--lg" onClick={start}>{t('landing.ctaShort')}</button>
         </section>
       </div>
     </div>

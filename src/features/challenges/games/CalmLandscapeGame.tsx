@@ -1,5 +1,6 @@
 import { Moon, Sun, Volume2, VolumeX } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { startAmbient } from '../../../animations/effects';
 import { Palm } from '../ChallengeArt';
 import type { GameProps } from '../types';
@@ -9,6 +10,7 @@ export const MIN_STAY_SEC = 20;
 const LANTERNS = [{ x: 150, y: 150 }, { x: 330, y: 132 }, { x: 490, y: 154 }];
 
 export function CalmLandscapeGame({ env, onDone }: GameProps) {
+  const { t } = useTranslation();
   const [phase, setPhase] = useState<'scene' | 'ask'>('scene');
   const [dusk, setDusk] = useState(false);
   const [lit, setLit] = useState<boolean[]>([false, false, false]);
@@ -20,7 +22,7 @@ export function CalmLandscapeGame({ env, onDone }: GameProps) {
   const nextId = useRef(0);
 
   useEffect(() => {
-    env.say('calm', 'خذ لك لحظة. ما فيه شي لازم تسويه.');
+    env.say('calm', 'games.landscape.intro');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -46,17 +48,17 @@ export function CalmLandscapeGame({ env, onDone }: GameProps) {
   }
 
   function answer(help: string | null) {
-    onDone({ acc: null, retries: 0, mood: 'calm', say: 'الله يعطيك العافية.', data: { help, secs, touches: touches.current } });
+    onDone({ acc: null, retries: 0, mood: 'calm', say: 'games.landscape.done', data: { help, secs, touches: touches.current } });
   }
 
   if (phase === 'ask') {
     return (
       <div className="scene q">
-        <h2 className="q__t">كيف كان البريك؟</h2>
+        <h2 className="q__t">{t('games.landscape.how')}</h2>
         <div className="choices choices--3">
-          {[['y', 'ارتحت'], ['s', 'شوي'], ['n', 'ما فرق']].map(([k, l]) => <button key={k} type="button" className="opt" onClick={() => answer(k)}>{l}</button>)}
+          {['y', 's', 'n'].map((k) => <button key={k} type="button" className="opt" onClick={() => answer(k)}>{t(`games.common.help.${k}`)}</button>)}
         </div>
-        <div className="row row--c"><button type="button" className="btn-link" onClick={() => answer(null)}>أفضّل ما أجاوب</button></div>
+        <div className="row row--c"><button type="button" className="btn-link" onClick={() => answer(null)}>{t('games.common.preferNot')}</button></div>
       </div>
     );
   }
@@ -65,7 +67,7 @@ export function CalmLandscapeGame({ env, onDone }: GameProps) {
   return (
     <div className="scene land">
       <div className={`land__stage ${dusk ? 'is-dusk' : ''}`}>
-        <svg viewBox="0 0 640 360" role="img" aria-label="واحة هادية فيها فوانيس ونخل وماء">
+        <svg viewBox="0 0 640 360" role="img" aria-label={t('games.landscape.sceneLabel')}>
           <rect width="640" height="360" fill={dusk ? '#6C63B8' : '#CFE9FF'} className="land__sky" />
           {dusk ? [[80, 50], [200, 90], [420, 40], [540, 90], [300, 30]].map(([x, y]) => <circle key={x} cx={x} cy={y} r="2.5" fill="#FFFDF8" />) : <circle cx="530" cy="70" r="36" fill="#FFD36E" />}
           {dusk && <path d="M556 92A32 32 0 1 1 526 44a26 26 0 0 0 30 48z" fill="#FFD36E" />}
@@ -86,17 +88,17 @@ export function CalmLandscapeGame({ env, onDone }: GameProps) {
           ))}
         </svg>
         {LANTERNS.map((l, i) => (
-          <button key={i} type="button" className="land__hit" style={{ left: `${(l.x / 640) * 100}%`, top: `${(l.y / 360) * 100}%` }} aria-label={`الفانوس ${i + 1}`} aria-pressed={lit[i]} onClick={() => { touch(); setLit(lit.map((v, x) => (x === i ? !v : v))); }} />
+          <button key={i} type="button" className="land__hit" style={{ left: `${(l.x / 640) * 100}%`, top: `${(l.y / 360) * 100}%` }} aria-label={t('games.landscape.lantern', { n: i + 1 })} aria-pressed={lit[i]} onClick={() => { touch(); setLit(lit.map((v, x) => (x === i ? !v : v))); }} />
         ))}
-        <button type="button" className="land__hit land__hit--water" aria-label="الماء" onClick={() => ripple(200 + Math.random() * 240, 296 + Math.random() * 20)} />
-        <button type="button" className="land__hit land__hit--palm" aria-label="النخلة" onClick={() => { touch(); setSway((v) => (v ? 0 : 7)); }} />
+        <button type="button" className="land__hit land__hit--water" aria-label={t('games.landscape.water')} onClick={() => ripple(200 + Math.random() * 240, 296 + Math.random() * 20)} />
+        <button type="button" className="land__hit land__hit--palm" aria-label={t('games.landscape.palm')} onClick={() => { touch(); setSway((v) => (v ? 0 : 7)); }} />
       </div>
       <div className="land__ctl">
-        <button type="button" className="btn sm alt" aria-pressed={dusk} onClick={() => { touch(); setDusk(!dusk); }}>{dusk ? <Sun size={15} aria-hidden="true" /> : <Moon size={15} aria-hidden="true" />} {dusk ? 'نهار' : 'مساء'}</button>
-        {env.snd && <button type="button" className="btn sm alt" aria-pressed={sound} onClick={() => setSound(!sound)}>{sound ? <Volume2 size={15} aria-hidden="true" /> : <VolumeX size={15} aria-hidden="true" />} صوت هادي</button>}
-        <button type="button" className="btn sm" disabled={!canEnd} onClick={() => setPhase('ask')}>خلص بريكي</button>
+        <button type="button" className="btn sm alt" aria-pressed={dusk} onClick={() => { touch(); setDusk(!dusk); }}>{dusk ? <Sun size={15} aria-hidden="true" /> : <Moon size={15} aria-hidden="true" />} {t(dusk ? 'games.landscape.day' : 'games.landscape.evening')}</button>
+        {env.snd && <button type="button" className="btn sm alt" aria-pressed={sound} onClick={() => setSound(!sound)}>{sound ? <Volume2 size={15} aria-hidden="true" /> : <VolumeX size={15} aria-hidden="true" />} {t('games.landscape.sound')}</button>}
+        <button type="button" className="btn sm" disabled={!canEnd} onClick={() => setPhase('ask')}>{t('games.landscape.end')}</button>
       </div>
-      <p className="note center">{canEnd ? 'خذ وقتك، وارجع لما تحس إنك جاهز.' : 'اضغط الفوانيس أو الماء أو النخلة، أو بس خلك تشوف. زر الإنهاء يجهز بعد لحظات.'}</p>
+      <p className="note center">{t(canEnd ? 'games.landscape.ready' : 'games.landscape.guide')}</p>
     </div>
   );
 }

@@ -1,7 +1,16 @@
 <!doctype html>
-<html lang="ar" dir="rtl">
+<html lang="ar-SA" dir="rtl">
   <head>
     <meta charset="utf-8" />
+    <!-- Sets the saved language before the first paint, so English never flashes in the wrong direction. -->
+    <script>
+      try {
+        if (JSON.parse(localStorage.getItem('kw2') || 'null').lang === 'en') {
+          document.documentElement.lang = 'en';
+          document.documentElement.dir = 'ltr';
+        }
+      } catch (e) {}
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#28785B" />
     <meta name="description" content="خويّك منصة سعودية للعافية الذهنية: تحديات تفاعلية وخطط يومية مرنة. ليست جهة تشخيص أو علاج." />

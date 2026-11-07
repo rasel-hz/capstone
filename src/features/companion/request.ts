@@ -15,6 +15,7 @@ export function buildChatRequest(message: string, s: AppState) {
       .map((m) => ({ role: m.b ? 'assistant' : 'user', text: m.t })),
     context: {
       address: s.g,
+      lang: s.lang,
       lowEnergyToday: isLowEnergy(s),
       confirmed: s.ctx,
       attempts: st.attempts.length,

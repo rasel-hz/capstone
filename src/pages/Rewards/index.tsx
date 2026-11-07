@@ -1,5 +1,6 @@
 import { Award, Check, Crown, Footprints, Layers, Lock, Palette, RefreshCw, Shapes, Sunrise, type LucideIcon } from 'lucide-react';
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { PageHeader, ProgressBar } from '../../components/ui/kit';
 import { Mascot } from '../../components/mascot/Mascot';
 import { useMascot } from '../../components/mascot/useMascot';
@@ -30,6 +31,7 @@ function Medal({ art, earned }: { art: AchievementArt; earned: boolean }) {
 const STICKERS = (Object.keys(CHALLENGES) as ChallengeId[]).filter((id) => !CHALLENGES[id].selfReport);
 
 export function Rewards() {
+  const { t } = useTranslation();
   const s = useAppState();
   const store = useStore();
   const lvl = level(s);
@@ -49,47 +51,47 @@ export function Rewards() {
 
   return (
     <>
-      <PageHeader title="مكافآتي" sub="مكافآت داخل التطبيق فقط حاليًا. ما فيه سلاسل أيام، وأيام الراحة جزء طبيعي من الرحلة." />
+      <PageHeader title={t('rewards.title')} sub={t('rewards.sub')} />
 
       <section className="rew-hero">
-        <Mascot state={mascot.state} size={116} label="خويّك" interactive />
+        <Mascot state={mascot.state} size={116} label={t('common.brand')} interactive />
         <div className="grow">
-          <p className="eyebrow">المستوى {lvl}</p>
-          <p className="rew-hero__xp"><b>{xp}</b> نقطة</p>
-          <ProgressBar value={s.xp % 100} label="التقدم للمستوى التالي" />
-          <p className="note">باقي {100 - (s.xp % 100)} نقطة للمستوى {lvl + 1}. النقاط تشجيع على المشاركة، مو مقياس لصحتك.</p>
+          <p className="eyebrow">{t('common.levelN', { n: lvl })}</p>
+          <p className="rew-hero__xp"><b>{xp}</b> {t('common.pointsWord')}</p>
+          <ProgressBar value={s.xp % 100} label={t('common.toNextLevel')} />
+          <p className="note">{t('rewards.toNext', { left: 100 - (s.xp % 100), next: lvl + 1 })} {t('common.xpDisclaimer')}</p>
         </div>
       </section>
 
       <section className="panel">
-        <div className="panel__h"><h2>إنجازاتي</h2><span className="note">{earned} من {list.length}</span></div>
+        <div className="panel__h"><h2>{t('rewards.achievements')}</h2><span className="note">{t('rewards.ofTotal', { n: earned, total: list.length })}</span></div>
         <ul className="medals">
           {list.map((a) => (
-            <li key={a.label} className={a.earned ? 'chip--earned' : ''}>
+            <li key={a.art} className={a.earned ? 'chip--earned' : ''}>
               <Medal art={a.art} earned={a.earned} />
-              <b>{a.label}</b>
-              <span className="note">{a.earned ? 'حصلت عليه' : a.hint}</span>
+              <b>{t(`rewards.items.${a.art}.label`)}</b>
+              <span className="note">{a.earned ? t('rewards.earned') : t(`rewards.items.${a.art}.hint`)}</span>
             </li>
           ))}
         </ul>
       </section>
 
       <section className="panel">
-        <h2>مفتوحات</h2>
+        <h2>{t('rewards.unlocks')}</h2>
         <div className="unlocks">
-          {UNLOCKS.map((t) => {
-            const open = lvl >= t.level;
-            const active = !!t.theme && s.theme === t.theme;
+          {UNLOCKS.map((u) => {
+            const open = lvl >= u.level;
+            const active = !!u.theme && s.theme === u.theme;
             return (
-              <div key={t.label} className={`unlock ${open ? 'is-open' : ''}`}>
-                <span className={`unlock__art ${t.theme ? 'unlock__art--theme' : 'unlock__art--hat'}`} aria-hidden="true">{t.theme ? <Palette size={26} /> : <Crown size={26} />}</span>
+              <div key={u.id} className={`unlock ${open ? 'is-open' : ''}`}>
+                <span className={`unlock__art ${u.theme ? 'unlock__art--theme' : 'unlock__art--hat'}`} aria-hidden="true">{u.theme ? <Palette size={26} /> : <Crown size={26} />}</span>
                 <div className="grow">
-                  <b>{t.label}</b>
-                  <p className="note flush">{open ? (t.theme ? 'مفتوح، وتقدر تفعله.' : 'مفتوحة، ويلبسها خويّك من نفسه.') : `تنفتح عند المستوى ${t.level}`}</p>
+                  <b>{t(`rewards.unlockItems.${u.id}.name`)}</b>
+                  <p className="note flush">{open ? t(`rewards.unlockItems.${u.id}.open`) : t('rewards.unlocksAt', { n: u.level })}</p>
                 </div>
-                {open && t.theme ? (
-                  <button type="button" className="btn sm alt" aria-pressed={active} onClick={() => store.update((d) => { d.theme = d.theme ? '' : t.theme; })}>{active ? 'ألغِ' : 'فعّل'}</button>
-                ) : open ? <Check size={18} aria-label="مفتوحة" /> : <Lock size={18} aria-label="مقفلة" />}
+                {open && u.theme ? (
+                  <button type="button" className="btn sm alt" aria-pressed={active} onClick={() => store.update((d) => { d.theme = d.theme ? '' : u.theme; })}>{t(active ? 'rewards.turnOff' : 'rewards.turnOn')}</button>
+                ) : open ? <Check size={18} aria-label={t('rewards.unlocked')} /> : <Lock size={18} aria-label={t('rewards.locked')} />}
               </div>
             );
           })}
@@ -97,20 +99,20 @@ export function Rewards() {
       </section>
 
       <section className="panel">
-        <div className="panel__h"><h2>مجموعتي</h2><span className="note">{stickers} من {STICKERS.length}</span></div>
-        <p className="note">كل تحدي تكمله أول مرة يضيف بطاقته لمجموعتك.</p>
+        <div className="panel__h"><h2>{t('rewards.collection')}</h2><span className="note">{t('rewards.ofTotal', { n: stickers, total: STICKERS.length })}</span></div>
+        <p className="note">{t('rewards.collectionNote')}</p>
         <ul className="stickers">
           {STICKERS.map((id) => (
             <li key={id} className={done.has(id) ? 'is-on' : ''}>
               <div className="sticker__art"><ChallengeArt id={id} /></div>
-              <span>{done.has(id) ? CHALLENGES[id].t : 'لسا'}</span>
-              <span className="sr-only">{done.has(id) ? '' : CHALLENGES[id].t}</span>
+              <span>{done.has(id) ? t(`challenges.items.${id}.name`) : t('rewards.notYet')}</span>
+              <span className="sr-only">{done.has(id) ? '' : t(`challenges.items.${id}.name`)}</span>
             </li>
           ))}
         </ul>
       </section>
 
-      <p className="note center">ما عندنا شركاء ولا قسائم حاليًا، وأي عرض خارجي يحتاج اتفاق موقّع قبل ما يظهر هنا.</p>
+      <p className="note center">{t('rewards.noPartners')}</p>
     </>
   );
 }

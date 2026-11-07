@@ -3,7 +3,7 @@
 > **Document type:** Single Source of Truth (Product Requirements + Current-State Audit + Technical Blueprint + Team Handoff)
 > **Version:** 1.0 — 2026-11-06
 > **Source of current implementation:** `خويّك _ Khowayk.html` supplied by the project owner.
-> **Language:** Arabic-first (Saudi/Najdi), English for technical interfaces and code.
+> **Language:** Arabic-first (Saudi/Najdi), with a full English interface. English for technical interfaces and code.
 > **Status key:** `[CURRENT]` verified in supplied HTML · `[TARGET]` approved product direction, not yet implemented · `[PROPOSED]` suggested design requiring approval · `[EXTERNAL]` requires external service/agreement.
 > **Critical rule:** Never describe a proposed feature, partner, integration, medical capability, or AI model as live unless verified in the running system.
 
@@ -33,7 +33,8 @@ This file is intended for product managers, UI/UX designers, frontend engineers,
 |---|---|---|
 | Public landing page | CURRENT | Hero, mascot, how it works, journeys, playable memory preview, Saudi lifestyle, honest positioning, CTAs. Sample rewards section removed. |
 | RTL Arabic visual system | CURRENT | IBM Plex Sans Arabic, CSS variables, sidebar/mobile bottom navigation. Improve accessibility, componentization, and polish. |
-| Animated mascot | CURRENT | SVG character with multiple expressions, hover/click reaction on landing, simple floating/glow effects. Target richer custom animation system. |
+| English interface | CURRENT | Every screen and challenge in Saudi Arabic and English, with RTL and LTR, switchable mid-game. See `docs/I18N.md`. |
+| Animated mascot | CURRENT | Approved 2D character with a clip for each of its 11 states, tied to real app events. Safari and reduced motion use the still image. See `docs/MASCOT.md`. |
 | Onboarding | CURRENT | 5 steps for name/pronouns, chosen journeys, routine/sleep, prayer buffer, sound/motion. |
 | Home | CURRENT | Greeting, energy check-in, mission timeline with reasons, progress, quick actions, «ترتيب يومك» (manual prayer time, confirmed context, schedule). The driving card moved to settings; if the user set driving, the mission is replaced by a safety notice. |
 | Journey selection | CURRENT | 8 journey definitions with a detail map of shared challenges; not 8 distinct clinical programs. |

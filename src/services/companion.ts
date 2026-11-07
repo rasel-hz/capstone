@@ -29,7 +29,7 @@ export const aiCompanion: CompanionService = {
     return {
       messages: [r.reply],
       tone: r.tone,
-      ...(r.pending ? { pending: { ctx: r.pending.ctx, low: r.pending.low ? 1 : 0, card: state.g === 'f' ? 'تبين أخفف مهمة اليوم؟' : 'تبي أخفف مهمة اليوم؟' } } : {}),
+      ...(r.pending ? { pending: { ctx: r.pending.ctx, low: r.pending.low ? 1 : 0, card: 1 } } : {}),
     };
   },
 };

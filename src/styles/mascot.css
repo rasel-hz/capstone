@@ -13,18 +13,18 @@
 
 /* Held states, for image art. A clip supplies its own movement. */
 .mascot:not(.is-still):not(.has-clip).mascot--idle .mascot__body { animation: m-breathe 3.6s ease-in-out infinite; }
-.mascot:not(.is-still).mascot--listening .mascot__body { animation: m-attend 2.4s ease-in-out infinite; }
-.mascot:not(.is-still).mascot--thinking .mascot__body { animation: m-bob 2.8s ease-in-out infinite; }
-.mascot:not(.is-still).mascot--calm .mascot__body { animation: m-breathe 6s ease-in-out infinite; }
-.mascot:not(.is-still).mascot--resting .mascot__body { animation: m-breathe 8s ease-in-out infinite; }
-.mascot--concerned .mascot__body { transform: translateY(1.5%) scale(.98); }
+.mascot:not(.is-still):not(.has-clip).mascot--listening .mascot__body { animation: m-attend 2.4s ease-in-out infinite; }
+.mascot:not(.is-still):not(.has-clip).mascot--thinking .mascot__body { animation: m-bob 2.8s ease-in-out infinite; }
+.mascot:not(.is-still):not(.has-clip).mascot--calm .mascot__body { animation: m-breathe 6s ease-in-out infinite; }
+.mascot:not(.is-still):not(.has-clip).mascot--resting .mascot__body { animation: m-breathe 8s ease-in-out infinite; }
+.mascot--concerned:not(.has-clip) .mascot__body { transform: translateY(1.5%) scale(.98); }
 
-/* One-time reactions. These also play on still mascots, because they are brief feedback. */
-.mascot--greeting .mascot__body { animation: m-hop 1.3s var(--ease) both; }
-.mascot--happy .mascot__body { animation: m-bounce .9s var(--ease) both; }
-.mascot--celebrating .mascot__body { animation: m-jump 1.5s var(--ease) both; }
-.mascot--encouraging .mascot__body { animation: m-nod .8s var(--ease) both; }
-.mascot--curious .mascot__body { animation: m-perk .7s var(--ease) both; }
+/* One-time reactions for image art, such as in Safari. These also play on still mascots, because they are brief feedback. */
+.mascot--greeting:not(.has-clip) .mascot__body { animation: m-hop 1.3s var(--ease) both; }
+.mascot--happy:not(.has-clip) .mascot__body { animation: m-bounce .9s var(--ease) both; }
+.mascot--celebrating:not(.has-clip) .mascot__body { animation: m-jump 1.5s var(--ease) both; }
+.mascot--encouraging:not(.has-clip) .mascot__body { animation: m-nod .8s var(--ease) both; }
+.mascot--curious:not(.has-clip) .mascot__body { animation: m-perk .7s var(--ease) both; }
 
 /* Effects around the character. With reduced motion they stay visible, without moving. */
 .mascot__fx { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }

@@ -1,6 +1,6 @@
 /* Navigation */
 nav {
-  width: 204px; padding: 20px 12px; background: var(--surface); border-inline-start: 1px solid var(--line);
+  width: 204px; padding: 20px 12px; background: var(--surface); border-inline-end: 1px solid var(--line);
   display: flex; flex-direction: column; gap: 3px; position: sticky; top: 0; height: 100vh; flex: none; z-index: 4;
 }
 nav b { font-size: 25px; padding: 4px 14px 16px; color: var(--em); }
@@ -18,9 +18,9 @@ nav button.on:hover { background: none; }
 @media (max-width: 860px) {
   nav {
     width: 100%; height: auto; position: fixed; top: auto; bottom: 0; flex-direction: row; padding: 5px 4px; justify-content: space-around;
-    padding-bottom: calc(5px + env(safe-area-inset-bottom, 0px)); border-inline-start: 0; border-top: 1px solid var(--line); gap: 0;
+    padding-bottom: calc(5px + env(safe-area-inset-bottom, 0px)); border-inline-end: 0; border-top: 1px solid var(--line); gap: 0;
   }
-  nav b { display: none; }
+  nav b, nav .lang-sw { display: none; }
   nav button { padding: 6px 1px 5px; font-size: 10.5px; flex: 1 1 0; min-width: 0; flex-direction: column; gap: 2px; min-height: 52px; justify-content: center; line-height: 1.2; }
   nav button:hover { background: none; }
   .nav-pill { inset: 1px 3px; }
@@ -370,3 +370,21 @@ input[type='time'] { width: auto; }
 .ob-j__t { padding: 6px 9px 8px; line-height: 1.4; }
 .ob-j__c { position: absolute; top: 5px; inset-inline-start: 5px; width: 22px; height: 22px; border-radius: 50%; background: var(--em); color: #fff; display: inline-flex; align-items: center; justify-content: center; }
 @media (max-width: 480px) { .stepper em { display: none; } .stepper .is-cur em { display: inline; } }
+
+/* Language switcher */
+.lang-sw {
+  border: 0; background: var(--cr); color: var(--ink); font: inherit; font-size: 13.5px; min-height: 40px; padding: 6px 12px; border-radius: 11px; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px; box-shadow: inset 0 0 0 1px var(--line); transition: background var(--t-micro) var(--ease);
+}
+.lang-sw:hover { background: var(--lil); }
+nav .lang-sw { margin-top: auto; }
+.gh .lang-sw { background: none; box-shadow: none; min-height: 44px; padding: 4px 8px; font-size: 12.5px; }
+.ob-top { display: flex; justify-content: flex-end; margin-bottom: 10px; }
+.lt__end { display: flex; gap: 8px; align-items: center; }
+
+/* Arrows that point along the reading direction. Their icons are drawn for right to left. */
+[dir='ltr'] .flip { transform: scaleX(-1); }
+
+/* English needs a little less line height than Arabic, using the same font's Latin letters. */
+html[lang='en'] body { line-height: 1.6; }
+html[lang='en'] h1, html[lang='en'] h2 { letter-spacing: -.01em; }

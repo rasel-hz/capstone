@@ -42,11 +42,12 @@ Reactions come only from real events. A repeat of the reaction already playing i
 
 | Asset | Status |
 |---|---|
-| `public/mascot/base/pose-main.png` | ✅ Used for every state without its own file |
-| `public/mascot/animations/idle.webm` | ✅ Used for `idle` |
-| The other 10 states | ❌ Not created yet |
+| `public/mascot/base/pose-main.png` | Used as the still image for every state |
+| `public/mascot/animations/*.webm` | A clip for all 11 states. Reactions are 3 seconds, `calm`, `resting` and `idle` are 5 |
 
-Because the current art is one flat image, **the face can't change between states yet**. Those states differ by whole-body movement and by small effects drawn around the character (`MascotFx.tsx`), such as thought dots, sleep z's and sparkles. This is deliberate: the system doesn't fake facial animation, and the artwork isn't redrawn. A state's effects turn off automatically once it has its own clip or image.
+Clips play for every state, except on Safari, under reduced motion, or once the level 4 hat is unlocked. During a focus task a still mascot plays reactions only, and holds no looping clip.
+
+Without a clip, the mascot falls back to the still image with whole-body CSS movement and small effects around the character (`MascotFx.tsx`). Because that image is a single pose, **the face doesn't change in those cases**.
 
 ## Adding a new animation
 
@@ -55,10 +56,10 @@ Because the current art is one flat image, **the face can't change between state
 3. Add one line to `CLIPS` in `src/components/mascot/manifest.ts`:
 
 ```ts
-happy: { src: `${base}mascot/animations/happy.webm` },
+happy: clip('happy'),
 ```
 
-Still images work the same way, through `EXPRESSIONS` and `public/mascot/expressions/`. For a one-time state, check that its duration in `ONE_SHOT_MS` matches the clip.
+Still images work the same way, through `EXPRESSIONS` and `public/mascot/expressions/`. For a one-time state, set its duration in `ONE_SHOT_MS` to the clip's length. Clips are fetched into the browser cache when the page goes idle (`preloadClips`), about 3.6 MB in total.
 
 ## Fallbacks
 

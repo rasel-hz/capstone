@@ -2,6 +2,8 @@
 
 Written 2026-11-07, at commit `b3ce984` on `faris-branch`, and updated after the product redesign. See `CHANGELOG.md` for that work.
 
+For a short list of what's done and what's left, see [PROJECT_STATUS.md](PROJECT_STATUS.md).
+
 ## Prompt to give the AI agent
 
 Paste this at the start of the agent's session:
@@ -18,8 +20,9 @@ Paste this at the start of the agent's session:
 |---|---|
 | Working app | React, TypeScript and Vite, with all screens and 12 playable challenges |
 | Chat | Connected to OpenAI and checked with a real key, with keyword rules as the fallback |
-| Mascot | Component and 11 states are built, but only 1 real animation exists |
-| Tests | 72 unit tests pass; type check and build pass |
+| Languages | Saudi Arabic and English, switchable mid-game. See `docs/I18N.md` |
+| Mascot | Component and 11 states are built, each with its own clip |
+| Tests | 102 unit tests pass; type check and build pass |
 | Data | Stored in the browser only (`localStorage` key `kw2`); no backend or accounts |
 | Public deployment | **Not safe yet**, because anyone who can reach the server can spend the API key |
 
@@ -102,6 +105,9 @@ The app works without an API key, using keyword rules and saying so on screen. T
 - Context is saved only after the user confirms it (§11.5).
 - Keep the three crisis layers in `server/chat.ts`.
 - Don't send the user's name, chosen journeys or typed game text to the model without a consent decision from the team.
+
+**Language**
+- Never put interface text in a component or in saved state. See `docs/I18N.md`.
 
 **Game code**
 - Follow "Adding a game" in `docs/ARCHITECTURE.md`.
@@ -212,7 +218,7 @@ See `docs/AI.md` for what's sent to OpenAI and the full results of the real-mode
 - Safari, real phones and screen readers
 - The retry against a real dropped connection (unit test only)
 - Some game paths: the `start2` and `study_sprint` timers running all the way out, and the sound options by ear
-- A mission with all three steps completed in one run after the redesign, the system's own reduced-motion setting, and the backup mascot image
+- The system's own reduced-motion setting and the backup mascot image
 
 The real-model check was a spot check, not an evaluation. There are no automated browser tests.
 
@@ -228,7 +234,7 @@ The real-model check was a spot check, not an evaluation. There are no automated
 | About 2 of 40 real calls failed | `server/chat.ts` | One took over 20 seconds, and one failed quickly after about a minute idle. The cause isn't confirmed. The server now logs the failure type |
 | Daily mission barely uses chosen journeys | `src/features/mission/planner.ts` | It's almost always `video`, then `mem` or `seq`, then `calm`, `start2` or `time`. The six new challenges never enter it automatically |
 | Resumed challenges restart | `MissionPlayer.tsx` | Allowed by reference Flow B, and explained on screen. No game checkpoints yet |
-| Bundle is 544 KB (173 KB gzipped) | Build | Over Vite's 500 KB warning. Works, but code splitting would help phones |
+| Bundle is about 690 KB (215 KB gzipped) | Build | Over Vite's 500 KB warning. Works, but code splitting would help phones |
 | Browser back button doesn't move between tabs | `state.view` | React Router wasn't added on purpose |
 
 ## What to do next
@@ -271,27 +277,11 @@ Specs are in section 5 of `docs/TASK_CATALOG.md`. Build in this order, because l
 
 ### 4. Finish the mascot
 
-Generate clips in Masko from the main pose, using the account where the character was created. Every clip must start and end on that pose. Check the first clip before making the rest, because each generation costs credits.
+All 11 clips are in the app. What's left:
 
-| Save as, in `public/mascot/animations/` | Length | Prompt |
-|---|---|---|
-| `happy.webm` | 3 s | Smiles wider and gives one small, friendly wave, then lowers its arm. Returns to the starting pose. |
-| `celebrating.webm` | 3 s | Hops once with both arms up, smiling with its mouth open, and lands softly. Returns to the starting pose. |
-| `calm.webm` | 5 s or more | Slowly closes its eyes and takes one slow, small breath. Arms stay down and the feet stay planted. Opens its eyes and returns to the starting pose. |
-| `listening.webm` | 3 s | Leans in slightly and gives two gentle nods. Returns to the starting pose. |
-| `encouraging.webm` | 3 s | Gives one kind nod and a small fist pump with one arm. Returns to the starting pose. |
-| `curious.webm` | 3 s | Tilts its head to one side and raises one eyebrow, then straightens up. Returns to the starting pose. |
-| `concerned.webm` | 3 s | Softens its expression and slowly tilts its head with a caring look, not sad or dramatic. Returns to the starting pose. |
-| `thinking.webm` | 3 s | Looks up and to the side, and taps its chin once with one hand. Returns to the starting pose. |
-| `resting.webm` | 5 s | Blinks slowly and sleepily, and its head dips slightly. Returns to the starting pose. |
-| `greeting.webm` | Prompt not written yet | Should be a short wave that returns to the starting pose. |
-
-For each clip:
-- Add one line to `CLIPS` in `src/components/mascot/manifest.ts`.
-- For one-time states, match `ONE_SHOT_MS` to the clip's length. The current values are shorter than 3 seconds.
-- Check for a version that works on iPhone, because WebM transparency isn't reliable in Safari.
-
-**Phone icon:** not started. In Masko's Logo tab, use this prompt, then save the largest PNG as `assets/icon-source.png` and generate the icon sizes and web manifest from it:
+- **iPhone:** Safari shows the still image, because WebM transparency isn't reliable there. Check whether Masko offers a version that works, such as MOV or HEVC.
+- **Reduced motion:** these users see the same still image for every state. Stills for each state would go in `EXPRESSIONS`.
+- **Phone icon:** not started. In Masko's Logo tab, use this prompt, then save the largest PNG as `assets/icon-source.png` and generate the icon sizes and web manifest from it:
 
 > App icon of the character's head and leaf only, centered and looking straight ahead, friendly closed-mouth smile. Fill about 65% of a square image. Flat, solid background color #28785B. No text, no shadow, no border, no rounded corners.
 

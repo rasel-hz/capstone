@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '../../context/AppStateContext';
 import { Challenges } from '../../pages/Challenges';
 import { Companion } from '../../pages/Companion';
@@ -15,6 +16,7 @@ const PAGES: Record<ViewId, (p: { onNavigate(v: ViewId): void }) => React.JSX.El
 };
 
 export function AppShell({ onNavigate }: { onNavigate(v: ViewId): void }) {
+  const { t } = useTranslation();
   const view = useAppSelector((s) => s.view) as ViewId;
   const Page = PAGES[view] || Home;
   return (
@@ -25,7 +27,7 @@ export function AppShell({ onNavigate }: { onNavigate(v: ViewId): void }) {
         <Page onNavigate={onNavigate} />
       </main>
       {view !== 'chat' && (
-        <button type="button" className="fab" aria-label="افتح خويّك" onClick={() => onNavigate('chat')}>
+        <button type="button" className="fab" aria-label={t('nav.openBuddy')} onClick={() => onNavigate('chat')}>
           <Mascot state="idle" size={50} still />
         </button>
       )}

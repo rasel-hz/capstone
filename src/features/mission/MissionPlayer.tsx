@@ -1,23 +1,26 @@
 import { Check, ChevronLeft, Clock, FastForward, Flag, Pause, Play, Sparkles, Target, Volume2, VolumeX, X } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { fireConfetti, playSound, prefersReduced } from '../../animations/effects';
 import { Mascot } from '../../components/mascot/Mascot';
 import { isOneShot, type MascotState } from '../../components/mascot/manifest';
 import { useMascot } from '../../components/mascot/useMascot';
 import { Segmented } from '../../components/ui/kit';
+import { LanguageSwitcher } from '../../components/ui/LanguageSwitcher';
 import { Overlay } from '../../components/ui/Overlay';
 import { useAppState, useStore } from '../../context/AppStateContext';
 import { useCountUp } from '../../hooks/useCountUp';
 import { useTimers } from '../../hooks/useTimers';
+import { msg, type Msg } from '../../i18n';
 import type { Difficulty, GameResult, ViewId } from '../../types';
-import { byGender, level } from '../../utils';
-import { CHALLENGES, INSTRUCTIONS } from '../challenges/catalog';
+import { level } from '../../utils';
+import { CHALLENGES } from '../challenges/catalog';
 import { ChallengeArt, OasisBackdrop } from '../challenges/ChallengeArt';
 import { GAMES } from '../challenges/games';
 import type { GameEnv } from '../challenges/types';
 import {
   abandonItem, advance, beginItem, completeItem, exitMission, finishMission, isPastEnd, pauseItem, resumeItem,
-  shouldOfferEasier, skipItem, type MissionSummary,
+  shouldOfferEasier, skipItem, summaryLines, summarySuggestion, type MissionSummary,
 } from './engine';
 import { MissionTimeline } from './MissionTimeline';
 
@@ -29,7 +32,7 @@ interface ResultView {
   base: number;
   acc: number | null;
   retries: number;
-  note?: string;
+  note?: Msg;
   leveledUp: boolean;
   newLevel: number;
   last: boolean;
@@ -37,14 +40,15 @@ interface ResultView {
 
 const PREROLL_MS = 3200;
 const RESULT_MS = 4200;
-const minutes = (m: number) => (m === 1 ? 'دقيقة' : m === 2 ? 'دقيقتين' : `${m} دقائق`);
 
 function XpLine({ xp }: { xp: number }) {
+  const { t } = useTranslation();
   const v = useCountUp(xp);
-  return <p className="res__xp"><Sparkles size={20} aria-hidden="true" /> +{v} نقطة</p>;
+  return <p className="res__xp"><Sparkles size={20} aria-hidden="true" /> {t('player.xpGain', { n: v })}</p>;
 }
 
 export function MissionPlayer({ start, onClose, onNavigate }: { start: PlayerStart; onClose(): void; onNavigate(v: ViewId): void }) {
+  const { t } = useTranslation();
   const store = useStore();
   const s = useAppState();
   const M = s.mission!;
@@ -53,7 +57,7 @@ export function MissionPlayer({ start, onClose, onNavigate }: { start: PlayerSta
   const [paused, setPaused] = useState(false);
   const [confirmEnd, setConfirmEnd] = useState(false);
   const [mood, setMood] = useState<MascotState>('happy');
-  const [bubble, setBubble] = useState('');
+  const [bubble, setBubble] = useState<Msg>('');
   const [round, setRound] = useState<{ c: number; t: number; l: string } | null>(null);
   const [result, setResult] = useState<ResultView | null>(null);
   const [summary, setSummary] = useState<MissionSummary | null>(null);
@@ -65,13 +69,15 @@ export function MissionPlayer({ start, onClose, onNavigate }: { start: PlayerSta
   const finishing = useRef(false);
   const advanced = useRef(false);
 
-  const say = useCallback((m: MascotState, t?: string) => {
-    if (t != null) setBubble(t);
+  // The bubble keeps a key or function, wrapped so React doesn't treat a function as a state updater.
+  const setSpeech = useCallback((m: Msg) => setBubble(() => m), []);
+  const say = useCallback((m: MascotState, text?: Msg) => {
+    if (text != null) setSpeech(text);
     if (isOneShot(m)) mascot.play(m);
     else setMood(m);
-  }, [mascot.play]);
+  }, [mascot.play, setSpeech]);
   const sfx = useCallback<GameEnv['sfx']>((k) => playSound(!!store.getState().snd, k), [store]);
-  const reportRound = useCallback<GameEnv['round']>((c, t, l = 'الجولة') => setRound(t ? { c, t, l } : null), []);
+  const reportRound = useCallback<GameEnv['round']>((c, total, l = 'games.common.round') => setRound(total ? { c, t: total, l } : null), []);
 
   const finish = useCallback(() => {
     if (finishing.current) return;
@@ -109,9 +115,9 @@ export function MissionPlayer({ start, onClose, onNavigate }: { start: PlayerSta
     setPhase('preroll');
     setMood('listening');
     const isResume = resumed && !advanced.current;
-    setBubble(isResume ? 'آخر مرة وقفنا هنا. نعيد هذا التحدي من أوله، ومحاولاتك السابقة محفوظة.' : INSTRUCTIONS[id]);
+    setSpeech(isResume ? 'player.resumeNote' : `challenges.items.${id}.instructions`);
     timers.after(() => setPhase('game'), isResume ? PREROLL_MS + 1600 : PREROLL_MS);
-  }, [store, timers, resumed]);
+  }, [store, timers, resumed, setSpeech]);
 
   const next = useCallback(() => {
     timers.clear();
@@ -129,7 +135,7 @@ export function MissionPlayer({ start, onClose, onNavigate }: { start: PlayerSta
     } else if (start === 'run') {
       run();
     } else {
-      setBubble(M.solo ? INSTRUCTIONS[M.items[0].id] : byGender(s.g, 'يلا يا وحش، وريني شطارتك!', 'يلا يا وحشة، وريني شطارتك!'));
+      setSpeech(M.solo ? `challenges.items.${M.items[0].id}.instructions` : (s.g === 'f' ? 'player.go_f' : 'player.go_m'));
       mascot.play('greeting');
     }
     // Runs once when the player opens.
@@ -147,14 +153,14 @@ export function MissionPlayer({ start, onClose, onNavigate }: { start: PlayerSta
     const done = m.items[m.idx];
     const nextItem = m.items[m.idx + 1];
     if (!CHALLENGES[done.id].selfReport) playSound(!!st.snd, 'fin');
-    say(r.mood || 'celebrating', r.say ?? (r.acc == null ? 'خذتها على هونك.' : r.retries ? 'رجعت وحاولت مرة ثانية، وهذا يحسب لك.' : 'يا سلام! كذا الشغل.'));
+    say(r.mood || 'celebrating', r.say ?? (r.acc == null ? 'player.sayDone' : r.retries ? 'player.sayRetried' : 'player.sayGood'));
     if (o.leveledUp) fireConfetti(!!st.rm);
     setRound(null);
     setResult({ xp: o.xp, base: CHALLENGES[done.id].xp, acc: r.acc, retries: r.retries, note: r.note, leveledUp: o.leveledUp, newLevel: o.newLevel, last: !nextItem });
     setPhase('result');
     if (shouldOfferEasier(done, nextItem)) {
       timers.after(() => {
-        say('concerned', 'لاحظت إن هالتحدي كان فيه محاولات. أخفف اللي بعده؟');
+        say('concerned', 'player.offerEasier');
         setPhase('easier');
       }, RESULT_MS - 1000);
     } else {
@@ -206,29 +212,32 @@ export function MissionPlayer({ start, onClose, onNavigate }: { start: PlayerSta
 
   const Game = GAMES[it.id];
   const c = CHALLENGES[it.id];
+  const name = t(`challenges.items.${it.id}.name`);
+  const instructions = t(`challenges.items.${it.id}.instructions`);
   const inPlay = phase === 'game' || phase === 'preroll';
   return (
     <div className={`mp mp--${phase}`}>
       <header className="gh">
-        <button type="button" className="gh__b" onClick={exit} aria-label="خروج وحفظ المهمة"><X size={19} aria-hidden="true" /><span>خروج</span></button>
+        <button type="button" className="gh__b" onClick={exit} aria-label={t('player.exitLabel')}><X size={19} aria-hidden="true" /><span>{t('player.exit')}</span></button>
         <div className="gh__mid">
-          <b className="gh__t">{phase === 'intro' && !M.solo ? 'مهمة اليوم' : c.t}</b>
+          <b className="gh__t">{phase === 'intro' && !M.solo ? t('player.dailyTitle') : name}</b>
           <div className="gh__p">
             {M.items.length > 1 && (
-              <div className="dots" role="img" aria-label={`التحدي ${M.idx + 1} من ${M.items.length}`}>
+              <div className="dots" role="img" aria-label={t('player.challengeOf', { n: M.idx + 1, total: M.items.length })}>
                 {M.items.map((g, i) => <i key={i} className={i < M.idx ? (g.status === 'COMPLETED' ? 'on' : 'off') : i === M.idx ? 'cur' : ''} />)}
               </div>
             )}
-            {round && phase === 'game' && <span className="gh__r" aria-live="polite">{round.l} {round.c} من {round.t}</span>}
+            {round && phase === 'game' && <span className="gh__r" aria-live="polite">{t('player.roundOf', { label: t(round.l), n: round.c, total: round.t })}</span>}
           </div>
         </div>
         <div className="gh__act">
-          <button type="button" className="gh__b" aria-label={s.snd ? 'كتم الصوت' : 'تشغيل الصوت'} onClick={() => store.update((d) => { d.snd = d.snd ? 0 : 1; })}>{s.snd ? <Volume2 size={19} aria-hidden="true" /> : <VolumeX size={19} aria-hidden="true" />}</button>
+          <LanguageSwitcher />
+          <button type="button" className="gh__b" aria-label={t(s.snd ? 'player.mute' : 'player.unmute')} onClick={() => store.update((d) => { d.snd = d.snd ? 0 : 1; })}>{s.snd ? <Volume2 size={19} aria-hidden="true" /> : <VolumeX size={19} aria-hidden="true" />}</button>
           {inPlay && (
             <>
-              <button type="button" className="gh__b" onClick={pause} aria-label="إيقاف مؤقت"><Pause size={19} aria-hidden="true" /><span>إيقاف</span></button>
-              <button type="button" className="gh__b" onClick={skip} aria-label="تخطي"><FastForward size={19} aria-hidden="true" /><span>تخطي</span></button>
-              <button type="button" className="gh__b" onClick={() => setConfirmEnd(true)} aria-label="إنهاء التحدي"><Flag size={19} aria-hidden="true" /><span>إنهاء</span></button>
+              <button type="button" className="gh__b" onClick={pause} aria-label={t('player.pauseLabel')}><Pause size={19} aria-hidden="true" /><span>{t('player.pause')}</span></button>
+              <button type="button" className="gh__b" onClick={skip} aria-label={t('player.skip')}><FastForward size={19} aria-hidden="true" /><span>{t('player.skip')}</span></button>
+              <button type="button" className="gh__b" onClick={() => setConfirmEnd(true)} aria-label={t('player.endLabel')}><Flag size={19} aria-hidden="true" /><span>{t('player.end')}</span></button>
             </>
           )}
         </div>
@@ -237,70 +246,70 @@ export function MissionPlayer({ start, onClose, onNavigate }: { start: PlayerSta
       <div className="mpw">
         <div className={`cb ${phase === 'game' ? 'cb--small' : ''}`}>
           <Mascot state={mascot.state} size={phase === 'game' ? 48 : 84} still={phase === 'game'} />
-          <div className="bub" aria-live="polite">{bubble}</div>
+          <div className="bub" aria-live="polite">{msg(bubble)}</div>
         </div>
 
         <div className="stage">
           {phase === 'intro' && M.solo && (
             <div className="scene intro">
               <div className="intro__art"><ChallengeArt id={it.id} /></div>
-              <h1>{c.t}</h1>
-              <p>{INSTRUCTIONS[it.id]}</p>
+              <h1>{name}</h1>
+              <p>{instructions}</p>
               <div className="meta meta--c">
-                <span><Clock size={14} aria-hidden="true" /> تقريبًا {minutes(c.min)}</span>
-                <span><Sparkles size={14} aria-hidden="true" /> {c.xp ? `${c.xp} نقطة` : 'بدون نقاط'}</span>
+                <span><Clock size={14} aria-hidden="true" /> {t('player.about', { time: t('common.minutes', { count: c.min }) })}</span>
+                <span><Sparkles size={14} aria-hidden="true" /> {c.xp ? t('common.points', { count: c.xp }) : t('common.noPoints')}</span>
               </div>
               {c.hasEasy && (
-                <Segmented className="seg--c" label="الصعوبة" value={it.diff} options={[{ value: 'normal', label: 'عادي' }, { value: 'easy', label: 'أسهل' }]} onChange={setDiff} />
+                <Segmented<Difficulty> className="seg--c" label={t('player.difficulty')} value={it.diff} options={[{ value: 'normal', label: t('player.normal') }, { value: 'easy', label: t('player.easier') }]} onChange={setDiff} />
               )}
-              <button type="button" className="btn btn--lg" onClick={run}><Play size={17} aria-hidden="true" /> ابدأ</button>
+              <button type="button" className="btn btn--lg" onClick={run}><Play size={17} aria-hidden="true" /> {t('common.start')}</button>
             </div>
           )}
           {phase === 'intro' && !M.solo && (
             <div className="scene intro">
-              <h1>مهمة اليوم</h1>
+              <h1>{t('player.dailyTitle')}</h1>
               <MissionTimeline items={M.items} />
-              <p className="note">تبدأها مرة وحدة، وبعدها ننتقل بين التحديات تلقائيًا. تقدر توقف أو تطلع بأي وقت.</p>
-              <button type="button" className="btn btn--lg" onClick={run}><Play size={17} aria-hidden="true" /> يلا نبدأ</button>
+              <p className="note">{t('player.dailyNote')}</p>
+              <button type="button" className="btn btn--lg" onClick={run}><Play size={17} aria-hidden="true" /> {t('player.letsGo')}</button>
             </div>
           )}
           {phase === 'preroll' && (
             <div className="scene intro" key={runKey}>
               <div className="intro__art"><ChallengeArt id={it.id} /></div>
-              <h1>{c.t}</h1>
-              <p>{INSTRUCTIONS[it.id]}</p>
-              <p className="note">{it.diff === 'easy' ? 'نسخة أسهل · ' : ''}تقريبًا {minutes(c.min)}</p>
+              <h1>{name}</h1>
+              <p>{instructions}</p>
+              <p className="note">{it.diff === 'easy' ? t('player.easierPrefix') : ''}{t('player.about', { time: t('common.minutes', { count: c.min }) })}</p>
               <div className="bar bar--thin"><i className="bar-drain" style={{ animationDuration: `${PREROLL_MS}ms`, animationPlayState: held ? 'paused' : 'running' }} /></div>
-              <button type="button" className="btn" onClick={startGame}>ابدأ الحين</button>
+              <button type="button" className="btn" onClick={startGame}>{t('player.startNow')}</button>
             </div>
           )}
           {phase === 'game' && <Game key={runKey} diff={it.diff} env={env} onDone={onDone} />}
           {phase === 'result' && result && (
             <div className="scene res">
-              <span className="res__ok"><Check size={15} aria-hidden="true" /> مكتمل</span>
-              {result.base > 0 ? <XpLine xp={result.xp} /> : <p className="note">ما عليها نقاط، لأنها مشاعرك أنت.</p>}
-              {result.base > 0 && result.xp < result.base && <p className="note">نص النقاط، لأن الدقة أقل من ٥٠٪.</p>}
+              <span className="res__ok"><Check size={15} aria-hidden="true" /> {t('player.status.completed')}</span>
+              {result.base > 0 ? <XpLine xp={result.xp} /> : <p className="note">{t('player.noPointsFeelings')}</p>}
+              {result.base > 0 && result.xp < result.base && <p className="note">{t('player.halfPoints')}</p>}
               {result.acc != null && (
                 <div className="res__m">
-                  <div><Target size={16} aria-hidden="true" /><b>{result.acc}%</b><span>الدقة</span></div>
-                  <div><b>{result.retries}</b><span>إعادات</span></div>
+                  <div><Target size={16} aria-hidden="true" /><b>{result.acc}%</b><span>{t('player.accuracy')}</span></div>
+                  <div><b>{result.retries}</b><span>{t('player.retries')}</span></div>
                 </div>
               )}
-              {result.note && <p>{result.note}</p>}
-              {result.leveledUp && <p className="levelup"><Sparkles size={16} aria-hidden="true" /> وصلت المستوى {result.newLevel}</p>}
+              {result.note && <p>{msg(result.note)}</p>}
+              {result.leveledUp && <p className="levelup"><Sparkles size={16} aria-hidden="true" /> {t('player.levelUp', { n: result.newLevel })}</p>}
               <div className="bar bar--thin"><i className="bar-drain" style={{ animationDuration: `${RESULT_MS}ms`, animationPlayState: held ? 'paused' : 'running' }} /></div>
-              <button type="button" className="btn" onClick={() => { if (shouldOfferEasier(M.items[M.idx], M.items[M.idx + 1])) { timers.clear(); setPhase('easier'); say('concerned', 'أخفف اللي بعده؟'); } else next(); }}>
-                {result.last ? 'شوف الملخص' : 'التالي'} <ChevronLeft size={17} aria-hidden="true" />
+              <button type="button" className="btn" onClick={() => { if (shouldOfferEasier(M.items[M.idx], M.items[M.idx + 1])) { timers.clear(); setPhase('easier'); say('concerned', 'player.offerEasierShort'); } else next(); }}>
+                {t(result.last ? 'player.seeSummary' : 'common.next')} <ChevronLeft size={17} className="flip" aria-hidden="true" />
               </button>
             </div>
           )}
           {phase === 'easier' && (
             <div className="scene res">
-              <h2>تبي نسخة أسهل من «{CHALLENGES[M.items[M.idx + 1].id].t}»؟</h2>
-              <p className="note">القرار لك.</p>
+              <h2>{t('player.easierQ', { name: t(`challenges.items.${M.items[M.idx + 1].id}.name`) })}</h2>
+              <p className="note">{t('player.yourCall')}</p>
               <div className="row row--c">
-                <button type="button" className="btn" onClick={() => setNextDifficulty(true)}>إي، خففها</button>
-                <button type="button" className="btn alt" onClick={() => setNextDifficulty(false)}>لا، عادي</button>
+                <button type="button" className="btn" onClick={() => setNextDifficulty(true)}>{t('player.yesEasier')}</button>
+                <button type="button" className="btn alt" onClick={() => setNextDifficulty(false)}>{t('player.noNormal')}</button>
               </div>
             </div>
           )}
@@ -308,20 +317,20 @@ export function MissionPlayer({ start, onClose, onNavigate }: { start: PlayerSta
       </div>
 
       {paused && (
-        <Overlay label="إيقاف مؤقت" top>
+        <Overlay label={t('player.pausedLabel')} top>
           <Mascot state="resting" size={80} />
-          <h2>وقفنا شوي</h2>
-          <p>خذ راحتك. الوقت موقف، وما يحسب عليك.</p>
-          <button type="button" className="btn" onClick={resume}><Play size={16} aria-hidden="true" /> كمّل</button>
+          <h2>{t('player.pausedTitle')}</h2>
+          <p>{t('player.pausedText')}</p>
+          <button type="button" className="btn" onClick={resume}><Play size={16} aria-hidden="true" /> {t('common.continue')}</button>
         </Overlay>
       )}
       {confirmEnd && (
-        <Overlay label="إنهاء التحدي" top>
-          <h2>تنهي هالتحدي؟</h2>
-          <p>نحفظ محاولتك، بس ما نعلّمه مكتمل وما عليه نقاط. ما فيه لوم.</p>
+        <Overlay label={t('player.endLabel')} top>
+          <h2>{t('player.endQ')}</h2>
+          <p>{t('player.endText')}</p>
           <div className="row row--c">
-            <button type="button" className="btn" onClick={endConfirmed}>إنهاء</button>
-            <button type="button" className="btn alt" onClick={() => setConfirmEnd(false)}>رجوع</button>
+            <button type="button" className="btn" onClick={endConfirmed}>{t('player.end')}</button>
+            <button type="button" className="btn alt" onClick={() => setConfirmEnd(false)}>{t('common.back')}</button>
           </div>
         </Overlay>
       )}
@@ -330,6 +339,7 @@ export function MissionPlayer({ start, onClose, onNavigate }: { start: PlayerSta
 }
 
 function Completion({ summary, mascotState, onClose, onNavigate }: { summary: MissionSummary; mascotState: MascotState; onClose(): void; onNavigate(v: ViewId): void }) {
+  const { t } = useTranslation();
   const s = useAppState();
   const xp = useCountUp(summary.xp, 900);
   const { all, doneCount, total, quiet } = summary;
@@ -337,35 +347,37 @@ function Completion({ summary, mascotState, onClose, onNavigate }: { summary: Mi
     onClose();
     onNavigate(v);
   };
+  const title = quiet ? 'player.done.quiet' : all ? (s.g === 'f' ? 'player.done.all_f' : 'player.done.all_m') : doneCount ? 'player.done.partial' : 'player.done.none';
   return (
     <div className="mp mp--finish">
       <div className="done">
         <div className="done__scene">
           <OasisBackdrop />
-          <Mascot state={mascotState} size={130} label="خويّك" className="done__m" />
+          <Mascot state={mascotState} size={130} label={t('common.brand')} className="done__m" />
         </div>
         <div className="done__body">
-          <h1>{quiet ? 'شكرًا إنك شاركتني' : all ? byGender(s.g, 'ياخي أنت كفو!', 'ياخي أنتِ كفو!') : doneCount ? 'انتهت المهمة' : 'ولا يهمك، انتهت المهمة'}</h1>
+          <div className="done__lang"><LanguageSwitcher /></div>
+          <h1>{t(title)}</h1>
           {!quiet && (
             <>
               <div className="res__m">
-                <div><b>{doneCount} من {total}</b><span>مكتملة</span></div>
-                <div><b>+{xp}</b><span>نقطة</span></div>
-                <div><b>{level(s)}</b><span>المستوى</span></div>
+                <div><b>{t('player.done.ofTotal', { n: doneCount, total })}</b><span>{t('player.done.completed')}</span></div>
+                <div><b>+{xp}</b><span>{t('common.pointsWord')}</span></div>
+                <div><b>{level(s)}</b><span>{t('common.level')}</span></div>
               </div>
               <MissionTimeline items={s.mission!.items} />
-              <h3>اللي صار فعلاً</h3>
+              <h3>{t('player.done.whatHappened')}</h3>
             </>
           )}
-          <p>{summary.lines}.</p>
-          {!quiet && <h3>اقتراح لبكرة</h3>}
-          <p>{summary.suggestion}</p>
-          {s.prayer && <p className="note">وإذا قرب وقت الصلاة نرتب يومنا حولها.</p>}
-          {!quiet && <p className="note">هذي نتائج ألعاب للمتابعة الشخصية، وما تدل على تحسن علاجي.</p>}
+          <p>{summaryLines(summary)}{t('common.sentenceEnd')}</p>
+          {!quiet && <h3>{t('player.done.tomorrow')}</h3>}
+          <p>{summarySuggestion(summary)}</p>
+          {s.prayer && <p className="note">{t('player.done.prayer')}</p>}
+          {!quiet && <p className="note">{t('player.done.disclaimer')}</p>}
           <div className="row row--c">
-            <button type="button" className="btn" onClick={() => leave('chat')}>سولف مع خويّك</button>
-            <button type="button" className="btn alt" onClick={() => leave('prog')}>تطوري</button>
-            <button type="button" className="btn alt" onClick={() => leave('home')}>الرئيسية</button>
+            <button type="button" className="btn" onClick={() => leave('chat')}>{t('player.done.chat')}</button>
+            <button type="button" className="btn alt" onClick={() => leave('prog')}>{t('nav.prog')}</button>
+            <button type="button" className="btn alt" onClick={() => leave('home')}>{t('nav.home')}</button>
           </div>
         </div>
       </div>

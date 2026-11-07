@@ -5,7 +5,8 @@
 .gh__t { display: block; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .gh__p { display: flex; gap: 10px; justify-content: center; align-items: center; min-height: 16px; }
 .gh__r { font-size: 12.5px; color: var(--mut); }
-.gh__act { display: flex; gap: 2px; }
+.gh__act { display: flex; gap: 2px; align-items: center; }
+.done__lang { display: flex; justify-content: flex-end; }
 .gh__b { border: 0; background: none; font: inherit; font-size: 12.5px; color: var(--ink); min-width: 44px; min-height: 44px; padding: 4px 8px; border-radius: 11px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 5px; transition: background var(--t-micro) var(--ease); }
 .gh__b:hover { background: var(--cr); }
 .dots { display: flex; gap: 4px; }
@@ -48,7 +49,8 @@
 .form h3 { font-weight: 500; margin-top: 8px; }
 @media (max-width: 620px) {
   .gh { padding: 4px 6px; gap: 2px; }
-  .gh__b span { display: none; }
+  .gh__b span, .gh .lang-sw span { display: none; }
+  .gh .lang-sw { min-width: 40px; padding: 4px; }
   .gh__b { padding: 4px; min-width: 40px; }
   .gh__t { font-size: 13.5px; }
   .dots i { width: 14px; }
@@ -91,7 +93,7 @@
 .clip__ctl button:hover, .clip__ctl button.on { background: rgba(255, 255, 255, .18); }
 .clip__ctl :focus-visible { outline-color: var(--sun); }
 .clip__time { font-size: 12.5px; font-variant-numeric: tabular-nums; direction: ltr; white-space: nowrap; }
-.clip__bar { flex: 1; height: 6px; background: rgba(255, 255, 255, .25); box-shadow: none; direction: rtl; }
+.clip__bar { flex: 1; height: 6px; background: rgba(255, 255, 255, .25); box-shadow: none; }
 .clip__bar i { background: var(--sun); }
 
 /* Memory */
@@ -145,6 +147,7 @@
 .cmp__r b { width: 56px; font-variant-numeric: tabular-nums; }
 .cmp__t { flex: 1; height: 22px; background: var(--cr); border-radius: 7px; overflow: hidden; }
 .cmp__t i { display: block; height: 100%; border-radius: 7px; animation: grow-x .7s var(--ease) backwards; transform-origin: right; }
+[dir='ltr'] .cmp__t i { transform-origin: left; }
 .cmp__t .is-est { background: var(--lav); }
 .cmp__t .is-act { background: var(--em); }
 

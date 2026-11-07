@@ -1,46 +1,32 @@
 import type { Challenge, ChallengeCategory, ChallengeId, Journey } from '../../types/index.ts';
 
+// Stable data only. All text lives in the locale files, under challenges.items.<id> and journeys.items.<id>.
 export const CHALLENGES: Record<ChallengeId, Challenge> = {
-  video: { t: 'ركز معي شوي', cat: 'تركيز', min: 1, xp: 30, k: 'v', hasEasy: true, scored: true, desc: 'مشهد واحة قصير، وبعده أسئلة عن اللي شفته.', purpose: 'تمرين انتباه قصير يناسب وقت فراغ بسيط.' },
-  mem: { t: 'وش تتذكر؟', cat: 'ذاكرة', min: 2, xp: 25, k: 'm', hasEasy: true, scored: true, desc: 'احفظ الأشكال وألوانها، وقلّي وش اختفى.', purpose: 'جولات ذاكرة بصرية تصعب شوي شوي.' },
-  seq: { t: 'رتبها يا وحش', cat: 'تخطيط', min: 2, xp: 25, k: 's', hasEasy: true, scored: true, desc: 'رتّب خطوات يوم حقيقي بالسحب أو الضغط.', purpose: 'تمرين على ترتيب الخطوات قبل ما تبدأها.' },
-  time: { t: 'وين راح الوقت؟', cat: 'وعي بالوقت', min: 1, xp: 20, k: 't', hasEasy: false, scored: false, desc: 'توقّع المدة، وقارن توقعك بالوقت الفعلي.', purpose: 'تشوف الفرق بين إحساسك بالوقت والوقت الفعلي.' },
-  calm: { t: 'على هونك', cat: 'استرخاء', min: 2, xp: 15, k: 'c', hasEasy: false, scored: false, desc: 'تنفس هادي بسرعة تناسبك، أو بريك بدون تنفس.', purpose: 'وقفة هادية في يومك، وتقدر تتخطاها.' },
-  start2: { t: 'دقيقتين ونبدأ', cat: 'مهمة حقيقية', min: 2, xp: 25, k: 'd', hasEasy: false, scored: false, desc: 'اختر مهمة مؤجلة وابدأ أصغر خطوة فيها.', purpose: 'يساعد على بداية المهام المؤجلة بخطوة صغيرة.' },
-  attention_scene: { t: 'وش اللي تغيّر؟', cat: 'تركيز', min: 2, xp: 25, k: 'a', hasEasy: true, scored: true, desc: 'قارن مشهدين وحدد الفروق بينهم.', purpose: 'تمرين انتباه للتفاصيل، بدون عجلة.' },
-  priority_board: { t: 'وش أول شيء؟', cat: 'تخطيط', min: 2, xp: 20, k: 'p', hasEasy: true, scored: false, desc: 'وزّع مهامك على الحين، بعدين، ومو اليوم.', purpose: 'يخفف زحمة المهام لما تحس كل شي مهم.' },
-  breakdown: { t: 'فكّكها', cat: 'مهمة حقيقية', min: 3, xp: 25, k: 'b', hasEasy: true, scored: false, desc: 'قسّم مهمة كبيرة لخطوات صغيرة، وحط لها خطة.', purpose: 'يحوّل مهمة كبيرة لخطوة أولى واضحة.' },
-  study_sprint: { t: 'مذاكرة على قدك', cat: 'مهمة حقيقية', min: 5, xp: 30, k: 'y', hasEasy: false, scored: false, desc: 'جلسة مذاكرة قصيرة، مع مكان تركن فيه المشتتات.', purpose: 'جلسة تركيز قصيرة لجدول الدراسة أو الشغل.' },
-  emotion_map: { t: 'وش جوّك؟', cat: 'استرخاء', min: 1, xp: 0, k: 'e', hasEasy: false, scored: false, selfReport: true, desc: 'اختر وش تحس، ووش ممكن يفيدك. هذا كلامك أنت.', purpose: 'وقفة اختيارية تسجل فيها جوّك بكلامك أنت.' },
-  calm_landscape: { t: 'خذ لك بريك', cat: 'استرخاء', min: 1, xp: 10, k: 'l', hasEasy: false, scored: false, desc: 'واحة هادية تتفاعل معها على راحتك.', purpose: 'بريك بصري قصير بين الشغلات.' },
+  video: { cat: 'focus', min: 1, xp: 30, k: 'v', hasEasy: true, scored: true },
+  mem: { cat: 'memory', min: 2, xp: 25, k: 'm', hasEasy: true, scored: true },
+  seq: { cat: 'planning', min: 2, xp: 25, k: 's', hasEasy: true, scored: true },
+  time: { cat: 'time', min: 1, xp: 20, k: 't', hasEasy: false, scored: false },
+  calm: { cat: 'relax', min: 2, xp: 15, k: 'c', hasEasy: false, scored: false },
+  start2: { cat: 'real', min: 2, xp: 25, k: 'd', hasEasy: false, scored: false },
+  attention_scene: { cat: 'focus', min: 2, xp: 25, k: 'a', hasEasy: true, scored: true },
+  priority_board: { cat: 'planning', min: 2, xp: 20, k: 'p', hasEasy: true, scored: false },
+  breakdown: { cat: 'real', min: 3, xp: 25, k: 'b', hasEasy: true, scored: false },
+  study_sprint: { cat: 'real', min: 5, xp: 30, k: 'y', hasEasy: false, scored: false },
+  emotion_map: { cat: 'relax', min: 1, xp: 0, k: 'e', hasEasy: false, scored: false, selfReport: true },
+  calm_landscape: { cat: 'relax', min: 1, xp: 10, k: 'l', hasEasy: false, scored: false },
 };
 
-export const CATEGORIES: ChallengeCategory[] = ['تركيز', 'ذاكرة', 'تخطيط', 'وعي بالوقت', 'استرخاء', 'مهمة حقيقية'];
-
-export const INSTRUCTIONS: Record<ChallengeId, string> = {
-  video: 'بتشوف مشهد قصير من الواحة، ٢٤ ثانية. انتبه لتفاصيله، وبعدها أسألك.',
-  mem: 'احفظ الأشكال وألوانها، وبعدها قلّي وش اختفى.',
-  seq: 'رتّب الخطوات بالترتيب اللي تشوفه منطقي. اسحبها أو اضغط عليها.',
-  time: 'قدّر كم ثانية بتاخذ منك مهمة بسيطة، وبعدها نقارن.',
-  calm: 'تنفّس معي على هونك، أو خذ بريك بدون تنفس. القرار لك.',
-  start2: 'نختار مهمة مؤجلة ونبدأها بخطوة صغيرة.',
-  attention_scene: 'قدامك مشهدين. اضغط في المشهد الثاني على الأشياء اللي تغيرت.',
-  priority_board: 'وزّع المهام على ثلاث قوائم، وبعدها اختر أول شي. ما فيه إجابة غلط.',
-  breakdown: 'اكتب مهمة كبيرة، قسّمها لخطوات صغيرة، وحط لها خطة بسيطة.',
-  study_sprint: 'اختر مدة تناسبك وابدأ. وأي شي يشتتك اكتبه بجنب وارجع.',
-  emotion_map: 'اختر وش تحس فيه الحين، إذا تبي. أنا ما أخمّن مشاعرك، وهذي إجابتك أنت.',
-  calm_landscape: 'واحة هادية. اضغط على الفوانيس والماء والنخل، أو بس خلك تشوفها.',
-};
+export const CATEGORIES: ChallengeCategory[] = ['focus', 'memory', 'planning', 'time', 'relax', 'real'];
 
 export const JOURNEYS: Journey[] = [
-  { id: 'adhd', n: 'التركيز والتنظيم', a: ['video', 'attention_scene', 'priority_board', 'seq', 'breakdown', 'time', 'mem', 'start2', 'study_sprint'], d: 'بدء المهام، ترتيب الأولويات، وتقدير الوقت', g: '#E9DFFF,#c9b8ff' },
-  { id: 'anx', n: 'الهدوء والقلق', a: ['calm', 'calm_landscape', 'emotion_map', 'video', 'mem'], d: 'وقفات هادية واختيارات لطيفة، وتقدر تتخطاها', g: '#d9f0e0,#bfe4ff' },
-  { id: 'ocd', n: 'التعامل مع عدم اليقين', a: ['calm', 'time'], d: 'محتوى تثقيفي فقط، وأي برنامج علاجي يكون مع مختص', g: '#cdeaf2,#e3f3ee' },
-  { id: 'mood', n: 'المزاج والحماس', a: ['start2', 'emotion_map', 'breakdown', 'calm', 'seq'], d: 'خطوات صغيرة تقدر عليها، بدون ضغط', g: '#ffe6d1,#fff1b8' },
-  { id: 'sleep', n: 'النوم والروتين', a: ['calm', 'calm_landscape', 'seq', 'time'], d: 'تهدئة في آخر اليوم وترتيب روتينك', g: '#b9b4e8,#E9DFFF' },
-  { id: 'soc', n: 'الثقة الاجتماعية', a: ['seq', 'mem'], d: 'تجهيز للمناسبات. تحديات الحوار لسا ما انبنت', g: '#ffd9c2,#E9DFFF' },
-  { id: 'aut', n: 'روتين واضح وهادئ', a: ['seq', 'time', 'calm', 'calm_landscape'], d: 'جدول واضح، وحركة وصوت على اختيارك', g: '#dff2e8,#e9e5f7' },
-  { id: 'gen', n: 'عافية عامة', a: ['video', 'attention_scene', 'mem', 'calm', 'time', 'calm_landscape', 'emotion_map'], d: 'شوية من كل شي', g: '#fff1b8,#8DBFA3' },
+  { id: 'adhd', a: ['video', 'attention_scene', 'priority_board', 'seq', 'breakdown', 'time', 'mem', 'start2', 'study_sprint'] },
+  { id: 'anx', a: ['calm', 'calm_landscape', 'emotion_map', 'video', 'mem'] },
+  { id: 'ocd', a: ['calm', 'time'] },
+  { id: 'mood', a: ['start2', 'emotion_map', 'breakdown', 'calm', 'seq'] },
+  { id: 'sleep', a: ['calm', 'calm_landscape', 'seq', 'time'] },
+  { id: 'soc', a: ['seq', 'mem'] },
+  { id: 'aut', a: ['seq', 'time', 'calm', 'calm_landscape'] },
+  { id: 'gen', a: ['video', 'attention_scene', 'mem', 'calm', 'time', 'calm_landscape', 'emotion_map'] },
 ];
 
 export const SHAPES: Record<string, string> = {
@@ -53,6 +39,6 @@ export const SHAPES: Record<string, string> = {
   drop: '<path d="M12 2s7 7 7 12a7 7 0 01-14 0c0-5 7-12 7-12z"/>',
   leaf: '<path d="M4 20C4 9 10 4 21 3c0 11-5 17-15 17z"/>',
 };
-export const SHAPE_NAMES: Record<string, string> = { circle: 'دائرة', square: 'مربع', tri: 'مثلث', star: 'نجمة', heart: 'قلب', moon: 'هلال', drop: 'قطرة', leaf: 'ورقة' };
 export const COLORS = ['#FF8E83', '#FFD36E', '#8BCDF1', '#A78BFA', '#28785B', '#FFC6A8'];
-export const COLOR_NAMES = ['مرجاني', 'أصفر', 'سماوي', 'بنفسجي', 'أخضر', 'خوخي'];
+// Color index to the stable name used in locale keys (games.colors.<name>).
+export const COLOR_IDS = ['coral', 'yellow', 'sky', 'lavender', 'green', 'peach'];

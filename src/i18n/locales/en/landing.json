@@ -1,0 +1,81 @@
+{
+  "eyebrow": "A Saudi companion for your day",
+  "heroTitle": "Every day has its own mood, and KHOWAYK keeps pace with you",
+  "heroText": "It chats with you, sets up a short mission to match your energy, and offers playable challenges to help you organize your day. It doesn't diagnose or treat.",
+  "cta": "Let's start our journey",
+  "ctaShort": "Get started",
+  "discover": "Discover KHOWAYK",
+  "mascotLabel": "KHOWAYK. Tap and it reacts",
+  "tapHint": "Try tapping it",
+  "howTitle": "How does it work?",
+  "steps": {
+    "chat": {
+      "title": "You chat",
+      "text": "You tell it about your day, and it asks before saving anything."
+    },
+    "mission": {
+      "title": "It sets a mission",
+      "text": "Three short steps, each with its reason."
+    },
+    "play": {
+      "title": "You play",
+      "text": "Start once, then move between challenges automatically."
+    },
+    "results": {
+      "title": "You see results",
+      "text": "Real numbers from your attempts, with no diagnosis."
+    },
+    "rewards": {
+      "title": "You unlock rewards",
+      "text": "In-app points and achievements, with no streaks."
+    }
+  },
+  "meetTitle": "Meet KHOWAYK",
+  "meetText": "A small companion that responds to the moment: it listens, thinks with you, and is happy when you get things done. It isn't a therapist, or a replacement for family, friends or professionals.",
+  "meet": {
+    "listening": "Listens",
+    "thinking": "Thinks with you",
+    "encouraging": "Encourages",
+    "celebrating": "Celebrates",
+    "calm": "Keeps you calm",
+    "concerned": "Cares when you're tired"
+  },
+  "demoTitle": "Try a challenge now",
+  "demoIntro": "Try a small challenge, no sign-up needed.",
+  "demoStart": "Let's play",
+  "demoGood": "Nice! Want to keep going?",
+  "demoSample": "No worries, this is only a sample. Want to keep going?",
+  "demoResult": "Your first-try accuracy: {{acc}}%. This was a sample, and it wasn't saved.",
+  "journeysTitle": "Journeys you choose",
+  "journeysNote": "For support and practice, not treatment programs. Choose more than one, with no diagnosis needed.",
+  "saudiTitle": "Made for daily life in Saudi Arabia",
+  "saudi": {
+    "prayer": {
+      "title": "Prayer time",
+      "text": "Enter the time and choose how long to protect, and challenges wait."
+    },
+    "driving": {
+      "title": "Driving",
+      "text": "Set it before you leave, and no challenges appear. Eyes on the road."
+    },
+    "family": {
+      "title": "Family gatherings",
+      "text": "Tell it about your event, and it lightens your mission with your approval."
+    },
+    "ramadan": {
+      "title": "Ramadan and Eid",
+      "text": "Adjust your routine yourself, with no assumptions."
+    },
+    "work": {
+      "title": "Work and study",
+      "text": "Challenges and examples that suit your schedule."
+    },
+    "weather": {
+      "title": "Weather",
+      "text": "Not connected right now, and we won't pretend otherwise."
+    }
+  },
+  "honestTitle": "To be honest",
+  "honestText": "KHOWAYK is a wellbeing platform, not a diagnosis or treatment service. Your data stays on your device, and smart replies only run with your consent. We have no partners or vouchers right now. If you're going through a hard time, talk to someone you trust or a professional.",
+  "closing": "Ready to start? KHOWAYK is waiting."
+}

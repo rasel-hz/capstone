@@ -1,0 +1,60 @@
+{
+  "crisis": {
+    "marker": "I can't replace a person",
+    "check": "I want to check in, because what you said matters. If someone is hurting you, or you're thinking of hurting yourself or not wanting to live, please don't carry this alone.",
+    "support": "What you said matters to me, and I care about you. I can't replace a person being with you right now. If you're in danger, call an ambulance on 997 or go to the nearest emergency room, or call the Ministry of Health on 937. If you can, reach out to someone you trust right now."
+  },
+  "rules": {
+    "factLow": "your energy is low",
+    "factSleep": "you slept late",
+    "factWork": "you have work or study",
+    "factEvent": "you have an event",
+    "understood": "Sounds like you've got a lot going on today. Here's what I understood: {{facts}}. Should I save that to shape today's mission? That's only from what you said, and I'm not guessing beyond it.",
+    "noResults": "I don't have any records yet. Once you finish a mission, I can tell you about your actual results.",
+    "avg": ", with {{acc}}% average accuracy",
+    "results": "You have {{total}} attempts on record and completed {{done}}{{avg}}. This is just for your own tracking and doesn't measure your health.",
+    "greet": "Hey there! I'm doing well. How about you? How's your sleep and your day?",
+    "thanks": "You're welcome! I'm here if you need me, and don't forget time with the people you love.",
+    "fallback": "I hear you. Want to tell me more about your day? If you'd like to try something light, you can start today's mission from Home."
+  },
+  "statusAi": "Replies come from an AI model (OpenAI) and can be wrong",
+  "statusRules": "Replies come from rules inside the app, not an AI model",
+  "disclaimer": "I'm not a therapist and I don't diagnose. I don't replace your family, friends or professionals.",
+  "consent": {
+    "title": "Turn on smart replies?",
+    "text": "If you agree, your message, recent chat messages and a summary of your challenge results go to OpenAI to produce a reply. We don't send your name or chosen journeys.",
+    "note": "According to OpenAI's policy, API data isn't used for training and may be kept for up to 30 days to monitor abuse. Don't write sensitive information you don't want to share. You can turn this off any time in My Profile.",
+    "yes": "I agree",
+    "no": "No, keep using the rules"
+  },
+  "logLabel": "Conversation",
+  "empty": "Tell me about your day: your sleep, your work, or anything on your mind.",
+  "card": {
+    "ask_m": "Want me to lighten today's mission?",
+    "ask_f": "Want me to lighten today's mission?",
+    "note": "This is what I understood from you. I won't save anything without your approval.",
+    "lowFact": "Your energy is low today",
+    "drop": "Remove: {{fact}}",
+    "empty": "You've removed everything, so there's nothing to save.",
+    "saveLighter": "Save and lighten the plan",
+    "saveOnly": "Just save",
+    "edit": "Edit",
+    "no": "No",
+    "savedLighter": "Done. I saved that and lightened today's mission. You can see it on Home.",
+    "saved": "Done. I saved it, and your plan hasn't changed.",
+    "declined": "No problem, I didn't save anything."
+  },
+  "typing": "Your buddy is typing",
+  "fallback": "I couldn't reach smart replies right now, so I answered with simple rules and may have misunderstood. If you're going through a hard time or you're in danger, talk to someone you trust or call an ambulance on 997.",
+  "driving": "Typing is off because you said you're driving. Once you've arrived safely, change it in My Profile.",
+  "suggestLabel": "Suggestions",
+  "suggest": {
+    "late": "I slept late today",
+    "low": "I've got no energy today",
+    "event": "I have a family dinner tonight",
+    "results": "How are my results?"
+  },
+  "inputLabel": "Your message to your buddy",
+  "inputPh": "Write to your buddy...",
+  "send": "Send"
+}

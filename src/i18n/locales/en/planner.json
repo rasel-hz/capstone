@@ -1,0 +1,26 @@
+{
+  "why": {
+    "video": "We start with a short focus",
+    "mem": "After focus, a light memory round",
+    "time": "We finish with a small time-estimate exercise",
+    "start2": "We finish with a small step on a real task",
+    "starter": "A general starter",
+    "lowCalm": "You told me your energy is low, so it ends with something calm",
+    "lowFirst": "You told me your energy is low, so we took the easier version",
+    "shortFirst": "You agreed to a lighter mission, so we took the easier version",
+    "eventSeq": "You saved that you have an event, so we practise planning for it",
+    "lastLow": "Your last accuracy was {{acc}}%, so we start easier",
+    "journey": "From your journey: {{journey}}",
+    "self": "You chose this",
+    "break": "You chose to take a break",
+    "fromJourney": "From {{journey}}"
+  },
+  "reason": {
+    "low": "at your energy today",
+    "event": "around the event you saved",
+    "sleep": "with your sleep in mind",
+    "withContext": "Simple steps, {{parts}}.",
+    "steps": "Three simple steps, and we move between them automatically.",
+    "starter": "A general starter until I know more about your day. Chat with me and I'll make it lighter."
+  }
+}

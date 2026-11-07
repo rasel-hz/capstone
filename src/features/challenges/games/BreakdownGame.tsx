@@ -1,34 +1,41 @@
 import { ArrowDown, ArrowUp, Lock, Plus, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { tr } from '../../../i18n';
 import type { GameProps } from '../types';
 
-const SEEDS: Record<string, string[]> = {
-  'أذاكر للاختبار': ['أحدد الدروس المطلوبة', 'أجمع الملخصات', 'أذاكر أول درس ٢٥ دقيقة', 'أحل أسئلة قصيرة'],
-  'أجهز العرض': ['أكتب الفكرة الرئيسية', 'أحدد ٣ نقاط', 'أسوي أول شريحة', 'أتدرب مرة وحدة'],
-  'أرتب الغرفة': ['أجمع الملابس', 'أرمي الزبالة', 'أرتب المكتب', 'أكنس الأرض'],
-  'أخلص المعاملة': ['أحدد الأوراق المطلوبة', 'أصور الأوراق', 'أرفعها في الموقع', 'أتابع الطلب'],
-};
-const WHEN = ['بعد الصلاة', 'بعد القهوة', 'أول ما أوصل البيت', 'بعد الغدا'];
+const SEEDS: Record<string, string[]> = { exam: ['a', 'b', 'c', 'd'], talk: ['a', 'b', 'c', 'd'], room: ['a', 'b', 'c', 'd'], paperwork: ['a', 'b', 'c', 'd'] };
+const WHEN = ['prayer', 'coffee', 'home', 'lunch'];
+
+// "seed:..." values stay in the current language. Anything typed stays exactly as typed.
+function label(v: string) {
+  if (!v.startsWith('seed:')) return v;
+  const [area, id, step] = v.slice(5).split('/');
+  if (area === 'when') return tr(`games.breakdown.when.${id}`);
+  return step ? tr(`games.breakdown.seeds.${id}.steps.${step}`) : tr(`games.breakdown.seeds.${id}.task`);
+}
 
 export function BreakdownGame({ diff, env, onDone }: GameProps) {
+  const { t } = useTranslation();
   const max = diff === 'easy' ? 1 : 5;
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [task, setTask] = useState('');
   const [steps, setSteps] = useState<string[]>([]);
   const [draft, setDraft] = useState('');
   const [when, setWhen] = useState('');
-  const seeds = SEEDS[task.trim()] ?? [];
+  const seedId = task.startsWith('seed:') ? task.slice(5).split('/')[1] : null;
+  const seeds = seedId ? SEEDS[seedId].map((x) => `seed:task/${seedId}/${x}`) : [];
 
   useEffect(() => {
-    env.round(step, 3, 'الخطوة');
-    env.say(step === 3 ? 'encouraging' : 'curious', step === 1 ? 'وش الشي الكبير اللي يثقل عليك؟' : step === 2 ? 'قسّمها لخطوات صغيرة.' : 'متى بتبدأ أول خطوة؟');
+    env.round(step, 3, 'games.common.step');
+    env.say(step === 3 ? 'encouraging' : 'curious', `games.breakdown.say${step}`);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [step]);
 
   function add(v: string) {
-    const t = v.trim();
-    if (!t || steps.includes(t) || steps.length >= max) return;
-    setSteps([...steps, t]);
+    const c = v.trim();
+    if (!c || steps.includes(c) || steps.length >= max) return;
+    setSteps([...steps, c]);
     setDraft('');
     env.sfx('tap');
   }
@@ -41,81 +48,87 @@ export function BreakdownGame({ diff, env, onDone }: GameProps) {
   if (step === 1) {
     return (
       <div className="scene form">
-        <label htmlFor="bd-task"><h2 className="q__t">وش المهمة الكبيرة؟</h2></label>
-        <input id="bd-task" maxLength={100} placeholder="اكتبها بكلماتك، أو اختر مثال" value={task} onChange={(e) => setTask(e.target.value)} />
-        <div className="tags" role="group" aria-label="أمثلة">
-          {Object.keys(SEEDS).map((x) => <button key={x} type="button" className="tag tag--btn" onClick={() => setTask(x)}>{x}</button>)}
+        <label htmlFor="bd-task"><h2 className="q__t">{t('games.breakdown.taskQ')}</h2></label>
+        <input id="bd-task" dir="auto" maxLength={100} placeholder={t('games.breakdown.taskPh')} value={label(task)} onChange={(e) => setTask(e.target.value)} />
+        <div className="tags" role="group" aria-label={t('games.common.examples')}>
+          {Object.keys(SEEDS).map((x) => <button key={x} type="button" className="tag tag--btn" onClick={() => setTask(`seed:task/${x}`)}>{t(`games.breakdown.seeds.${x}.task`)}</button>)}
         </div>
-        <p className="note"><Lock size={13} aria-hidden="true" /> اللي تكتبه يبقى على جهازك.</p>
-        <div className="row row--c"><button type="button" className="btn" disabled={!task.trim()} onClick={() => setStep(2)}>التالي</button></div>
+        <p className="note"><Lock size={13} aria-hidden="true" /> {t('games.common.staysOnDevice')}</p>
+        <div className="row row--c"><button type="button" className="btn" disabled={!task.trim()} onClick={() => setStep(2)}>{t('common.next')}</button></div>
       </div>
     );
   }
 
   if (step === 2) {
+    const unused = seeds.filter((x) => !steps.includes(x));
     return (
       <div className="scene form">
-        <h2 className="q__t">فكّك: {task.trim()}</h2>
+        <h2 className="q__t">{t('games.breakdown.title')} <bdi>{label(task).trim()}</bdi></h2>
         <ol className="bd__list">
           {steps.map((x, i) => (
             <li key={x} className="crd crd--in">
               <b className="slot__n">{i + 1}</b>
-              <span className="grow">{x}</span>
-              <button type="button" aria-label={`${x}: طلّعها لفوق`} disabled={i === 0} onClick={() => move(i, -1)}><ArrowUp size={16} /></button>
-              <button type="button" aria-label={`${x}: نزّلها لتحت`} disabled={i === steps.length - 1} onClick={() => move(i, 1)}><ArrowDown size={16} /></button>
-              <button type="button" aria-label={`احذف ${x}`} onClick={() => setSteps(steps.filter((y) => y !== x))}><X size={16} /></button>
+              <span className="grow" dir="auto">{label(x)}</span>
+              <button type="button" aria-label={t('games.common.moveUp', { item: label(x) })} disabled={i === 0} onClick={() => move(i, -1)}><ArrowUp size={16} /></button>
+              <button type="button" aria-label={t('games.common.moveDown', { item: label(x) })} disabled={i === steps.length - 1} onClick={() => move(i, 1)}><ArrowDown size={16} /></button>
+              <button type="button" aria-label={t('games.common.remove', { item: label(x) })} onClick={() => setSteps(steps.filter((y) => y !== x))}><X size={16} /></button>
             </li>
           ))}
         </ol>
-        {!steps.length && <p className="note center">ما أضفت خطوات للحين. خلها صغيرة، بحيث تبدأها بدون تفكير كثير.</p>}
+        {!steps.length && <p className="note center">{t('games.breakdown.noSteps')}</p>}
         {steps.length < max ? (
           <>
             <form className="pb__add" onSubmit={(e) => { e.preventDefault(); add(draft); }}>
-              <input aria-label="خطوة جديدة" maxLength={80} placeholder="أضف خطوة صغيرة" value={draft} onChange={(e) => setDraft(e.target.value)} />
-              <button type="submit" className="btn sm alt" aria-label="أضف الخطوة"><Plus size={16} aria-hidden="true" /></button>
+              <input dir="auto" aria-label={t('games.breakdown.newStep')} maxLength={80} placeholder={t('games.breakdown.stepPh')} value={draft} onChange={(e) => setDraft(e.target.value)} />
+              <button type="submit" className="btn sm alt" aria-label={t('games.breakdown.addStep')}><Plus size={16} aria-hidden="true" /></button>
             </form>
-            {seeds.filter((x) => !steps.includes(x)).length > 0 && (
-              <div className="tags" role="group" aria-label="أمثلة للخطوات">
-                {seeds.filter((x) => !steps.includes(x)).map((x) => <button key={x} type="button" className="tag tag--btn" onClick={() => add(x)}><Plus size={13} aria-hidden="true" /> {x}</button>)}
+            {unused.length > 0 && (
+              <div className="tags" role="group" aria-label={t('games.common.examples')}>
+                {unused.map((x) => <button key={x} type="button" className="tag tag--btn" onClick={() => add(x)}><Plus size={13} aria-hidden="true" /> {label(x)}</button>)}
               </div>
             )}
           </>
-        ) : <p className="note center">{max === 1 ? 'خطوة وحدة تكفي لهالنسخة.' : 'كفاية، ٥ خطوات تغطيها.'}</p>}
+        ) : <p className="note center">{t(max === 1 ? 'games.breakdown.oneEnough' : 'games.breakdown.fiveEnough')}</p>}
         <div className="row row--c">
-          <button type="button" className="btn alt" onClick={() => setStep(1)}>رجوع</button>
-          <button type="button" className="btn" disabled={!steps.length} onClick={() => setStep(3)}>التالي</button>
+          <button type="button" className="btn alt" onClick={() => setStep(1)}>{t('common.back')}</button>
+          <button type="button" className="btn" disabled={!steps.length} onClick={() => setStep(3)}>{t('common.next')}</button>
         </div>
       </div>
     );
   }
 
-  const ready = !!when.trim();
+  const whenText = label(when).trim();
   return (
     <div className="scene form">
-      <h2 className="q__t">حط لها خطة</h2>
-      <p className="plan">إذا صار <b>{when.trim() || '...'}</b>، بسوي: <b>{steps[0]}</b></p>
-      <div className="tags" role="group" aria-label="متى؟">
-        {WHEN.map((x) => <button key={x} type="button" className={`tag tag--btn ${when === x ? 'on' : ''}`} aria-pressed={when === x} onClick={() => setWhen(x)}>{x}</button>)}
+      <h2 className="q__t">{t('games.breakdown.planTitle')}</h2>
+      <p className="plan">{t('games.breakdown.planLine', { when: whenText || '...', step: label(steps[0]) })}</p>
+      <div className="tags" role="group" aria-label={t('games.breakdown.whenLabel')}>
+        {WHEN.map((x) => {
+          const v = `seed:when/${x}`;
+          return <button key={x} type="button" className={`tag tag--btn ${when === v ? 'on' : ''}`} aria-pressed={when === v} onClick={() => setWhen(v)}>{label(v)}</button>;
+        })}
       </div>
-      <label htmlFor="bd-when" className="note">أو اكتب وقت يناسبك</label>
-      <input id="bd-when" maxLength={40} placeholder="مثال: الساعة ٥" value={when} onChange={(e) => setWhen(e.target.value)} />
+      <label htmlFor="bd-when" className="note">{t('games.breakdown.orType')}</label>
+      <input id="bd-when" dir="auto" maxLength={40} placeholder={t('games.breakdown.whenPh')} value={whenText} onChange={(e) => setWhen(e.target.value)} />
       <div className="row row--c">
-        <button type="button" className="btn alt" onClick={() => setStep(2)}>رجوع</button>
+        <button type="button" className="btn alt" onClick={() => setStep(2)}>{t('common.back')}</button>
         <button
           type="button"
           className="btn"
-          disabled={!ready}
+          disabled={!whenText}
           onClick={() => {
             env.sfx('ok');
+            const first = steps[0];
+            const w = when;
             onDone({
               acc: null,
               retries: 0,
-              say: 'كذا صارت أخف.',
-              note: `خطتك: إذا صار ${when.trim()}، بتسوي: ${steps[0]}. النقاط على الخطة، مو على تنفيذها، لأننا ما نقدر نتحقق منه.`,
-              data: { task: task.trim(), steps, plan: { when: when.trim(), firstStep: steps[0] } },
+              say: 'games.breakdown.done',
+              note: () => tr('games.breakdown.note', { when: label(w).trim(), step: label(first) }),
+              data: { task: label(task).trim(), steps: steps.map(label), plan: { when: whenText, firstStep: label(first) } },
             });
           }}
-        >خلصت الخطة</button>
+        >{t('games.breakdown.finish')}</button>
       </div>
     </div>
   );

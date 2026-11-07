@@ -1,0 +1,99 @@
+{
+  "title": "Challenges",
+  "sub": "Short games to try at your own pace. They're for your own tracking, not a measure of your health.",
+  "featuredLabel": "A challenge to try",
+  "tryThis": "Try this",
+  "filterLabel": "Filter by type",
+  "categories": {
+    "all": "All",
+    "focus": "Focus",
+    "memory": "Memory",
+    "planning": "Planning",
+    "time": "Time Awareness",
+    "relax": "Relaxation",
+    "real": "Real-World Task"
+  },
+  "notTried": "Haven't tried it yet",
+  "times_one": "once",
+  "times_other": "{{count}} times",
+  "timesAcc": "{{times}} · last accuracy {{acc}}%",
+  "timesDone": "Completed {{times}}",
+  "hasEasy": "Has an easier version",
+  "scored": "Scored",
+  "play": "Play",
+  "playName": "Play {{name}}",
+  "items": {
+    "video": {
+      "name": "Focus for a Moment",
+      "desc": "A short oasis scene, then questions about what you saw.",
+      "purpose": "A short attention exercise for a spare moment.",
+      "instructions": "You'll watch a 24-second oasis scene. Watch the details, then I'll ask you about it."
+    },
+    "mem": {
+      "name": "What Do You Remember?",
+      "desc": "Memorize the shapes and colors, then tell me what vanished.",
+      "purpose": "Visual memory rounds that gradually get harder.",
+      "instructions": "Memorize the shapes and their colors, then tell me what vanished."
+    },
+    "seq": {
+      "name": "Put It in Order",
+      "desc": "Order the steps of a real day by dragging or tapping.",
+      "purpose": "Practice ordering steps before you start them.",
+      "instructions": "Put the steps in the order that makes sense to you. Drag or tap them."
+    },
+    "time": {
+      "name": "Where Did the Time Go?",
+      "desc": "Guess the duration, then compare it with the actual time.",
+      "purpose": "See the gap between how time feels and how long it took.",
+      "instructions": "Estimate how many seconds a simple task will take, then we'll compare."
+    },
+    "calm": {
+      "name": "Take It Easy",
+      "desc": "Calm breathing at your pace, or a break without breathing.",
+      "purpose": "A quiet pause in your day, and you can skip it.",
+      "instructions": "Breathe with me at your own pace, or take a break without breathing. Your call."
+    },
+    "start2": {
+      "name": "Just Two Minutes",
+      "desc": "Pick a task you keep putting off and start its smallest step.",
+      "purpose": "Helps you begin a delayed task with one small step.",
+      "instructions": "We'll pick a delayed task and start it with one small step."
+    },
+    "attention_scene": {
+      "name": "What Changed?",
+      "desc": "Compare two scenes and spot the differences.",
+      "purpose": "Attention to detail, with no rush.",
+      "instructions": "Here are two scenes. In the second one, tap what changed."
+    },
+    "priority_board": {
+      "name": "What Comes First?",
+      "desc": "Sort your tasks into now, later and not today.",
+      "purpose": "Lightens the load when everything feels important.",
+      "instructions": "Sort the tasks into three lists, then pick what comes first. There's no wrong answer."
+    },
+    "breakdown": {
+      "name": "Break It Down",
+      "desc": "Split a big task into small steps and make a plan.",
+      "purpose": "Turns a big task into a clear first step.",
+      "instructions": "Write down a big task, split it into small steps, and make a simple plan."
+    },
+    "study_sprint": {
+      "name": "Study Sprint",
+      "desc": "A short study session with a place to park distractions.",
+      "purpose": "A short focus session for study or work.",
+      "instructions": "Pick a length that suits you and start. Note down anything distracting, then come back."
+    },
+    "emotion_map": {
+      "name": "How Are You Feeling?",
+      "desc": "Choose how you feel and what might help, in your own terms.",
+      "purpose": "An optional pause to note how you feel, in your own terms.",
+      "instructions": "Choose how you feel right now, if you want to. I don't guess your feelings. This is your answer."
+    },
+    "calm_landscape": {
+      "name": "Take a Break",
+      "desc": "A calm oasis to interact with at your own pace.",
+      "purpose": "A short visual break between tasks.",
+      "instructions": "A calm oasis. Tap the lanterns, water and palm, or just look."
+    }
+  }
+}

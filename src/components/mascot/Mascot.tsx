@@ -30,10 +30,13 @@ export const Mascot = memo(function Mascot({ state = 'idle', size = 'medium', in
   const reduced = !!rm || !!systemRm;
   const id = useId().replace(/:/g, '');
   const [artFailed, setArtFailed] = useState(false);
-  const [videoReady, setVideoReady] = useState(false);
+  // Which clip is actually showing. The still image stays visible until the new clip has started, so a switch never flashes blank.
+  const [playingSrc, setPlayingSrc] = useState<string | null>(null);
 
   // The hat is an overlay, so it needs artwork that moves as one piece with it.
-  const clip = !reduced && !still && !hat && canPlayAlphaWebm ? CLIPS[state] : undefined;
+  // A still mascot keeps brief reactions, because they are feedback, and holds no looping clip during focus tasks.
+  const clip = !reduced && (!still || isOneShot(state)) && !hat && canPlayAlphaWebm ? CLIPS[state] : undefined;
+  const videoReady = !!clip && playingSrc === clip.src;
   const classes = ['mascot', `mascot--${state}`, still ? 'is-still' : '', clip ? 'has-clip' : '', interactive ? 'is-interactive' : '', className].filter(Boolean).join(' ');
   const style = { width: px, height: px } as CSSProperties;
   const a11y = label ? { role: 'img', 'aria-label': label } : { 'aria-hidden': true };
@@ -47,7 +50,7 @@ export const Mascot = memo(function Mascot({ state = 'idle', size = 'medium', in
         src={EXPRESSIONS[state] ?? BASE_IMAGE}
         alt=""
         draggable={false}
-        style={clip && videoReady ? { visibility: 'hidden' } : undefined}
+        style={videoReady ? { visibility: 'hidden' } : undefined}
         onError={() => setArtFailed(true)}
       />
       {clip && (
@@ -60,9 +63,8 @@ export const Mascot = memo(function Mascot({ state = 'idle', size = 'medium', in
           autoPlay
           playsInline
           preload="auto"
-          onPlaying={() => setVideoReady(true)}
-          onEmptied={() => setVideoReady(false)}
-          onError={() => setVideoReady(false)}
+          onPlaying={() => setPlayingSrc(clip.src)}
+          onError={() => setPlayingSrc(null)}
         />
       )}
       {hat && (

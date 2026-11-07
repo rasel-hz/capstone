@@ -1,17 +1,19 @@
 import { Bot, CarFront, Check, Pencil, Send, ShieldAlert, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Mascot } from '../../components/mascot/Mascot';
 import type { MascotState } from '../../components/mascot/manifest';
 import { useMascot } from '../../components/mascot/useMascot';
 import { useAppState, useStore } from '../../context/AppStateContext';
+import { tr } from '../../i18n';
 import { aiCompanion, isAiAvailable, ruleCompanion } from '../../services/companion';
 import type { ContextTag } from '../../types';
 import { today } from '../../utils';
 
-const TAGS: Record<ContextTag, string> = { event: 'عندك عزيمة أو مناسبة', work: 'عندك دوام أو دراسة', sleep: 'نومك كان متأخر' };
-const SUGGEST = ['نمت متأخر اليوم', 'مالي خلق اليوم', 'عندي عزيمة بالليل', 'كيف نتائجي؟'];
+const SUGGEST = ['late', 'low', 'event', 'results'];
 
 export function Companion() {
+  const { t } = useTranslation();
   const s = useAppState();
   const store = useStore();
   const [text, setText] = useState('');
@@ -59,10 +61,11 @@ export function Companion() {
     }
     setWaiting(false);
     store.update((d) => {
-      reply.messages.forEach((t) => d.chat.push({ b: 1, t }));
+      reply.messages.forEach((m) => d.chat.push({ b: 1, t: m }));
       if (reply.pending) {
         d.pend = { ctx: reply.pending.ctx, low: reply.pending.low };
-        d.chat.push({ b: 1, card: 1, t: reply.pending.card });
+        // The card's words come from the locale files when shown, because it is still a live control.
+        d.chat.push({ b: 1, card: 1, t: '' });
       }
     });
     setSupportive(reply.tone === 'crisis' ? 'concerned' : reply.tone === 'support' ? 'calm' : null);
@@ -83,7 +86,7 @@ export function Companion() {
         if (m === 1) d.pref = 'short';
       }
       d.pend = null;
-      d.chat.push({ b: 1, t: m === 1 ? 'تم يا بعدي، سجلتها وخففت مهمة اليوم. شوفها في الرئيسية.' : m === 2 ? 'تم، سجلتها وخطتك ما تغيّرت.' : 'عادي، ما سجلت شي.' });
+      d.chat.push({ b: 1, t: tr(m === 1 ? 'companion.card.savedLighter' : m === 2 ? 'companion.card.saved' : 'companion.card.declined') });
     });
   }
 
@@ -99,69 +102,74 @@ export function Companion() {
   const pend = s.pend;
   const empty = !!pend && !pend.ctx.length && !pend.low;
   const showSuggest = !waiting && !driving && !pend && s.chat.filter((m) => !m.b).length < 2;
+  const lowFact = t('companion.card.lowFact');
 
   return (
     <div className="chatp">
       <header className="chat-head">
-        <Mascot state={mascot.state} size={72} label="خويّك" />
+        <Mascot state={mascot.state} size={72} label={t('common.brand')} />
         <div className="grow">
-          <h1>خويّك</h1>
-          <span className={`status ${useAi ? 'status--ai' : ''}`}><Bot size={14} aria-hidden="true" /> {useAi ? 'ردود من نموذج ذكاء اصطناعي (OpenAI)، وممكن يغلط' : 'ردود من قواعد داخل التطبيق، مو نموذج لغوي'}</span>
+          <h1>{t('nav.chat')}</h1>
+          <span className={`status ${useAi ? 'status--ai' : ''}`}><Bot size={14} aria-hidden="true" /> {t(useAi ? 'companion.statusAi' : 'companion.statusRules')}</span>
         </div>
       </header>
-      <p className="note chat-disc">أنا مو معالج ولا أشخّص، وما أحل محل أهلك وأصحابك أو المختصين.</p>
+      <p className="note chat-disc">{t('companion.disclaimer')}</p>
 
       {aiReady && s.aiConsent == null && (
         <div className="panel consent">
-          <h3>تبي تفعّل الردود الذكية؟</h3>
-          <p>لو وافقت، رسالتك وآخر رسايل المحادثة وملخص نتائجك في التحديات تنرسل لشركة OpenAI عشان يطلع الرد. ما نرسل اسمك ولا الرحلات اللي اخترتها.</p>
-          <p className="note">حسب سياسة OpenAI، بيانات الـ API ما تُستخدم للتدريب، وممكن تُحفظ عندهم لمدة تصل إلى ٣٠ يوم لمراقبة إساءة الاستخدام. ولا تكتب معلومات حساسة ما تبي تشاركها. تقدر توقفها بأي وقت من ملفي.</p>
+          <h3>{t('companion.consent.title')}</h3>
+          <p>{t('companion.consent.text')}</p>
+          <p className="note">{t('companion.consent.note')}</p>
           <div className="row">
-            <button type="button" className="btn sm" onClick={() => store.update((d) => { d.aiConsent = 1; })}>أوافق</button>
-            <button type="button" className="btn sm alt" onClick={() => store.update((d) => { d.aiConsent = 0; })}>لا، خلها بالقواعد</button>
+            <button type="button" className="btn sm" onClick={() => store.update((d) => { d.aiConsent = 1; })}>{t('companion.consent.yes')}</button>
+            <button type="button" className="btn sm alt" onClick={() => store.update((d) => { d.aiConsent = 0; })}>{t('companion.consent.no')}</button>
           </div>
         </div>
       )}
 
       <div className="chat-box">
-        <div className="chat" ref={list} role="log" aria-live="polite" tabIndex={0} aria-label="المحادثة">
-          {!s.chat.length && <p className="note center">قل لي عن يومك: نومك، دوامك، أو أي شي يشغل بالك.</p>}
+        <div className="chat" ref={list} role="log" aria-live="polite" tabIndex={0} aria-label={t('companion.logLabel')}>
+          {!s.chat.length && <p className="note center">{t('companion.empty')}</p>}
           {s.chat.map((m, i) => (m.card ? (
             <div key={i} className="ccard">
-              <b>{m.t}</b>
-              <p className="note flush">هذا اللي فهمته من كلامك. ما أسجل شي إلا بموافقتك.</p>
+              <b>{t('companion.card.ask', { context: s.g })}</b>
+              <p className="note flush">{t('companion.card.note')}</p>
               {pend && (
                 <ul className="ccard__facts">
-                  {pend.low ? <li><span>طاقتك قليلة اليوم</span>{editing && <button type="button" aria-label="شيل: طاقتك قليلة اليوم" onClick={() => dropFact('low')}><X size={15} /></button>}</li> : null}
-                  {pend.ctx.map((c) => <li key={c}><span>{TAGS[c]}</span>{editing && <button type="button" aria-label={`شيل: ${TAGS[c]}`} onClick={() => dropFact(c)}><X size={15} /></button>}</li>)}
-                  {empty && <li className="note">شلت كل شي، فما فيه شي أسجله.</li>}
+                  {pend.low ? <li><span>{lowFact}</span>{editing && <button type="button" aria-label={t('companion.card.drop', { fact: lowFact })} onClick={() => dropFact('low')}><X size={15} /></button>}</li> : null}
+                  {pend.ctx.map((c) => {
+                    const fact = t(`common.context.${c}`);
+                    return <li key={c}><span>{fact}</span>{editing && <button type="button" aria-label={t('companion.card.drop', { fact })} onClick={() => dropFact(c)}><X size={15} /></button>}</li>;
+                  })}
+                  {empty && <li className="note">{t('companion.card.empty')}</li>}
                 </ul>
               )}
               <div className="row">
-                <button type="button" className="btn sm" disabled={empty} onClick={() => answerCard(1)}><Check size={15} aria-hidden="true" /> سجّل وخفّف الخطة</button>
-                <button type="button" className="btn sm alt" disabled={empty} onClick={() => answerCard(2)}>سجّل بس</button>
-                <button type="button" className="btn sm alt" aria-pressed={editing} onClick={() => setEditing(!editing)}><Pencil size={14} aria-hidden="true" /> عدّل</button>
-                <button type="button" className="btn sm alt" onClick={() => answerCard(0)}>لا</button>
+                <button type="button" className="btn sm" disabled={empty} onClick={() => answerCard(1)}><Check size={15} aria-hidden="true" /> {t('companion.card.saveLighter')}</button>
+                <button type="button" className="btn sm alt" disabled={empty} onClick={() => answerCard(2)}>{t('companion.card.saveOnly')}</button>
+                <button type="button" className="btn sm alt" aria-pressed={editing} onClick={() => setEditing(!editing)}><Pencil size={14} aria-hidden="true" /> {t('companion.card.edit')}</button>
+                <button type="button" className="btn sm alt" onClick={() => answerCard(0)}>{t('companion.card.no')}</button>
               </div>
             </div>
           ) : (
-            <div key={i} className={`m ${m.b ? 'b' : 'u'}`}>{m.t}</div>
+            <div key={i} className={`m ${m.b ? 'b' : 'u'}`} dir="auto">{m.t}</div>
           )))}
-          {waiting && <div className="m b m--typing" role="status" aria-label="خويّك يكتب"><i /><i /><i /></div>}
+          {waiting && <div className="m b m--typing" role="status" aria-label={t('companion.typing')}><i /><i /><i /></div>}
         </div>
 
-        {fellBack && <p className="alert" role="status"><ShieldAlert size={17} aria-hidden="true" /> <span>ما قدرت أوصل للرد الذكي الحين، فرديت عليك بالقواعد البسيطة، ويمكن ما فهمت كلامك زين. إذا تمر بوقت صعب أو في خطر عليك، كلّم شخص تثق فيه أو اتصل بالإسعاف 997.</span></p>}
-        {driving && <p className="alert" role="status"><CarFront size={17} aria-hidden="true" /> <span>وقفنا الكتابة لأنك حددت إنك تسوق. أول ما توصل بالسلامة غيّرها من ملفي.</span></p>}
+        {fellBack && <p className="alert" role="status"><ShieldAlert size={17} aria-hidden="true" /> <span>{t('companion.fallback')}</span></p>}
+        {driving && <p className="alert" role="status"><CarFront size={17} aria-hidden="true" /> <span>{t('companion.driving')}</span></p>}
 
         {showSuggest && (
-          <div className="tags chat-sug" role="group" aria-label="اقتراحات">
-            {SUGGEST.map((x) => <button key={x} type="button" className="tag tag--btn" onClick={() => void send(x)}>{x}</button>)}
+          <div className="tags chat-sug" role="group" aria-label={t('companion.suggestLabel')}>
+            {SUGGEST.map((k) => <button key={k} type="button" className="tag tag--btn" onClick={() => void send(t(`companion.suggest.${k}`))}>{t(`companion.suggest.${k}`)}</button>)}
           </div>
         )}
         <form className="chat-in" onSubmit={(e) => { e.preventDefault(); void send(text); }}>
           <input
-            aria-label="رسالتك لخويّك"
-            placeholder="اكتب لخويّك..."
+            dir="auto"
+            aria-label={t('companion.inputLabel')}
+            placeholder={t('companion.inputPh')}
             maxLength={1000}
             value={text}
             disabled={driving}
@@ -169,7 +177,7 @@ export function Companion() {
             onFocus={() => setFocused(true)}
             onBlur={() => setFocused(false)}
           />
-          <button type="submit" className="btn" disabled={driving || waiting || !text.trim()} aria-label="أرسل"><Send size={17} aria-hidden="true" /><span>أرسل</span></button>
+          <button type="submit" className="btn" disabled={driving || waiting || !text.trim()} aria-label={t('companion.send')}><Send size={17} className="flip" aria-hidden="true" /><span>{t('companion.send')}</span></button>
         </form>
       </div>
     </div>

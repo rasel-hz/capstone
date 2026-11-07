@@ -43,6 +43,10 @@ The planner is rule-based. Driving and prayer checks happen in `MissionProvider`
 - **Icons:** Lucide only, through `lucide-react`. No emoji; `tests/redesign.test.ts` fails if one appears in `src/`.
 - **Art:** `features/challenges/ChallengeArt.tsx` has the challenge art, journey art and oasis backdrop, all flat vector drawn from the palette.
 
+## Language
+
+All text is in `src/i18n/locales/`, and state holds stable IDs. See [I18N.md](I18N.md).
+
 ## The shared player
 
 `MissionPlayer.tsx` owns the header, intro, result and completion screens. A game only draws its play area and reports through `GameEnv`:
@@ -56,8 +60,8 @@ While the player or a blocking dialog is open, `MissionProvider` sets `inert` on
 ## Adding a game
 
 1. Create `src/features/challenges/games/YourGame.tsx` using the `GameProps` interface.
-2. Register it in `games/index.ts`, and in `CHALLENGES` and `INSTRUCTIONS` in `catalog.ts`.
-3. Add its ID to the `ChallengeId` type, add its art to `ChallengeArt.tsx`, and add it to any journey that should offer it.
+2. Register it in `games/index.ts`, and in `CHALLENGES` in `catalog.ts`.
+3. Add its ID to the `ChallengeId` type, add its art to `ChallengeArt.tsx`, add its text to `challenges.json` and `games.json` in both languages, and add it to any journey that should offer it.
 
 A game must:
 
@@ -65,6 +69,7 @@ A game must:
 - Respect `env.paused` for anything else that runs over time.
 - Call `onDone` only when its own completion rule is met.
 - Render user text as plain React text, never with `dangerouslySetInnerHTML`.
+- Keep stable IDs in state and look up words when rendering, so a language switch can't reset it.
 - Offer a tap alternative to any drag. `useDrag` in `games/parts.tsx` handles mouse and touch; native drag-and-drop doesn't fire on phones.
 - Set `selfReport: true` in the catalog for anything that records feelings, so it earns nothing and stays on the device.
 

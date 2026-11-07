@@ -1,0 +1,54 @@
+{
+  "title": "My Rewards",
+  "sub": "In-app rewards only for now. No streaks, and rest days are a normal part of the journey.",
+  "toNext": "{{left}} points to level {{next}}.",
+  "achievements": "My achievements",
+  "ofTotal": "{{n}} of {{total}}",
+  "earned": "Earned",
+  "items": {
+    "step": {
+      "label": "First step",
+      "hint": "Complete your first challenge"
+    },
+    "five": {
+      "label": "Five challenges",
+      "hint": "Complete 5 challenges"
+    },
+    "level": {
+      "label": "Level 2",
+      "hint": "Earn 100 points"
+    },
+    "variety": {
+      "label": "Tried 3 different games",
+      "hint": "Try 3 different challenges"
+    },
+    "retry": {
+      "label": "Came back and tried again",
+      "hint": "Try again after a wrong answer"
+    },
+    "return": {
+      "label": "A good return after a break",
+      "hint": "Come back after a rest and complete a challenge"
+    }
+  },
+  "unlocks": "Unlocks",
+  "unlockItems": {
+    "theme": {
+      "name": "Lavender theme",
+      "open": "Unlocked, and you can turn it on."
+    },
+    "hat": {
+      "name": "A hat for your buddy",
+      "open": "Unlocked, and your buddy wears it automatically."
+    }
+  },
+  "unlocksAt": "Unlocks at level {{n}}",
+  "turnOff": "Turn off",
+  "turnOn": "Turn on",
+  "unlocked": "Unlocked",
+  "locked": "Locked",
+  "collection": "My collection",
+  "collectionNote": "Completing a challenge for the first time adds its card to your collection.",
+  "notYet": "Not yet",
+  "noPartners": "We have no partners or vouchers right now. Any outside offer needs a signed agreement before it appears here."
+}

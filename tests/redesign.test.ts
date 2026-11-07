@@ -6,7 +6,7 @@ import { makeRound } from '../src/features/challenges/games/MemoryGame';
 import { challengeStatus } from '../src/features/challenges/ChallengeCard';
 import { buildChatRequest } from '../src/features/companion/request';
 import { beginItem, completeItem, createMission, skipItem } from '../src/features/mission/engine';
-import { generateMission, missionReason } from '../src/features/mission/planner';
+import { generateMission, missionReason, whyText } from '../src/features/mission/planner';
 import { achievements } from '../src/features/rewards/achievements';
 import { defaultState, hydrate } from '../src/services/storage';
 import type { AppState, Attempt, ChallengeId } from '../src/types';
@@ -69,7 +69,7 @@ describe('self-report stays unrewarded and private', () => {
 
 describe('mission explanations', () => {
   it('gives each step its own reason', () => {
-    const why = generateMission(fresh()).map((m) => m.why);
+    const why = generateMission(fresh()).map((m) => whyText(m.why));
     expect(new Set(why).size).toBe(why.length);
   });
 
@@ -80,8 +80,8 @@ describe('mission explanations', () => {
 
   it('names a chosen journey only if the user chose it', () => {
     const mine = generateMission(fresh({ needs: ['adhd'] }));
-    expect(mine.some((m) => m.why.includes('التركيز والتنظيم'))).toBe(true);
-    expect(generateMission(fresh({ needs: [] })).some((m) => m.why.includes('التركيز والتنظيم'))).toBe(false);
+    expect(mine.some((m) => whyText(m.why).includes('التركيز والتنظيم'))).toBe(true);
+    expect(generateMission(fresh({ needs: [] })).some((m) => whyText(m.why).includes('التركيز والتنظيم'))).toBe(false);
   });
 });
 
@@ -126,6 +126,18 @@ describe('skipping', () => {
     skipItem(s);
     expect(s.xp).toBe(0);
     expect(s.hist[0].status).toBe('SKIPPED');
+  });
+});
+
+describe('mascot clips', () => {
+  it('has a file for every state, and every reaction has a length', async () => {
+    const { CLIPS, ONE_SHOT_MS } = await import('../src/components/mascot/manifest');
+    const states = ['idle', 'greeting', 'listening', 'thinking', 'happy', 'celebrating', 'encouraging', 'curious', 'calm', 'resting', 'concerned'] as const;
+    states.forEach((st) => {
+      expect(CLIPS[st]?.src, st).toContain(`${st}.webm`);
+      expect(statSync(`public/mascot/animations/${st}.webm`).size, st).toBeGreaterThan(0);
+    });
+    Object.values(ONE_SHOT_MS).forEach((ms) => expect(ms).toBe(3040));
   });
 });
 

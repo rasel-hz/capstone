@@ -1,14 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTimers } from '../../../hooks/useTimers';
 import { OasisBackdrop } from '../ChallengeArt';
 import type { GameProps } from '../types';
 
 type Phase = 'setup' | 'ready' | 'in' | 'out' | 'quiet' | 'ask';
-const PACES: { sec: number; label: string; note: string }[] = [
-  { sec: 3, label: 'أسرع', note: '٣ ثواني' },
-  { sec: 4, label: 'عادي', note: '٤ ثواني' },
-  { sec: 5, label: 'أبطأ', note: '٥ ثواني' },
-];
+const PACES: { sec: number; id: string }[] = [{ sec: 3, id: 'fast' }, { sec: 4, id: 'normal' }, { sec: 5, id: 'slow' }];
 const CYCLES = 3;
 const QUIET_SEC = 30;
 
@@ -33,6 +30,7 @@ function tone(freq: number) {
 }
 
 export function CalmGame({ env, onDone }: GameProps) {
+  const { t } = useTranslation();
   const timers = useTimers(env.paused);
   const [phase, setPhase] = useState<Phase>('setup');
   const [pace, setPace] = useState(4);
@@ -43,7 +41,7 @@ export function CalmGame({ env, onDone }: GameProps) {
   const cycle = useRef(0);
 
   useEffect(() => {
-    env.say('calm', 'على هونك. اختر اللي يناسبك، وتقدر توقف بأي وقت.');
+    env.say('calm', 'games.calm.intro');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -63,7 +61,7 @@ export function CalmGame({ env, onDone }: GameProps) {
   function beginBreath() {
     setMode('breath');
     setPhase('ready');
-    env.say('calm', 'شهيق من الأنف، وزفير من الفم.');
+    env.say('calm', 'games.calm.breathGuide');
     const ms = pace * 1000;
     const breatheIn = () => {
       setPhase('in');
@@ -86,33 +84,33 @@ export function CalmGame({ env, onDone }: GameProps) {
     setMode('quiet');
     setCount(QUIET_SEC);
     setPhase('quiet');
-    env.say('calm', 'بدون تنفس موجّه. بس خذ لك نص دقيقة هدوء.');
+    env.say('calm', 'games.calm.quietGuide');
   }
 
   function answer(help: string | null) {
     env.sfx('ok');
-    onDone({ acc: null, retries: 0, say: 'خذتها على هونك.', mood: 'calm', data: { help, mode, pace: mode === 'breath' ? pace : null } });
+    onDone({ acc: null, retries: 0, say: 'games.calm.done', mood: 'calm', data: { help, mode, pace: mode === 'breath' ? pace : null } });
   }
 
   if (phase === 'setup') {
     return (
       <div className="scene calm-set">
         <div className="calm-set__art"><OasisBackdrop /></div>
-        <h2 className="q__t">كيف تبيها اليوم؟</h2>
-        <h3>سرعة التنفس</h3>
-        <div className="row row--c" role="group" aria-label="سرعة التنفس">
+        <h2 className="q__t">{t('games.calm.how')}</h2>
+        <h3>{t('games.calm.pace')}</h3>
+        <div className="row row--c" role="group" aria-label={t('games.calm.pace')}>
           {PACES.map((p) => (
-            <button key={p.sec} type="button" className={`pace ${pace === p.sec ? 'on' : ''}`} aria-pressed={pace === p.sec} onClick={() => setPace(p.sec)}><b>{p.label}</b><span>{p.note}</span></button>
+            <button key={p.sec} type="button" className={`pace ${pace === p.sec ? 'on' : ''}`} aria-pressed={pace === p.sec} onClick={() => setPace(p.sec)}><b>{t(`games.calm.paces.${p.id}`)}</b><span>{t('common.seconds', { count: p.sec })}</span></button>
           ))}
         </div>
         {env.snd && (
-          <label className="check center"><input type="checkbox" checked={sound} onChange={(e) => setSound(e.target.checked)} /> نغمة ناعمة مع كل نفس</label>
+          <label className="check center"><input type="checkbox" checked={sound} onChange={(e) => setSound(e.target.checked)} /> {t('games.calm.tone')}</label>
         )}
         <div className="row row--c">
-          <button type="button" className="btn" onClick={beginBreath}>ابدأ التنفس</button>
-          <button type="button" className="btn alt" onClick={beginQuiet}>ما أحب تمارين التنفس</button>
+          <button type="button" className="btn" onClick={beginBreath}>{t('games.calm.startBreathing')}</button>
+          <button type="button" className="btn alt" onClick={beginQuiet}>{t('games.calm.noBreathing')}</button>
         </div>
-        <p className="note center">تمرين للاسترخاء، وما نوعد بنتيجة معينة. إذا ضايقك وقّفه من فوق.</p>
+        <p className="note center">{t('games.calm.disclaimer')}</p>
       </div>
     );
   }
@@ -120,19 +118,16 @@ export function CalmGame({ env, onDone }: GameProps) {
   if (phase === 'ask') {
     return (
       <div className="scene q">
-        <h2 className="q__t">كيف حسيت؟</h2>
+        <h2 className="q__t">{t('games.calm.feel')}</h2>
         <div className="choices choices--3">
-          {[['y', 'ارتحت'], ['s', 'شوي'], ['n', 'ما فرق']].map(([k, l]) => (
-            <button key={k} type="button" className="opt" onClick={() => answer(k)}>{l}</button>
-          ))}
+          {['y', 's', 'n'].map((k) => <button key={k} type="button" className="opt" onClick={() => answer(k)}>{t(`games.common.help.${k}`)}</button>)}
         </div>
-        <div className="row row--c"><button type="button" className="btn-link" onClick={() => answer(null)}>أفضّل ما أجاوب</button></div>
-        <p className="note center">إجابتك للمتابعة فقط، وكلها مقبولة.</p>
+        <div className="row row--c"><button type="button" className="btn-link" onClick={() => answer(null)}>{t('games.common.preferNot')}</button></div>
+        <p className="note center">{t('games.common.trackingOnly')}</p>
       </div>
     );
   }
 
-  const label = phase === 'in' ? 'شهيق' : phase === 'out' ? 'زفير' : phase === 'quiet' ? 'هدوء' : 'استعد';
   return (
     <div className="calm">
       <OasisBackdrop dusk={phase === 'quiet'} className="calm__bg" />
@@ -145,8 +140,8 @@ export function CalmGame({ env, onDone }: GameProps) {
             aria-hidden="true"
           />
         )}
-        <p className="calm__t" aria-live="polite">{label}</p>
-        <p className="calm__s">{phase === 'quiet' ? `باقي ${count} ثانية` : `النفس ${cycleNo} من ${CYCLES}`}</p>
+        <p className="calm__t" aria-live="polite">{t(`games.calm.phases.${phase}`)}</p>
+        <p className="calm__s">{phase === 'quiet' ? t('games.calm.left', { time: t('common.seconds', { count }) }) : t('games.calm.breathOf', { n: cycleNo, total: CYCLES })}</p>
       </div>
     </div>
   );

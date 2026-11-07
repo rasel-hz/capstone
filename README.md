@@ -1,6 +1,6 @@
 # خويّك | Khowayk
 
-A Saudi Arabic wellness and daily-life companion: playable daily missions, progress and in-app rewards, with a chat that uses OpenAI or keyword rules. It is not a diagnostic or treatment tool.
+A Saudi wellness and daily-life companion, in Arabic and English: playable daily missions, progress and in-app rewards, with a chat that uses OpenAI or keyword rules. It is not a diagnostic or treatment tool.
 
 ## Run it
 
@@ -39,9 +39,10 @@ Then open http://localhost:8765.
 | `server/` | Holds the OpenAI key, safety gates and output validation |
 | `public/mascot/` | Mascot artwork |
 | `prototype/` | The original single-file app, kept for reference |
-| `docs/` | Architecture, mascot guide and task catalog |
+| `src/i18n/` | Language setup and all interface text |
+| `docs/` | Architecture, language system, AI, mascot guide and task catalog |
 
-Start with [KHOWAYK_REFERENCE.md](KHOWAYK_REFERENCE.md) for product requirements, then [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). To add mascot animations, see [docs/MASCOT.md](docs/MASCOT.md). To add challenges, see [docs/TASK_CATALOG.md](docs/TASK_CATALOG.md).
+Start with [docs/PROJECT_STATUS.md](docs/PROJECT_STATUS.md) for what is done and what is left, and [KHOWAYK_REFERENCE.md](KHOWAYK_REFERENCE.md) for product requirements. Then read [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). To add or change text, see [docs/I18N.md](docs/I18N.md). To add mascot animations, see [docs/MASCOT.md](docs/MASCOT.md). To add challenges, see [docs/TASK_CATALOG.md](docs/TASK_CATALOG.md).
 
 ## What is real today
 

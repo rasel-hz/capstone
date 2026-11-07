@@ -1,13 +1,13 @@
 import { motion } from 'motion/react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { PageHeader } from '../../components/ui/kit';
 import { useAppState } from '../../context/AppStateContext';
 import { ChallengeCard } from '../../features/challenges/ChallengeCard';
 import { CATEGORIES, CHALLENGES } from '../../features/challenges/catalog';
 import { useMissions } from '../../features/mission/MissionProvider';
-import type { AppState, ChallengeId } from '../../types';
+import type { AppState, ChallengeCategory, ChallengeId } from '../../types';
 
-const ALL = 'الكل';
 const IDS = Object.keys(CHALLENGES) as ChallengeId[];
 
 // Features something the user hasn't tried yet, or their least recent one. It's a browsing aid, not a recommendation engine.
@@ -19,26 +19,27 @@ function featuredId(s: AppState): ChallengeId {
 }
 
 export function Challenges() {
+  const { t } = useTranslation();
   const s = useAppState();
   const missions = useMissions();
-  const [filter, setFilter] = useState(ALL);
+  const [filter, setFilter] = useState<'all' | ChallengeCategory>('all');
   const [featured] = useState(() => featuredId(s));
-  const list = IDS.filter((id) => (filter === ALL ? id !== featured : CHALLENGES[id].cat === filter));
-  const play = (id: ChallengeId) => missions.start([{ id, why: 'اخترته بنفسك', diff: 'normal' }]);
+  const list = IDS.filter((id) => (filter === 'all' ? id !== featured : CHALLENGES[id].cat === filter));
+  const play = (id: ChallengeId) => missions.start([{ id, why: [{ k: 'self' }], diff: 'normal' }]);
   return (
     <>
-      <PageHeader title="تحدياتي" sub="ألعاب قصيرة تجربها على راحتك. هي للمتابعة الشخصية، مو قياس لصحتك." />
-      {filter === ALL && (
-        <section aria-label="تحدي مقترح للتجربة" className="feat">
-          <p className="eyebrow">جرّب هذا</p>
+      <PageHeader title={t('challenges.title')} sub={t('challenges.sub')} />
+      {filter === 'all' && (
+        <section aria-label={t('challenges.featuredLabel')} className="feat">
+          <p className="eyebrow">{t('challenges.tryThis')}</p>
           <ChallengeCard id={featured} state={s} onPlay={() => play(featured)} featured />
         </section>
       )}
-      <div className="filters" role="group" aria-label="فلترة حسب النوع">
-        {[ALL, ...CATEGORIES].map((c) => (
+      <div className="filters" role="group" aria-label={t('challenges.filterLabel')}>
+        {(['all', ...CATEGORIES] as const).map((c) => (
           <button key={c} type="button" className={`flt ${filter === c ? 'on' : ''}`} aria-pressed={filter === c} onClick={() => setFilter(c)}>
             {filter === c && <motion.span layoutId="flt-active" className="flt__pill" transition={{ type: 'spring', stiffness: 420, damping: 36 }} />}
-            <span className="flt__t">{c}</span>
+            <span className="flt__t">{t(`challenges.categories.${c}`)}</span>
           </button>
         ))}
       </div>

@@ -1,5 +1,7 @@
 import { crisisMessage, detectCrisis, isCrisisText } from '../src/features/companion/crisis.ts';
 import { CHALLENGES } from '../src/features/challenges/catalog.ts';
+import ar from '../src/i18n/locales/ar-SA/challenges.json' with { type: 'json' };
+import en from '../src/i18n/locales/en/challenges.json' with { type: 'json' };
 import { REPLY_SCHEMA, SYSTEM_PROMPT } from './prompt.ts';
 
 export const DEFAULT_MODEL = 'gpt-6-luna';
@@ -23,6 +25,7 @@ export interface ChatRequest {
   history: { role: 'user' | 'assistant'; text: string }[];
   context: {
     address: 'm' | 'f';
+    lang: 'ar-SA' | 'en';
     lowEnergyToday: boolean;
     confirmed: string[];
     completed: number;
@@ -72,6 +75,7 @@ export function parseRequest(raw: unknown): ChatRequest {
     history,
     context: {
       address: c.address === 'f' ? 'f' : 'm',
+      lang: c.lang === 'en' ? 'en' : 'ar-SA',
       lowEnergyToday: c.lowEnergyToday === true,
       confirmed: (Array.isArray(c.confirmed) ? c.confirmed : []).filter((t): t is string => CONTEXT_TAGS.includes(t as string)),
       completed: num(c.completed),
@@ -82,12 +86,16 @@ export function parseRequest(raw: unknown): ChatRequest {
   };
 }
 
-const crisisReply = (lv: 1 | 2): ChatReply => ({ reply: crisisMessage(lv), tone: 'crisis', source: 'safety' });
+const crisisReply = (lv: 1 | 2, lang: 'ar-SA' | 'en' = 'ar-SA'): ChatReply => ({ reply: crisisMessage(lv, lang), tone: 'crisis', source: 'safety' });
 
-const DIAGNOSIS = /(عندك|فيك|مصاب|تعاني من|you have)[^.،!؟]{0,16}(اكتئاب|وسواس|فرط الحركة|تشتت الانتباه|توحد|ثنائي القطب|اضطراب|depression|ocd|adhd|bipolar|disorder)/i;
+const DIAGNOSIS = /(عندك|فيك|مصاب|تعاني من|you have|you may have|you might have|you probably have|you're suffering from|you suffer from|sounds like you have)[^.،!؟]{0,16}(اكتئاب|وسواس|فرط الحركة|تشتت الانتباه|توحد|ثنائي القطب|اضطراب|depression|ocd|adhd|bipolar|disorder)/i;
+
+// A sentence that refuses or only asks isn't a diagnosis, such as "I can't tell you if you have ADHD".
+const REFUSAL = /(can't|cannot|can not|can’t|won't|won’t|not able|unable|don't know|don’t know|\bif you\b|\bwhether\b|\bdo you\b|ما أقدر|ما اقدر|ما أعرف|ما اعرف|ما أشخص|ما أشخّص|إذا|لو\s|هل\s)/i;
+const isDiagnosis = (reply: string) => reply.split(/[.،!؟?\n]+/).some((part) => DIAGNOSIS.test(part + '.') && !REFUSAL.test(part));
 
 // Final checks on what the model proposed. Anything unexpected is rejected rather than shown.
-export function acceptOutput(rawText: string): ChatReply {
+export function acceptOutput(rawText: string, lang: 'ar-SA' | 'en' = 'ar-SA'): ChatReply {
   let o: Record<string, unknown>;
   try {
     o = JSON.parse(rawText);
@@ -96,8 +104,8 @@ export function acceptOutput(rawText: string): ChatReply {
   }
   const reply = typeof o.reply === 'string' ? o.reply.trim() : '';
   if (!reply || reply.length > MAX_REPLY || typeof o.distress !== 'boolean') throw new ChatError(502, 'bad_model_output');
-  if (o.distress) return crisisReply(2);
-  if (DIAGNOSIS.test(reply)) throw new ChatError(502, 'unsafe_model_output');
+  if (o.distress) return crisisReply(2, lang);
+  if (isDiagnosis(reply)) throw new ChatError(502, 'unsafe_model_output');
   const c = (o.context ?? {}) as Record<string, unknown>;
   const ctx = CONTEXT_TAGS.filter((t) => c[t] === true);
   const low = c.low_energy === true;
@@ -111,6 +119,7 @@ export function acceptOutput(rawText: string): ChatReply {
 
 function contextBlock(c: ChatRequest['context']) {
   return JSON.stringify({
+    reply_language: c.lang === 'en' ? 'English' : 'Saudi Arabic',
     address_user_as: c.address === 'f' ? 'female' : 'male',
     reported_low_energy_today: c.lowEnergyToday,
     confirmed_today: c.confirmed,
@@ -118,7 +127,7 @@ function contextBlock(c: ChatRequest['context']) {
       started_attempts: c.attempts,
       completed: c.completed,
       average_first_try_accuracy_percent: c.avgAccuracy,
-      by_challenge: c.byChallenge.map((b) => ({ name: CHALLENGES[b.id as keyof typeof CHALLENGES].t, completed: b.count, last_accuracy_percent: b.lastAccuracy })),
+      by_challenge: c.byChallenge.map((b) => ({ name: (c.lang === 'en' ? en : ar).items[b.id as keyof typeof CHALLENGES].name, completed: b.count, last_accuracy_percent: b.lastAccuracy })),
     },
   });
 }
@@ -139,7 +148,7 @@ export async function handleChat(raw: unknown, deps: ChatDeps): Promise<ChatRepl
 
   // Clear crisis wording never reaches the AI service, and gets the reviewed response.
   const lv = detectCrisis(req.message);
-  if (lv) return crisisReply(lv);
+  if (lv) return crisisReply(lv, req.context.lang);
 
   if (!deps.apiKey) throw new ChatError(503, 'ai_not_configured');
   const doFetch = deps.fetch ?? fetch;
@@ -158,7 +167,7 @@ export async function handleChat(raw: unknown, deps: ChatDeps): Promise<ChatRepl
     if (m.ok) {
       const data = (await m.json()) as { results?: { categories?: Record<string, boolean> }[] };
       const cats = data.results?.[0]?.categories ?? {};
-      if (SELF_HARM.some((k) => cats[k])) return crisisReply(2);
+      if (SELF_HARM.some((k) => cats[k])) return crisisReply(2, req.context.lang);
     }
   } catch {
     // Moderation failing shouldn't stop the chat; the distress flag still applies.
@@ -196,5 +205,5 @@ export async function handleChat(raw: unknown, deps: ChatDeps): Promise<ChatRepl
     console.error(`OpenAI request failed with status ${res.status}`);
     throw new ChatError(res.status === 401 ? 503 : 502, res.status === 401 ? 'ai_auth_failed' : res.status === 429 ? 'ai_rate_limited' : 'ai_failed');
   }
-  return acceptOutput(outputText(await res.json()));
+  return acceptOutput(outputText(await res.json()), req.context.lang);
 }
