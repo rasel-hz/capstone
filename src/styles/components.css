@@ -295,8 +295,31 @@ input[type='time'] { width: auto; }
 .sugc__meta { display: inline-flex; gap: 4px; align-items: center; font-size: var(--fs-meta); color: var(--mut); }
 .sugc__why { margin: 2px 0 6px; font-size: var(--fs-meta); color: var(--mut); line-height: 1.55; }
 .sugc__act { display: flex; flex-wrap: wrap; gap: 6px; }
+.sugc__tasks { display: flex; flex-wrap: wrap; gap: 4px; margin: 4px 0 0; }
+.sugc__tasks li { background: var(--lil); border-radius: 7px; padding: 1px 8px; font-size: 12.5px; }
 .sugc__mission { align-self: flex-start; margin-top: 6px; font-size: var(--fs-meta); }
 .sugc__done { align-self: flex-end; margin: 0; }
+/* Prayer: a calm check-in, an optional break, and location setup. No warning colours, no lock. */
+.pci { display: flex; gap: 12px; align-items: center; background: var(--surface); border-radius: var(--r-md); padding: 14px; box-shadow: var(--shadow-card); text-align: start; }
+.pci h2 { font-size: 17px; margin-bottom: 2px; }
+.pci__act { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.pci--compact { box-shadow: inset 0 0 0 1.5px var(--lil), var(--shadow-card); }
+.ov .pci { box-shadow: none; padding: 0; }
+.pbk { display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; max-width: 420px; }
+.pbk h2 { font-size: 19px; }
+.pbk .timer-big { font-size: 34px; }
+.pbk__len { display: flex; flex-direction: column; gap: 8px; align-items: center; }
+.pbk__custom { display: flex; gap: 6px; align-items: center; }
+.pbk__custom input { width: 84px; }
+.pbk-row .grow b { font-size: 14.5px; }
+.psu { display: flex; flex-direction: column; gap: 8px; padding: 10px 0; }
+.psu__current { display: flex; gap: 8px; align-items: center; background: var(--em-l); border-radius: var(--r-sm); padding: 8px 10px; flex-wrap: wrap; }
+.psu__explain { background: var(--cr); border-radius: var(--r-sm); padding: 10px 12px; }
+.psu__explain p { margin: 0 0 8px; }
+.psu__pick { display: flex; flex-direction: column; gap: 8px; }
+.psu__search { display: flex; gap: 6px; align-items: center; border: 1.5px solid var(--line); border-radius: 12px; padding: 0 10px; background: #fff; }
+.psu__search input { border: 0; box-shadow: none; padding-inline: 0; flex: 1; min-width: 0; }
+.today__prayer > span:last-child { text-align: end; }
 .fbq { background: var(--cr); border-radius: var(--r-md); padding: 12px; margin: 10px 0; }
 .fbq__q { margin: 0 0 8px; text-align: center; font-weight: 500; }
 .m--typing { display: flex; gap: 5px; padding: 14px; }

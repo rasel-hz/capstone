@@ -7,6 +7,8 @@ import { CalmGame } from './CalmGame';
 import { CalmLandscapeGame } from './CalmLandscapeGame';
 import { EmotionMapGame } from './EmotionMapGame';
 import { MemoryGame } from './MemoryGame';
+import { MicroStartGame } from './MicroStartGame';
+import { ThoughtSortGame } from './ThoughtSortGame';
 import { PriorityBoardGame } from './PriorityBoardGame';
 import { SequenceGame } from './SequenceGame';
 import { StartGame } from './StartGame';
@@ -27,6 +29,8 @@ export const GAMES: Record<ChallengeId, ComponentType<GameProps>> = {
   study_sprint: StudySprintGame,
   emotion_map: EmotionMapGame,
   calm_landscape: CalmLandscapeGame,
+  micro_start: MicroStartGame,
+  thought_sort: ThoughtSortGame,
 };
 
 export { MemoryGame };

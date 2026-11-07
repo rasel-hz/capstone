@@ -125,7 +125,8 @@ export function Companion() {
 
   const pend = s.pend;
   const empty = !!pend && !pend.ctx.length && !pend.low;
-  const showSuggest = !waiting && !driving && !pend && s.chat.filter((m) => !m.b).length < 2;
+  // Starter ideas only for an empty chat, so they never crowd a reply or a suggestion card.
+  const showSuggest = !waiting && !driving && !pend && !s.chat.length;
   const lowFact = t('companion.card.lowFact');
 
   return (

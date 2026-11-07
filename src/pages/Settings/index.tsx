@@ -4,7 +4,11 @@ import { useTranslation } from 'react-i18next';
 import { Dialog, IconBadge, PageHeader, Segmented, SettingRow, Toggle } from '../../components/ui/kit';
 import { useAppState, useStore } from '../../context/AppStateContext';
 import { JOURNEYS } from '../../features/challenges/catalog';
-import { CitySelect, TodayPrayers } from '../../features/prayer/PrayerCity';
+import { TodayPrayers } from '../../features/prayer/PrayerCity';
+import { placeOf, settingsOf, turnOff } from '../../features/prayer/gate';
+import { PrayerSetup } from '../../features/prayer/PrayerSetup';
+import { METHODS, type MethodId } from '../../features/prayer/times';
+import { clearTypedText, typedCount } from '../../features/plan/privacy';
 import { formatList, type Lang, type Msg, msg } from '../../i18n';
 import { useLanguage } from '../../i18n/useLanguage';
 import { level, today } from '../../utils';
@@ -18,8 +22,6 @@ const Group = ({ id, title, icon, children }: { id: string; title: string; icon:
   </section>
 );
 
-// Removes only text the user typed into challenges. Scores, XP and dates stay.
-const TYPED = ['task', 'step', 'topic', 'notes', 'steps', 'plan', 'now', 'later', 'notToday', 'first'];
 
 export function Settings({ onNavigate }: { onNavigate(v: ViewId): void }) {
   const { t } = useTranslation();
@@ -30,7 +32,8 @@ export function Settings({ onNavigate }: { onNavigate(v: ViewId): void }) {
   const [prayer, setPrayer] = useState(s.prayer);
   const [ask, setAsk] = useState<'wipe' | 'typed' | null>(null);
   const [saved, setSaved] = useState<Msg>('');
-  const typedCount = s.hist.filter((h) => h.data && typeof h.data === 'object' && TYPED.some((k) => k in (h.data as object))).length;
+  const typedN = typedCount(s);
+  const place = placeOf(s);
   const set = (fn: Parameters<typeof store.update>[0]) => store.update(fn);
 
   function flash(key: string) {
@@ -49,11 +52,7 @@ export function Settings({ onNavigate }: { onNavigate(v: ViewId): void }) {
   }
 
   function clearTyped() {
-    set((d) => {
-      d.hist.forEach((h) => {
-        if (h.data && typeof h.data === 'object') TYPED.forEach((k) => delete (h.data as Record<string, unknown>)[k]);
-      });
-    });
+    set(clearTypedText);
     setAsk(null);
     flash('settings.flashTyped');
   }
@@ -101,18 +100,39 @@ export function Settings({ onNavigate }: { onNavigate(v: ViewId): void }) {
 
       <Group id="day" title={t('settings.day')} icon={MapPin}>
         <SettingRow title={t('settings.schedule')}><Segmented<string> label={t('settings.schedule')} value={s.sched} options={['work', 'study', 'flex'].map((v) => ({ value: v, label: t(`common.sched.${v}`) }))} onChange={(v) => set((d) => { d.sched = v; })} /></SettingRow>
-        <SettingRow title={t('common.prayer.city')} note={t('settings.cityNote')}>
-          <CitySelect value={s.city} onChange={(c) => { set((d) => { d.city = c; }); flash(c ? 'settings.flashCity' : 'settings.flashManual'); }} />
+        <SettingRow title={t('prayer.settings.on')} note={t('prayer.settings.onNote')}>
+          <Toggle label={t('prayer.settings.on')} on={!!s.prayerOn} onChange={(v) => { set((d) => { if (v) d.prayerOn = 1; else turnOff(d); }); flash(v ? 'prayer.settings.flashOn' : 'prayer.settings.flashOff'); }} />
         </SettingRow>
-        {s.city ? <><TodayPrayers city={s.city} /><p className="note">{t('common.prayer.calcNote')}</p></> : (
-          <SettingRow title={t('settings.nextPrayer')} note={t('settings.nextPrayerNote')}>
-            <div className="row">
-              <input type="time" aria-label={t('settings.prayerLabel')} value={prayer} onChange={(e) => setPrayer(e.target.value)} />
-              <button type="button" className="btn sm alt" onClick={() => { set((d) => { d.prayer = prayer; d.prayerDay = today(); }); flash('settings.flashPrayer'); }}>{t('common.save')}</button>
-            </div>
-          </SettingRow>
+        {!!s.prayerOn && (
+          <>
+            <PrayerSetup value={{ city: s.city, loc: s.loc }} onChange={(v) => { set((d) => { d.city = v.city; d.loc = v.loc; }); flash(v.loc || v.city ? 'settings.flashCity' : 'settings.flashManual'); }} />
+            {place ? (
+              <>
+                <TodayPrayers place={place} settings={settingsOf(s)} />
+                <p className="note">{t('prayer.settings.calcNote', { method: t(`prayer.methods.${s.prayerMethod}`) })}</p>
+                <SettingRow title={t('prayer.settings.method')} note={t('prayer.settings.methodNote')}>
+                  <select className="city-select" aria-label={t('prayer.settings.method')} value={s.prayerMethod} onChange={(e) => set((d) => { d.prayerMethod = e.target.value as MethodId; })}>
+                    {METHODS.map((m) => <option key={m} value={m}>{t(`prayer.methods.${m}`)}</option>)}
+                  </select>
+                </SettingRow>
+                <SettingRow title={t('prayer.settings.asr')}>
+                  <Segmented<number> label={t('prayer.settings.asr')} value={s.prayerAsr} options={[0, 1].map((v) => ({ value: v, label: t(`prayer.settings.asrOpt.${v}`) }))} onChange={(v) => set((d) => { d.prayerAsr = v === 1 ? 1 : 0; })} />
+                </SettingRow>
+              </>
+            ) : (
+              <SettingRow title={t('settings.nextPrayer')} note={t('settings.nextPrayerNote')}>
+                <div className="row">
+                  <input type="time" aria-label={t('settings.prayerLabel')} value={prayer} onChange={(e) => setPrayer(e.target.value)} />
+                  <button type="button" className="btn sm alt" onClick={() => { set((d) => { d.prayer = prayer; d.prayerDay = today(); }); flash('settings.flashPrayer'); }}>{t('common.save')}</button>
+                </div>
+              </SettingRow>
+            )}
+            <SettingRow title={t('settings.protect')} note={t('prayer.settings.protectNote')}><Segmented<number> label={t('settings.protectLabel')} value={s.pp} options={[0, 20, 30, 45].map((v) => ({ value: v, label: v ? t('common.minShort', { n: v }) : t('settings.none') }))} onChange={(v) => set((d) => { d.pp = v; })} /></SettingRow>
+            <SettingRow title={t('prayer.settings.ask')} note={t('prayer.settings.askNote')}>
+              <Toggle label={t('prayer.settings.ask')} on={!!s.prayerAsk} onChange={(v) => set((d) => { d.prayerAsk = v ? 1 : 0; })} />
+            </SettingRow>
+          </>
         )}
-        <SettingRow title={t('settings.protect')}><Segmented<number> label={t('settings.protectLabel')} value={s.pp} options={[0, 20, 30, 45].map((v) => ({ value: v, label: v ? t('common.minShort', { n: v }) : t('settings.none') }))} onChange={(v) => set((d) => { d.pp = v; })} /></SettingRow>
         <div className="set-note"><CarFront size={18} aria-hidden="true" /><div>
           <b>{t('settings.driving')}</b>
           <p className="note flush">{t('settings.drivingNote')}</p>
@@ -134,7 +154,7 @@ export function Settings({ onNavigate }: { onNavigate(v: ViewId): void }) {
           <ul className="plain">
             <li>{t('settings.storedAttempts', { n: s.hist.length, xp: s.xp, level: level(s) })}</li>
             <li>{t('settings.storedEnergy', { n: s.en.length, m: s.chat.filter((m) => !m.b).length })}</li>
-            <li>{t('settings.storedTyped', { n: typedCount })}</li>
+            <li>{t('settings.storedTyped', { n: typedN })}</li>
           </ul>
         </div>
         <div className="set-sub">
@@ -145,7 +165,7 @@ export function Settings({ onNavigate }: { onNavigate(v: ViewId): void }) {
         </div>
         <div className="row">
           <button type="button" className="btn sm alt" onClick={exportData}><Download size={15} aria-hidden="true" /> {t('settings.export')}</button>
-          <button type="button" className="btn sm alt" disabled={!typedCount} onClick={() => setAsk('typed')}><Type size={15} aria-hidden="true" /> {t('settings.clearTyped')}</button>
+          <button type="button" className="btn sm alt" disabled={!typedN} onClick={() => setAsk('typed')}><Type size={15} aria-hidden="true" /> {t('settings.clearTyped')}</button>
           <button type="button" className="btn sm btn--danger" onClick={() => setAsk('wipe')}><Trash2 size={15} aria-hidden="true" /> {t('settings.wipe')}</button>
         </div>
       </Group>

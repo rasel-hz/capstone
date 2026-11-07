@@ -1,6 +1,6 @@
 import type { AppState } from '../types';
 import { today } from '../utils';
-import { CITIES } from '../features/prayer/times';
+import { CITIES, isMethod, roundCoord, validTz, type PrayerPlace } from '../features/prayer/times';
 
 // Storage sits behind this interface so a real backend can replace it later.
 export interface StateRepository {
@@ -16,6 +16,7 @@ export const defaultState = (): AppState => ({
   started: 0, done: 0, name: '', g: 'm', needs: [], sched: 'work', pat: '', sleep: '', pp: 30, prayer: '',
   snd: 1, rm: 0, notif: 0, ctx: [], pend: null, hist: [], en: [], xp: 0, view: 'home', chat: [], mission: null,
   pref: null, drive: 0, driving: 0, last: Date.now(), theme: '', comeback: 0, lastDaily: null, aiConsent: null, prayerDay: '', city: '', largeText: 0, lang: 'ar-SA', fb: [],
+  prayerOn: 1, prayerAsk: 1, prayerMethod: 'umm_al_qura', prayerAsr: 0, loc: null, prayerAck: null, prayerBreak: null,
 });
 
 export const localRepository: StateRepository = {
@@ -51,5 +52,14 @@ export function hydrate(saved: Partial<AppState> | null, now = Date.now()): AppS
   if (typeof s.city !== 'string' || !Object.hasOwn(CITIES, s.city)) s.city = '';
   if (s.lang !== 'en') s.lang = 'ar-SA';
   if (!Array.isArray(s.fb)) s.fb = [];
+  s.prayerOn = s.prayerOn === 0 ? 0 : 1;
+  s.prayerAsk = s.prayerAsk === 0 ? 0 : 1;
+  if (!isMethod(s.prayerMethod)) s.prayerMethod = 'umm_al_qura';
+  s.prayerAsr = s.prayerAsr === 1 ? 1 : 0;
+  const l = s.loc as PrayerPlace | null;
+  s.loc = l && Number.isFinite(l.lat) && Number.isFinite(l.lng) && validTz(l.tz) ? { lat: roundCoord(l.lat), lng: roundCoord(l.lng), tz: l.tz } : null;
+  if (s.prayerAck && (typeof s.prayerAck.key !== 'string' || !['prayed', 'later', 'back'].includes(s.prayerAck.v))) s.prayerAck = null;
+  const b = s.prayerBreak;
+  if (b && !(typeof b.start === 'number' && b.mins > 0 && b.mins <= 120 && typeof b.key === 'string')) s.prayerBreak = null;
   return s;
 }

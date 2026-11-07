@@ -146,6 +146,24 @@ const ART: Record<ChallengeId, ReactNode> = {
       <path d="M92 86q10-4 20 0M104 92q8-3 16 0" stroke={C.iv} strokeWidth="2" fill="none" strokeLinecap="round" />
     </Frame>
   ),
+  // Steps getting smaller, ending in one small block with a play mark.
+  micro_start: (
+    <Frame bg="#FFF2CF">
+      {[0, 1, 2, 3].map((i) => <rect key={i} x={18 + i * 26} y={22 + i * 9} width={52 - i * 11} height={56 - i * 18} rx="8" fill={[C.pe, C.sun, C.sage, C.em][i]} opacity={i === 3 ? 1 : 0.85} />)}
+      <circle cx="128" cy="50" r="17" fill={C.iv} />
+      <path d="M123 41l13 9-13 9z" fill={C.em} />
+    </Frame>
+  ),
+  // Three trays: one with a check, one with a cloud, one with a calendar mark.
+  thought_sort: (
+    <Frame bg="#E9F2FB">
+      {[0, 1, 2].map((i) => <rect key={i} x={14 + i * 46} y="40" width="40" height="44" rx="9" fill={C.iv} />)}
+      <path d="M26 62l6 6 10-12" stroke={C.em} strokeWidth="3.5" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M72 66a7 7 0 0 1 2-13 9 9 0 0 1 17 2 6 6 0 0 1 1 11z" fill={C.lil} />
+      <rect x="114" y="52" width="24" height="20" rx="4" fill={C.pe} /><path d="M114 58h24" stroke={C.iv} strokeWidth="2" />
+      <circle cx="56" cy="22" r="9" fill={C.sun} /><circle cx="80" cy="16" r="6" fill={C.sky} /><circle cx="100" cy="24" r="7" fill={C.cor} opacity=".85" />
+    </Frame>
+  ),
 };
 
 export const ChallengeArt = ({ id }: { id: ChallengeId }) => <>{ART[id]}</>;

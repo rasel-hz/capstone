@@ -40,13 +40,15 @@ This file is intended for product managers, UI/UX designers, frontend engineers,
 | Journey selection | CURRENT | 8 journey definitions with a detail map of shared challenges; not 8 distinct clinical programs. |
 | Challenges | CURRENT | 12 playable types: the 6 in §8 plus `attention_scene`, `priority_board`, `breakdown`, `study_sprint`, `emotion_map` and `calm_landscape` from §9. Library has categories, real status and original art. |
 | Connected mission player | CURRENT | Focused full-screen player: intro, automatic progression, round indicator, feedback, skip/end/pause/exit, result, final summary. Mid-game state isn't restored: a resumed challenge restarts, and says so. |
-| Companion chat | CURRENT (basic) | OpenAI through a small server when a key is set and the user consents, with explicit confirmation of context. Keyword rules otherwise, labelled on screen. No tools, server-side memory or accounts yet. See `docs/AI.md`. |
-| AI conversation and reasoning | TARGET | Real AI model + tools + safety controls + structured extraction, memory consent, and evaluation. |
-| Mission personalization | CURRENT (basic) | Deterministic rule-based `genMission()`; no true AI planner or external data. |
+| Companion chat | CURRENT | OpenAI through a small server when a key is set and the user consents. Helpful-first replies in the language the user writes in, structured output (intent, goals, the user's tasks, stated minutes, up to 3 catalog activities), all validated on the server. Keyword rules otherwise, labelled as limited mode. No tools, server-side memory or accounts yet. See `docs/AI.md`. |
+| AI conversation and reasoning | CURRENT (partial) / TARGET | Structured extraction, grounded task lists, safety layers and a 21-case real-model check (`npm run eval:ai`) are in. Tool calling, server memory with provenance and a scored evaluation dataset are TARGET. |
+| Chat-to-game planning | CURRENT | The user's own tasks go from the chat into `seq`'s personal planning board; their choices are saved and fed back to the chat. See `docs/AI.md#from-chat-to-game-personal-planning`. |
+| Mission personalization | CURRENT (basic) | Chat suggestions are ranked by an explainable engine (`src/features/recommend/`). The daily mission is still the rule-based `genMission()`. |
 | Progress dashboard | CURRENT | Locally calculated completion, accuracy, week and month chart, per-challenge results (scored and unscored kept apart), self-reports, and basic pattern statements. |
 | XP and achievements | CURRENT | Points, level = floor(XP/100)+1, achievements, challenge card collection, lavender theme and mascot hat unlocks. `emotion_map` earns no XP and counts toward nothing (§14.2). |
 | External brand rewards | TARGET / EXTERNAL | No live vouchers, contracts, inventory, or redemption partners. |
-| Prayer times | CURRENT (calculated) | User picks one of 20 Saudi cities and times are calculated on the device with Umm al-Qura (Isha +30 min in Ramadan); every prayer is protected for the configured interval. No location is read. Manual entry remains when no city is chosen. |
+| Prayer times | CURRENT (calculated) | Optional. The user searches one of 20 Saudi cities or shares their location once (rounded to about 1 km, kept with its time zone). Times are calculated on the device with the adhan library: Umm al-Qura by default, 8 other methods, standard or Hanafi Asr; sunrise shown apart. Nothing is sent to a prayer API. Manual entry remains. See `docs/PRAYER.md`. |
+| Prayer-aware scheduling | CURRENT | No lock. In a protected window the app asks once («صلّيت؟»): prayed → continue the saved mission; not yet → optional break reminder with the mission saved; not now → continue. Each window is separate, one answer is kept at a time, nothing earns XP, and the user can turn prompts or the whole feature off. |
 | Traffic, calendar, weather | TARGET / EXTERNAL | Not connected; driving hours and event context are user-entered/keyword captured. |
 | Persistent backend | TARGET | Prototype stores JSON in browser `localStorage` under `kw2`. |
 | Authentication/multi-device sync | TARGET | Not implemented in supplied file. |
@@ -181,7 +183,7 @@ Use meaningful color contrast, soft layered gradients, shadows, animated scene d
 |---|---|---|---:|---:|---|---|
 | `video` | ركز معي شوي | تركيز | 1 | 30 | 24-second animated oasis scene with balloons/birds, play/pause, CC, 2–3 multiple-choice questions, hints/replay | Not a real 3-minute video; HTML/SVG animation, fixed question bank; needs real media content pipeline |
 | `mem` | وش تتذكر؟ | ذاكرة | 2 | 25 | Observe 4–5 colored shapes for 5 seconds; identify missing shape, retry/hint; 1–2 rounds | Limited variants; timer/resume/score edge cases need review |
-| `seq` | رتبها يا وحش | تخطيط | 2 | 25 | Drag or click task cards into slots; morning routine or event preparation; validate order and retry | One “correct” ordering may be overly rigid; keyboard accessibility and culturally realistic alternatives needed |
+| `seq` | رتبها يا وحش | تخطيط | 2 | 25 | With the user's tasks from chat: Now / Later / Not today, then optional time blocks checked against their time, no score. Otherwise: the original ordering exercise, labelled as an example | Modes C (break a task into steps) and D (weekly board) not built yet; the example mode's fixed first and last steps remain |
 | `time` | وين راح الوقت؟ | وعي بالوقت | 1 | 20 | Predict 5/10/15/20 seconds for counting to ten; start/stop stopwatch; compare estimate vs actual | Very narrow task, no broader time-management transfer; divide-by-zero and timer edge cases need tests |
 | `calm` | على هونك | استرخاء | 2 | 15 | Animated breathing circle, 3 cycles, then “ارتحت / شوي / ما فرق” self-report | One breathing exercise is not appropriate for everyone; provide alternatives and opt-out |
 | `start2` | دقيقتين ونبدأ | مهمة حقيقية | 2 | 25 | Enter postponed task + smallest first step; 2-minute countdown; finish after timer | User-entered task not properly persisted in current result (`data.task` becomes a boolean-like value); fix data model |
@@ -359,7 +361,7 @@ If user mentions self-harm or immediate danger, respond supportively, prioritize
 
 | Integration | CURRENT | TARGET / implementation notes |
 |---|---|---|
-| Prayer | City-based Umm al-Qura calculation on the device (20 cities), or manual next prayer `HH:MM`, plus post-adhan buffer | City/time zone and verified prayer-times provider; user-selected calculation method; next five prayers, travel adjustments, protected windows, optional notifications; avoid assuming practice |
+| Prayer | City or rounded device location, calculated on the device (Umm al-Qura default, selectable method and Asr), or manual next prayer `HH:MM`, plus post-adhan buffer and a once-per-window check-in | City/time zone and verified prayer-times provider; user-selected calculation method; next five prayers, travel adjustments, protected windows, optional notifications; avoid assuming practice |
 | Traffic | Manual “أنا أسوق الحين” and hours driven | Opt-in maps ETA/traffic; no screen interaction while driving; arrival-based suggestions; do not claim access to driving telemetry |
 | Calendar | Context tags from confirmed chat only | Google/Microsoft/Apple calendar via authorized integration; least-privilege read; event confirmation; handle private titles carefully |
 | Weather | Landing states not connected | Verified forecast provider; adjust optional outdoor suggestions only; cite freshness in UI |

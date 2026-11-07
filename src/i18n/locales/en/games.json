@@ -459,5 +459,159 @@
     "end": "End my break",
     "ready": "Take your time, and come back when you're ready.",
     "guide": "Tap the lanterns, water or palm tree, or just look. The end button will be ready shortly."
+  },
+  "plan": {
+    "title": "Let's Organize Your Tasks",
+    "instructions": "These are the things you mentioned. Put each one under Now, Later or Not today. There's no wrong answer, and not everything has to happen today.",
+    "example": "Example scenario",
+    "suggestion": "Suggestion",
+    "skipSuggestion": "Remove this suggestion",
+    "suggest": {
+      "break": "A short break after work"
+    },
+    "tasksQ": "What's on your plate?",
+    "tasksNote": "Add at least two things in your own words. They stay on your device.",
+    "addLabel": "Add a task",
+    "addPh": "For example, the course you're taking",
+    "needTwo": "Add at least two to plan between them.",
+    "sortQ": "What's for now, and what can wait?",
+    "sortNote": "Your call. There's no wrong order.",
+    "sortGuide": "Tap a card, then tap where it goes. You can also drag it.",
+    "chooseCol": "Where does \"{{item}}\" go?",
+    "allPlaced": "Everything has a place.",
+    "needNow": "Put at least one thing under Now.",
+    "cols": {
+      "now": "Now",
+      "later": "Later",
+      "notToday": "Not today"
+    },
+    "timeQ": "How much time do you realistically have?",
+    "timeNote": "If you're not sure, plan priorities only. That's a good plan too.",
+    "prioritiesOnly": "Priorities only, no times",
+    "blocksQ": "Split your {{n}} minutes",
+    "blocksNote": "Set how long each one gets, and the order. Leave some breathing room if you like.",
+    "used": "{{used}} of {{total}} min planned",
+    "over": "{{n}} min over the time you have. Shorten something or move it to Later.",
+    "less": "Less time for {{item}}",
+    "more": "More time for {{item}}",
+    "finish": "Save my plan",
+    "doneSay": "Nice, that's a plan you chose.",
+    "say": {
+      "tasks": "Tell me what's on your plate.",
+      "sort": "Not everything has to happen today.",
+      "time": "Let's fit it into your time."
+    },
+    "sum": {
+      "now": "You chose {{items}} for now.",
+      "blocks": "Time: {{items}}.",
+      "block": "{{item}} {{n}} min",
+      "later": "{{items}} can wait for later.",
+      "notToday": "{{items}} isn't for today."
+    },
+    "followUp": "Want help turning that into a plan for the week?"
+  },
+  "micro": {
+    "taskQ": "What do you want to get started on?",
+    "fromChat": "Tasks you mentioned",
+    "taskPh": "Write the task in your own words",
+    "shrinkQ": "Your first step could be:",
+    "smaller": "Smaller, please",
+    "doable": "That's doable",
+    "writeOwn": "Write my own step",
+    "ownLabel": "Your own first step",
+    "ownPh": "Something you could do in a minute or two",
+    "smallest": "That's as small as it gets. Small is the point.",
+    "ladder": {
+      "block": "Work on it for 15 focused minutes",
+      "part": "Do one small part of it",
+      "where": "Open it and find where you stopped",
+      "ready": "Put what you need in front of you",
+      "open": "Just open it"
+    },
+    "modeQ": "How do you want to try it?",
+    "modes": {
+      "0": "No timer",
+      "60": "60 seconds",
+      "120": "2 minutes"
+    },
+    "modesNote": {
+      "0": "Go at your own pace",
+      "60": "Quick and done",
+      "120": "A little more room"
+    },
+    "noTimer": "No clock. Come back whenever you're ready.",
+    "goNow": "Go do it. I'll wait here.",
+    "doneEarly": "I've started",
+    "back": "I'm back",
+    "askQ": "How did it go?",
+    "outcomes": {
+      "started": "I started",
+      "bit": "I started a little",
+      "not": "Not yet"
+    },
+    "honest": "Any answer is fine. Not yet is useful to know too.",
+    "say": {
+      "task": "Let's make starting easy.",
+      "shrink": "Smaller is better. Shrink it till it feels easy.",
+      "mode": "Pick a pace that suits you.",
+      "go": "Just this one step.",
+      "ask": "How did it go?"
+    },
+    "done": {
+      "started": "You started. That's the hardest part.",
+      "bit": "A little is still a start.",
+      "not": "That's okay. The step is ready for when you are."
+    },
+    "note": {
+      "started": "Starting with a small step often makes the next one easier.",
+      "not": "Not starting today is fine. Your first step is saved for next time."
+    }
+  },
+  "thought": {
+    "addQ": "What's on your mind?",
+    "addNote": "Write up to {{count}} things, in your own words.",
+    "addLabel": "Something on your mind",
+    "addPh": "For example, something coming up this week",
+    "examples": {
+      "deadline": "A deadline coming up",
+      "money": "Money this month",
+      "conversation": "A conversation I'm putting off",
+      "trip": "Plans that might change"
+    },
+    "private": "This stays on your device and isn't sent to the AI.",
+    "sortQ": "Where does each one fit?",
+    "sortNote": "There's no right answer. It's about what's useful for you right now.",
+    "buckets": {
+      "act": {
+        "title": "I can act on it",
+        "note": "There's something I can do"
+      },
+      "unsure": {
+        "title": "Uncertain",
+        "note": "Out of my hands, or unclear"
+      },
+      "later": {
+        "title": "Revisit later",
+        "note": "Not for now"
+      }
+    },
+    "stepQ": "One small next step?",
+    "stepNote": "Something small you could do, for one of these.",
+    "pickOne": "Choose one",
+    "stepLabel": "Your next step",
+    "stepPh": "For example, send one message",
+    "finish": "Done",
+    "skipStep": "Skip the step for now",
+    "noActQ": "Nothing to act on right now",
+    "noActNote": "That's okay. Some things can't be solved today. You can come back to them later.",
+    "unsureNote": "For the uncertain ones, it's okay to set them down for now.",
+    "doneSay": "Nice. That's a bit clearer now.",
+    "note": "You sorted {{act}} you can act on, {{unsure}} uncertain and {{later}} for later.",
+    "noteStep": "You sorted {{act}} you can act on, {{unsure}} uncertain and {{later}} for later. Next step: {{step}}",
+    "say": {
+      "add": "What's on your mind?",
+      "sort": "Let's sort them gently.",
+      "step": "Just one small step."
+    }
   }
 }

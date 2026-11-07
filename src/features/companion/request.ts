@@ -4,6 +4,14 @@ import { isLowEnergy } from '../mission/planner';
 import { isCrisisText } from './crisis';
 import { progressStats } from '../progress/stats';
 import { helpfulness } from '../recommend/engine';
+import { lastPlan } from '../plan/history';
+import { currentWindow, nextOf } from '../prayer/gate';
+
+function prayerContext(s: AppState, now = new Date()) {
+  const n = nextOf(s, now);
+  if (!n) return null;
+  return { next: n.id, minutesUntil: Math.max(0, Math.round((n.at.getTime() - now.getTime()) / 60000)), inWindow: !!currentWindow(s, now) };
+}
 import { today } from '../../utils';
 
 // Only what the reply needs leaves the device. The name, chosen journeys and task text are never sent.
@@ -23,6 +31,10 @@ export function buildChatRequest(message: string, s: AppState) {
       confirmed: s.ctx,
       // Only the net answer per activity, never when or how often it was given.
       feedback: [...new Set((s.fb ?? []).map((f) => f.id))].map((id) => ({ id, net: helpfulness(s, id) })),
+      // Tasks the user already shared in this chat, and what they chose for them, so follow-ups are factual.
+      lastPlan: lastPlan(s),
+      // Only for scheduling: the next prayer and how far away it is. Never the location or any check-in answer.
+      prayer: prayerContext(s),
       attempts: st.attempts.length,
       completed: st.completed.length,
       avgAccuracy: st.avgAccuracy,

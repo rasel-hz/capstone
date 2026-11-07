@@ -1,4 +1,4 @@
-import { BatteryFull, BatteryLow, BatteryMedium, ChevronDown, Clock, MessageCircle, Play, Shuffle, type LucideIcon } from 'lucide-react';
+import { BatteryFull, BatteryLow, BatteryMedium, ChevronDown, Clock, MessageCircle, Play, Shuffle, Timer, type LucideIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ProgressBar, Segmented } from '../../components/ui/kit';
@@ -10,11 +10,14 @@ import { ChallengeArt } from '../../features/challenges/ChallengeArt';
 import { currentItem, hasOpenMission } from '../../features/mission/engine';
 import { MissionTimeline } from '../../features/mission/MissionTimeline';
 import { useMissions } from '../../features/mission/MissionProvider';
-import { generateMission, inPrayerWindow, isLowEnergy, missionReason, whyText } from '../../features/mission/planner';
-import { NextPrayerLine } from '../../features/prayer/PrayerCity';
+import { generateMission, isLowEnergy, missionReason, whyText } from '../../features/mission/planner';
+import { acknowledge, breakLeft, needsCheckIn, nextOf, placeOf } from '../../features/prayer/gate';
+import { PrayerCheckIn } from '../../features/prayer/PrayerBreak';
+import { useMinute } from '../../features/prayer/PrayerCity';
+import { formatPrayerTime } from '../../features/prayer/times';
 import { progressStats } from '../../features/progress/stats';
 import { recommend } from '../../features/recommend/engine';
-import { formatDate, iso } from '../../i18n';
+import { currentLang, formatDate, iso } from '../../i18n';
 import type { ChallengeId, EnergyLevel, PlannedItem, ViewId } from '../../types';
 import { level, today } from '../../utils';
 
@@ -42,8 +45,11 @@ export function Home({ onNavigate }: { onNavigate(v: ViewId): void }) {
   const doneToday = !!s.lastDaily && s.lastDaily.d === today();
   const latest = s.en[s.en.length - 1];
   const energyToday = latest && latest.d === today() ? latest.e : null;
-  const praying = inPrayerWindow(s);
-  const blocked = !!s.driving || praying;
+  // Prayer time never blocks the dashboard. It shows a small check-in, once per window, if the user wants that.
+  // Ticks every minute, so the next prayer and any check-in update without a reload.
+  const now = useMinute();
+  const askWindow = needsCheckIn(s, now);
+  const blocked = !!s.driving;
   const st = progressStats(s);
 
   useEffect(() => {
@@ -74,6 +80,17 @@ export function Home({ onNavigate }: { onNavigate(v: ViewId): void }) {
         </div>
       </section>
 
+      {s.prayerBreak && !s.driving && <BreakRow onOpen={() => missions.openBreak(null)} />}
+      {askWindow && !s.prayerBreak && !s.driving && (
+        <PrayerCheckIn
+          compact
+          window={askWindow}
+          onPrayed={() => store.update((d) => acknowledge(d, askWindow, 'prayed'))}
+          onNotYet={() => missions.openBreak(askWindow)}
+          onNotNow={() => store.update((d) => acknowledge(d, askWindow, 'later'))}
+        />
+      )}
+
       {s.driving ? (
         <section className="next next--stop" aria-labelledby="next-t">
           <Mascot state="concerned" size={72} />
@@ -82,12 +99,6 @@ export function Home({ onNavigate }: { onNavigate(v: ViewId): void }) {
             <p>{t('dashboard.drivingText')}</p>
             <button type="button" className="btn sm alt" onClick={() => onNavigate('set')}>{t('dashboard.drivingAction')}</button>
           </div>
-        </section>
-      ) : praying ? (
-        <section className="next" aria-labelledby="next-t">
-          <p className="eyebrow">{t('dashboard.nextStep')}</p>
-          <h2 id="next-t">{t('dashboard.prayerTime')}</h2>
-          <p className="note flush">{t('dashboard.prayerText')}</p>
         </section>
       ) : open ? (
         OpenMission({ onOptions: () => setOptions(!options), options, blocked })
@@ -118,6 +129,21 @@ export function Home({ onNavigate }: { onNavigate(v: ViewId): void }) {
   );
 
   // Plain render helpers, called as functions, so nothing remounts on each render.
+  function BreakRow({ onOpen }: { onOpen(): void }) {
+    const b = s.prayerBreak!;
+    // The current time, not the minute tick, which can be up to a minute old.
+    const left = breakLeft(b, Date.now());
+    return (
+      <button type="button" className="mini pbk-row" onClick={onOpen}>
+        <span className="talk__icon"><Timer size={20} aria-hidden="true" /></span>
+        <span className="grow">
+          <b>{left ? t('prayer.break.rowLeft', { n: Math.ceil(left / 60000) }) : t('prayer.break.rowUp')}</b>
+          <span className="note">{t(hasOpenMission(s) ? 'prayer.break.saved' : 'prayer.break.reminderOnly')}</span>
+        </span>
+      </button>
+    );
+  }
+
   function OpenMission({ options, onOptions, blocked }: { options: boolean; onOptions(): void; blocked: boolean }) {
     const M = s.mission!;
     const it = currentItem(s)!;
@@ -201,11 +227,20 @@ export function Home({ onNavigate }: { onNavigate(v: ViewId): void }) {
     );
   }
 
-  // Only details that exist. No empty cards to fill space.
+  // Only details that exist. No empty cards to fill space, and no prayer time unless one was calculated.
   function DayContext({ onNavigate }: { onNavigate(v: ViewId): void }) {
     const rows = [];
-    if (s.city) rows.push(<li key="p"><span>{t('dashboard.nextPrayer')}</span><NextPrayerLine city={s.city} /></li>);
-    else if (s.prayer) rows.push(<li key="p"><span>{t('dashboard.nextPrayer')}</span><b>{s.prayer}</b></li>);
+    const next = nextOf(s, now);
+    const place = placeOf(s);
+    if (next && place) {
+      const mins = Math.max(0, Math.round((next.at.getTime() - now.getTime()) / 60000));
+      rows.push(
+        <li key="p" className="today__prayer">
+          <span>{t('dashboard.nextPrayer')}</span>
+          <span><b>{t(`common.prayer.names.${next.id}`)} · {formatPrayerTime(next.at, currentLang(), place.tz)}</b> <span className="note">{mins < 60 ? t('prayer.inMin', { count: mins }) : t('prayer.inHours', { h: Math.floor(mins / 60), m: mins % 60 })}</span></span>
+        </li>,
+      );
+    } else if (s.prayerOn && s.prayer && s.prayerDay === today()) rows.push(<li key="p"><span>{t('dashboard.nextPrayer')}</span><b>{s.prayer}</b></li>);
     if (s.ctx.length) rows.push(<li key="c"><span>{t('dashboard.approved')}</span><span className="tags">{s.ctx.map((c) => <span key={c} className="tag">{t(`common.context.${c}`)}</span>)}</span></li>);
     if (!rows.length) return null;
     return (

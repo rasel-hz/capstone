@@ -16,7 +16,7 @@ describe('recommendation engine', () => {
 
   it('only returns challenges that support the goal', () => {
     const r = recommend(state(), { goals: ['start'] });
-    expect(ids(r).sort()).toEqual(['breakdown', 'start2', 'study_sprint'].sort());
+    expect(ids(r).sort()).toEqual(['breakdown', 'micro_start', 'start2', 'study_sprint'].sort());
   });
 
   it('never suggests anything longer than the time the user has', () => {

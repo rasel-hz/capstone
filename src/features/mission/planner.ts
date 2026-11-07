@@ -2,20 +2,16 @@ import { formatList, tr } from '../../i18n';
 import type { AppState, ChallengeId, PlannedItem, Why, WhyPart } from '../../types';
 import { today } from '../../utils';
 import { JOURNEYS } from '../challenges/catalog';
-import { inCalculatedWindow } from '../prayer/times';
+import { currentWindow } from '../prayer/gate';
 
 export function isLowEnergy(s: AppState): boolean {
   const e = s.en[s.en.length - 1];
   return !!(e && e.d === today() && e.e === 'low') || s.pref === 'short';
 }
 
+/** Inside a protected prayer window. This only informs a check-in now; it never blocks on its own. */
 export function inPrayerWindow(s: AppState, now = new Date()): boolean {
-  // A chosen city protects every prayer of the day; otherwise only the time the user entered.
-  if (s.city) return inCalculatedWindow(s.city, s.pp, now);
-  if (!s.prayer || !s.pp) return false;
-  const [h, m] = s.prayer.split(':').map(Number);
-  const x = now.getHours() * 60 + now.getMinutes() - (h * 60 + m);
-  return x >= -2 && x < s.pp;
+  return !!currentWindow(s, now);
 }
 
 export function lastAccuracy(s: AppState, id: ChallengeId): number | null {

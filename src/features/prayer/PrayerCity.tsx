@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { currentLang } from '../../i18n';
-import { CITY_IDS, formatPrayerTime, nextPrayer, PRAYERS, prayerTimes } from './times';
+import { CITY_IDS, DEFAULT_SETTINGS, formatPrayerTime, placeNext, placeTimes, PRAYERS, type PrayerPlace, type PrayerSettings } from './times';
 
 /** Empty value means the user enters the prayer time by hand. */
 export function CitySelect({ id, value, onChange }: { id?: string; value: string; onChange(city: string): void }) {
@@ -24,29 +24,25 @@ export function useMinute() {
   return now;
 }
 
-export function NextPrayerLine({ city }: { city: string }) {
+/** Today's five prayers at the place, with the next one marked. Sunrise is shown apart: it isn't a prayer. */
+export function TodayPrayers({ place, settings = DEFAULT_SETTINGS }: { place: PrayerPlace; settings?: PrayerSettings }) {
   const { t } = useTranslation();
   const now = useMinute();
-  const next = nextPrayer(city, now);
-  if (!next) return null;
-  return <b>{t('common.prayer.next', { prayer: t(`common.prayer.names.${next.id}`), time: formatPrayerTime(next.at, currentLang()) })}</b>;
-}
-
-/** Today's five prayers, with the next one marked. */
-export function TodayPrayers({ city }: { city: string }) {
-  const { t } = useTranslation();
-  const now = useMinute();
-  const times = prayerTimes(city, now);
-  const next = nextPrayer(city, now);
-  if (!times) return null;
+  const times = placeTimes(place, now, 0, settings);
+  const next = placeNext(place, now, settings);
+  if (!times) return <p className="hint">{t('prayer.noTimes')}</p>;
+  const fmt = (d: Date) => formatPrayerTime(d, currentLang(), place.tz);
   return (
-    <ul className="prayers" aria-label={t('common.prayer.today', { city: t(`common.cities.${city}`) })}>
-      {PRAYERS.map((p) => (
-        <li key={p} className={next?.at.getTime() === times[p].getTime() ? 'on' : ''}>
-          <span>{t(`common.prayer.names.${p}`)}</span>
-          <b>{formatPrayerTime(times[p], currentLang())}</b>
-        </li>
-      ))}
-    </ul>
+    <>
+      <ul className="prayers" aria-label={t('prayer.todayList')}>
+        {PRAYERS.map((p) => (
+          <li key={p} className={next?.at.getTime() === times[p].getTime() ? 'on' : ''}>
+            <span>{t(`common.prayer.names.${p}`)}</span>
+            <b>{fmt(times[p])}</b>
+          </li>
+        ))}
+      </ul>
+      <p className="note">{t('prayer.sunrise', { time: fmt(times.sunrise) })}</p>
+    </>
   );
 }

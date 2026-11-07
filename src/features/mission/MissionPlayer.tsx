@@ -9,10 +9,16 @@ import { Segmented } from '../../components/ui/kit';
 import { LanguageSwitcher } from '../../components/ui/LanguageSwitcher';
 import { Overlay } from '../../components/ui/Overlay';
 import { useAppState, useStore } from '../../context/AppStateContext';
+import { isPlanResult, validatePlanConfig } from '../plan/config';
+import { acknowledge, needsCheckIn } from '../prayer/gate';
+import { PrayerCheckIn } from '../prayer/PrayerBreak';
+import type { PrayerWindow } from '../prayer/times';
+import { useMissions } from './MissionProvider';
+import { planSummary } from '../challenges/games/PersonalPlanGame';
 import { useCountUp } from '../../hooks/useCountUp';
 import { useTimers } from '../../hooks/useTimers';
 import { useBackHandler } from '../../services/native';
-import { msg, type Msg } from '../../i18n';
+import { msg, tr, type Msg } from '../../i18n';
 import type { Difficulty, GameResult, ViewId } from '../../types';
 import { level } from '../../utils';
 import { CHALLENGES } from '../challenges/catalog';
@@ -62,6 +68,8 @@ export function MissionPlayer({ start, onClose, onNavigate }: { start: PlayerSta
   const [round, setRound] = useState<{ c: number; t: number; l: string } | null>(null);
   const [result, setResult] = useState<ResultView | null>(null);
   const [summary, setSummary] = useState<MissionSummary | null>(null);
+  const [prayerAsk, setPrayerAsk] = useState<PrayerWindow | null>(null);
+  const missions = useMissions();
   const [resumed] = useState(start === 'run');
   const held = paused || confirmEnd;
   const timers = useTimers(held);
@@ -148,6 +156,11 @@ export function MissionPlayer({ start, onClose, onNavigate }: { start: PlayerSta
     store.update((d) => { out = completeItem(d, r); });
     const o = out as ReturnType<typeof completeItem>;
     if (!o) return;
+    // The companion follows up only on what was actually chosen and saved.
+    if (isPlanResult(r.data)) {
+      const plan = r.data;
+      store.update((d) => { d.chat.push({ b: 1, t: `${planSummary(plan)} ${tr('games.plan.followUp')}` }); });
+    }
     timers.clear();
     const st = store.getState();
     const m = st.mission!;
@@ -159,6 +172,12 @@ export function MissionPlayer({ start, onClose, onNavigate }: { start: PlayerSta
     setRound(null);
     setResult({ xp: o.xp, base: CHALLENGES[done.id].xp, acc: r.acc, retries: r.retries, note: r.note, leveledUp: o.leveledUp, newLevel: o.newLevel, last: !nextItem });
     setPhase('result');
+    // A prayer window that began during the game is raised here, between challenges, never mid-round.
+    const pw = nextItem ? needsCheckIn(st) : null;
+    if (pw) {
+      setPrayerAsk(pw);
+      return;
+    }
     if (shouldOfferEasier(done, nextItem)) {
       timers.after(() => {
         say('concerned', 'player.offerEasier');
@@ -220,8 +239,10 @@ export function MissionPlayer({ start, onClose, onNavigate }: { start: PlayerSta
 
   const Game = GAMES[it.id];
   const c = CHALLENGES[it.id];
-  const name = t(`challenges.items.${it.id}.name`);
-  const instructions = t(`challenges.items.${it.id}.instructions`);
+  // A personal planning board is named for what it is, not as the general example.
+  const personal = it.id === 'seq' && !!validatePlanConfig(it.cfg);
+  const name = personal ? t('games.plan.title') : t(`challenges.items.${it.id}.name`);
+  const instructions = personal ? t('games.plan.instructions') : t(`challenges.items.${it.id}.instructions`);
   const inPlay = phase === 'game' || phase === 'preroll';
   return (
     <div className={`mp mp--${phase}`}>
@@ -291,7 +312,7 @@ export function MissionPlayer({ start, onClose, onNavigate }: { start: PlayerSta
               <button type="button" className="btn" onClick={startGame}>{t('player.startNow')}</button>
             </div>
           )}
-          {phase === 'game' && <Game key={runKey} diff={it.diff} env={env} onDone={onDone} />}
+          {phase === 'game' && <Game key={runKey} diff={it.diff} env={env} onDone={onDone} cfg={validatePlanConfig(it.cfg)} />}
           {phase === 'result' && result && (
             <div className="scene res">
               <span className="res__ok"><Check size={15} aria-hidden="true" /> {t('player.status.completed')}</span>
@@ -305,10 +326,28 @@ export function MissionPlayer({ start, onClose, onNavigate }: { start: PlayerSta
               )}
               {result.note && <p>{msg(result.note)}</p>}
               {result.leveledUp && <p className="levelup"><Sparkles size={16} aria-hidden="true" /> {t('player.levelUp', { n: result.newLevel })}</p>}
+              {prayerAsk ? (
+                <PrayerCheckIn
+                  compact
+                  window={prayerAsk}
+                  onPrayed={() => { store.update((d) => acknowledge(d, prayerAsk, 'prayed')); setPrayerAsk(null); next(); }}
+                  onNotYet={() => {
+                    // The mission is saved exactly as it is now; the next challenge waits for the user.
+                    const w = prayerAsk;
+                    store.update((d) => { advance(d); exitMission(d); });
+                    onClose();
+                    missions.openBreak(w);
+                  }}
+                  onNotNow={() => { store.update((d) => acknowledge(d, prayerAsk, 'later')); setPrayerAsk(null); next(); }}
+                />
+              ) : (
+              <>
               <div className="bar bar--thin"><i className="bar-drain" style={{ animationDuration: `${RESULT_MS}ms`, animationPlayState: held ? 'paused' : 'running' }} /></div>
               <button type="button" className="btn" onClick={() => { if (shouldOfferEasier(M.items[M.idx], M.items[M.idx + 1])) { timers.clear(); setPhase('easier'); say('concerned', 'player.offerEasierShort'); } else next(); }}>
                 {t(result.last ? 'player.seeSummary' : 'common.next')} <ChevronLeft size={17} className="flip" aria-hidden="true" />
               </button>
+              </>
+              )}
             </div>
           )}
           {phase === 'easier' && (

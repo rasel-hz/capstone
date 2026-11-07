@@ -1,6 +1,6 @@
 import { detectCrisis } from '../features/companion/crisis';
 import { buildChatRequest } from '../features/companion/request';
-import { ruleReply, type CompanionReply } from '../features/companion/rules';
+import { mentionsWork, ruleReply, type CompanionReply } from '../features/companion/rules';
 import type { Goal } from '../features/recommend/goals';
 import type { AppState, ContextTag } from '../types';
 import { apiUrl } from './native';
@@ -31,16 +31,23 @@ export const aiCompanion: CompanionService = {
       reply: string;
       tone: CompanionReply['tone'];
       pending?: { ctx: ContextTag[]; low: boolean };
+      intent?: string;
       goals?: Goal[];
+      tasks?: string[];
       minutes?: number;
       suggest?: { ids: string[]; why: string };
     };
+    // Only a request for help planning gets the board on its own; recalling a past plan doesn't.
+    const planning = (r.intent === 'planning' || r.intent === 'advice') && !!r.tasks?.length && !!r.goals?.some((g) => g === 'prioritize' || g === 'time');
     return {
       messages: [r.reply],
       tone: r.tone,
       ...(r.pending ? { pending: { ctx: r.pending.ctx, low: r.pending.low ? 1 : 0, card: 1 } } : {}),
       // Only shown as a card when the model actually suggested something.
-      ...(r.suggest && r.tone !== 'crisis' ? { proposal: { prefer: r.suggest.ids, goals: r.goals, minutes: r.minutes, why: r.suggest.why } } : {}),
+      // Named tasks plus a wish to organise them is enough to offer the personal planning board.
+      ...((r.suggest || planning) && r.tone !== 'crisis'
+        ? { proposal: { prefer: r.suggest?.ids ?? [], goals: r.goals, minutes: r.minutes, why: r.suggest?.why, tasks: r.tasks, afterWork: mentionsWork(text) } }
+        : {}),
     };
   },
 };

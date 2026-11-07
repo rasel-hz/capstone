@@ -66,6 +66,28 @@ The model can't start missions, award XP, change plans or save anything. It can 
 
 The card offers **Start**, **Another** and **Not now**, plus "do all of them as one short mission" when there's more than one. Nothing starts on its own, and driving or prayer time still blocks starting.
 
+### From chat to game: personal planning
+
+This fixes the old mismatch. The planning game ("رتبها يا وحش", `seq`) used to choose one of three fixed scenes from the profile (`sched === 'study'` gave a university morning), because games received nothing from the chat.
+
+```text
+Message → AI: reply + goals + tasks (in the user's words) + one question if needed
+        → Server: keeps only tasks whose distinctive words appear in what the user wrote (server/grounding.ts)
+        → App: buildSuggestion puts seq first with a PlanConfig of exactly those tasks
+               (+ "a short break after work", labelled as a suggestion, only if they mentioned work)
+        → Card: "Let's Organize Your Tasks", with their tasks listed. Start / Another / Not now
+        → Mission item carries the config. The player validates it (validatePlanConfig) before the game sees it
+        → Game: Now / Later / Not today, then time blocks if they gave or choose their time
+        → Saved: what they chose (PlanResult) with the attempt. XP from app rules only, no score
+        → Chat: a factual follow-up built only from those choices
+        → Next messages: CONTEXT.last_plan, so "what did I decide?" is answered from the saved plan
+```
+
+- **No tasks named but they want to organise:** the board opens empty for them to add their own. It never fills in examples.
+- **No planning need:** no personal board. The general `seq` exercise still exists and is labelled "Example scenario".
+- **Planning or advice replies never show the save card**, even if the model flags "work today". Server rule in `acceptOutput`.
+- **Privacy:** the tasks live on the device in the chat card, the mission and the attempt. Settings → delete typed text removes them everywhere (`src/features/plan/privacy.ts`). The saved plan is sent to the AI only with chat consent, as `last_plan`.
+
 ### Offline replies (limited mode)
 
 Without a key, without consent, or when the AI can't be reached, `src/features/companion/rules.ts` answers. It is labelled on screen as limited mode, not AI. It recognises the same goals from keywords in both languages, replies with reviewed advice from the locale files in the language the person wrote in, and offers an activity through the same engine. It only asks to save context when someone describes how today is going.
@@ -104,7 +126,9 @@ Replies follow the language of the person's latest message, whatever language th
 
 Cases: the brief's "projects after work" message in English with the app in Arabic, overwhelmed in Saudi Arabic, hard to start studying, stressed after a long day, winding down for sleep, worry, exam distraction, a nervous meeting, exhausted and wanting rest, a diagnosis request, a code request, mixed Arabic and English, a greeting, results with none recorded, and "only 20 minutes tonight".
 
-**Results on 2026-11-07 with `gpt-6-luna`:** 15 of 15 on two runs, after fixing one false alarm in the checker (it had flagged "I can't tell whether you have ADHD", which is the correct refusal). For the brief's message, the reply suggested one main focus per evening, two or three evenings for the course, trading and chess on other days, and offered to sketch a weekly schedule. It asked to save nothing.
+**21 cases now**, including the brief's acceptance tests A to E: the Udacity message word for word (tasks extracted in the user's words, nothing invented, no save prompt), bored with no tasks, exhausted after work, a request for the memory game, and the Saudi Arabic "lots to do after work" with nothing named. On 2026-11-07 every reply was right in all 21; the last run scored 20 because the checker missed a curly apostrophe, since fixed. For the Udacity message the model returned the tasks `Udacity course`, `quantitative training`, `chess`, kept "training" as written, and suggested `seq`.
+
+**Earlier results:** 15 of 15 on two runs, after fixing one false alarm in the checker (it had flagged "I can't tell whether you have ADHD", which is the correct refusal). For the brief's message, the reply suggested one main focus per evening, two or three evenings for the course, trading and chess on other days, and offered to sketch a weekly schedule. It asked to save nothing.
 
 15 cases is a spot check, not proof. Grow the list as you find replies you don't like.
 

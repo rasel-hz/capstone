@@ -10,15 +10,16 @@ This file lists what has been done and what still needs doing. For how to run th
 |---|---|
 | App | React, TypeScript and Vite, with all screens working |
 | Languages | Saudi Arabic and English, switchable at any time, including mid-game |
-| Challenges | 12 playable |
+| Challenges | 14 playable, including Just the First Step and Let's Think It Through |
 | Chat | OpenAI, helpful-first, follows the language you write in, and suggests activities through an explainable engine. Offline fallback is labelled limited mode |
 | Home | One next step, a chat entry and a small progress line |
 | Mascot | A clip for all 11 states |
-| Prayer times | Calculated on the device for 20 Saudi cities |
+| Prayer times | Calculated on the device for a city or your rounded location, with a selectable method. A once-per-window check-in and an optional break replace the old lock. See [PRAYER.md](PRAYER.md) |
 | Navigation | 5 tabs, with خويّك raised in the middle on phones |
 | Android app | Built with Capacitor and running on the Android emulator. Games and chat not yet tried there. See [ANDROID.md](ANDROID.md) |
 | Data | Saved in the browser only, with no accounts or database |
-| Tests | 157 unit tests, type check and build all pass. `npm run eval:ai` passed 15 of 15 real-model cases |
+| Tests | 205 unit tests, type check and build all pass. `npm run eval:ai` has 23 real-model cases; every reply was right on 2026-11-07 |
+| Chat to game | Your own tasks go from the chat into the planning board, and your choices come back to the chat |
 | Public launch | **Not ready.** See "Before any public launch" below |
 
 All work so far is on `main`. Start new work on a new branch from `main`.
@@ -86,14 +87,19 @@ All work so far is on `main`. Start new work on a new branch from `main`.
 ## What we need to do
 
 ### Companion and recommendations
-- [ ] Build the next activities from the brief: `micro_start`, `grounding_54321`, `sleep_winddown`, `thought_sort`. See [CHALLENGES.md](CHALLENGES.md).
-- [ ] Let the AI help build a weekly plan step by step when the person asks for one, and save it only with consent.
+- [x] Pass the user's own tasks from chat to the planning game, save their choices, and follow up from them.
+- [ ] Add `seq` mode C (break one of their tasks into steps) and mode D (a weekly board with rest days).
+- [x] Build `micro_start` and `thought_sort`.
+- [ ] Build the next activities from the brief: `sleep_winddown`, `grounding_54321`, `estimate_compare`, `routine_builder`, `switch_rules`, `daily_reflection`, `self_compassion`, `social_dialogue`, `family_event_plan`. See [CHALLENGES.md](CHALLENGES.md).
+- [ ] Question banks with at least 15 validated variants per scored game, versioned, with seeded randomness, repeat avoidance and answer-key tests.
+- [ ] Exact-round checkpoints when resuming.
+- [ ] A full context store with provenance, consent scope and expiry for each fact. Today tasks stay with the chat card and the attempt, and only confirmed day tags are saved as context.
 - [ ] Use the AI's goals for the daily mission too, not only chat suggestions.
 - [ ] Stream replies so long answers appear as they're written.
 - [ ] Grow `npm run eval:ai` into a scored dataset with repeats, and run it before each release.
 - [ ] Move to typed tool calls (reference §11.3) and server-side memory with provenance (§7, §11.4) once there are accounts.
 - [ ] Have Saudi speakers and a clinician review the new offline advice lines.
-- [ ] Try the "Did this suit you?" question by finishing a mission on a phone. It's covered by code review, not a live run.
+- [x] Try the "Did this suit you?" question in a live run. It appeared after finishing the planning board in the browser.
 
 ### Android app
 - [x] Install Android Studio and run the app on an emulator.
@@ -137,7 +143,10 @@ All work so far is on `main`. Start new work on a new branch from `main`.
 - [ ] Add game checkpoints. A resumed challenge restarts from the beginning, and says so on screen.
 - [ ] Replace the 24-second animated scene in `video` with rights-cleared video.
 - [ ] Check calculated prayer times against the official Umm al-Qura calendar for a few cities and dates, including Ramadan. Only Riyadh on one date was compared so far.
-- [ ] Decide whether to add more cities or a "use my location" option, which would need a consent design.
+- [x] Add a "use my location" option with a consent step, and replace the prayer lock with a check-in and optional break.
+- [ ] Test "Use My Location" on a real phone and in a browser that allows it. In the preview pane the browser denied it, and the denied path was verified.
+- [ ] Add more verified cities (more Qassim cities, for example) from a checked dataset, and optional per-prayer minute adjustments.
+- [ ] Decide whether to add AlAdhan as an optional cross-check. Times are calculated on the device today.
 
 ### Mascot
 - [ ] **iPhone and Safari** show the still image, because WebM transparency isn't reliable there. Check whether Masko offers MOV or HEVC.

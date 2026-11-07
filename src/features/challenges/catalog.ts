@@ -14,15 +14,17 @@ export const CHALLENGES: Record<ChallengeId, Challenge> = {
   study_sprint: { cat: 'real', min: 5, xp: 30, k: 'y', hasEasy: false, scored: false },
   emotion_map: { cat: 'relax', min: 1, xp: 0, k: 'e', hasEasy: false, scored: false, selfReport: true },
   calm_landscape: { cat: 'relax', min: 1, xp: 10, k: 'l', hasEasy: false, scored: false },
+  micro_start: { cat: 'real', min: 2, xp: 20, k: 'u', hasEasy: true, scored: false },
+  thought_sort: { cat: 'relax', min: 3, xp: 15, k: 'o', hasEasy: true, scored: false },
 };
 
 export const CATEGORIES: ChallengeCategory[] = ['focus', 'memory', 'planning', 'time', 'relax', 'real'];
 
 export const JOURNEYS: Journey[] = [
-  { id: 'adhd', a: ['video', 'attention_scene', 'priority_board', 'seq', 'breakdown', 'time', 'mem', 'start2', 'study_sprint'] },
-  { id: 'anx', a: ['calm', 'calm_landscape', 'emotion_map', 'video', 'mem'] },
+  { id: 'adhd', a: ['video', 'attention_scene', 'priority_board', 'seq', 'breakdown', 'micro_start', 'time', 'mem', 'start2', 'study_sprint'] },
+  { id: 'anx', a: ['calm', 'calm_landscape', 'thought_sort', 'emotion_map', 'video', 'mem'] },
   { id: 'ocd', a: ['calm', 'time'] },
-  { id: 'mood', a: ['start2', 'emotion_map', 'breakdown', 'calm', 'seq'] },
+  { id: 'mood', a: ['micro_start', 'start2', 'emotion_map', 'breakdown', 'calm', 'seq'] },
   { id: 'sleep', a: ['calm', 'calm_landscape', 'seq', 'time'] },
   { id: 'soc', a: ['seq', 'mem'] },
   { id: 'aut', a: ['seq', 'time', 'calm', 'calm_landscape'] },

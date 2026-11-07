@@ -18,7 +18,9 @@ export interface ChallengeMeta {
 export const CHALLENGE_META: Record<ChallengeId, ChallengeMeta> = {
   priority_board: { goals: ['prioritize'] },
   breakdown: { goals: ['start', 'prioritize'] },
+  micro_start: { goals: ['start'], gentle: true },
   start2: { goals: ['start'], gentle: true },
+  thought_sort: { goals: ['worry', 'prioritize'] },
   study_sprint: { goals: ['focus', 'start'] },
   seq: { goals: ['social', 'prioritize'] },
   video: { goals: ['focus'] },

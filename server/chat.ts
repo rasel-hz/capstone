@@ -3,6 +3,7 @@ import { CHALLENGES } from '../src/features/challenges/catalog.ts';
 import ar from '../src/i18n/locales/ar-SA/challenges.json' with { type: 'json' };
 import en from '../src/i18n/locales/en/challenges.json' with { type: 'json' };
 import { messageLang } from '../src/features/companion/lang.ts';
+import { groundedTasks } from './grounding.ts';
 import { CHALLENGE_META, isGoal, type Goal } from '../src/features/recommend/goals.ts';
 import { INTENTS, REPLY_SCHEMA, SYSTEM_PROMPT } from './prompt.ts';
 
@@ -37,7 +38,40 @@ export interface ChatRequest {
     byChallenge: { id: string; count: number; lastAccuracy: number | null }[];
     /** Net self-reported helpfulness per challenge, from the last few answers. */
     feedback: { id: string; net: number }[];
+    /** What the user actually chose last time on the planning board, if anything. */
+    lastPlan: LastPlan | null;
+    /** Calculated on the device from the user's chosen city or location. Null when not set up. */
+    prayer: { next: string; minutesUntil: number; inWindow: boolean } | null;
   };
+}
+
+const PRAYER_IDS = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'];
+function parsePrayer(v: unknown): ChatRequest['context']['prayer'] {
+  const p = v as { next?: unknown; minutesUntil?: unknown; inWindow?: unknown } | null;
+  if (!p || typeof p.next !== 'string' || !PRAYER_IDS.includes(p.next) || typeof p.minutesUntil !== 'number' || !Number.isFinite(p.minutesUntil)) return null;
+  return { next: p.next, minutesUntil: Math.max(0, Math.min(1440, Math.round(p.minutesUntil))), inWindow: p.inWindow === true };
+}
+
+export interface LastPlan {
+  day: string;
+  now: string[];
+  later: string[];
+  notToday: string[];
+  blocks: { task: string; mins: number }[];
+  minutes: number | null;
+}
+
+const strList = (v: unknown) => (Array.isArray(v) ? v : []).filter((x): x is string => typeof x === 'string' && !!x.trim()).slice(0, 8).map((x) => x.trim().slice(0, 60));
+
+function parseLastPlan(v: unknown): LastPlan | null {
+  const p = v as Record<string, unknown> | null;
+  if (!p || typeof p !== 'object' || typeof p.day !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(p.day)) return null;
+  const blocks = (Array.isArray(p.blocks) ? p.blocks : []).slice(0, 8).flatMap((b) => {
+    const x = b as { task?: unknown; mins?: unknown };
+    return typeof x.task === 'string' && typeof x.mins === 'number' && x.mins > 0 && x.mins <= 480 ? [{ task: x.task.trim().slice(0, 60), mins: Math.round(x.mins) }] : [];
+  });
+  const minutes = typeof p.minutes === 'number' && p.minutes > 0 && p.minutes <= 480 ? Math.round(p.minutes) : null;
+  return { day: p.day, now: strList(p.now), later: strList(p.later), notToday: strList(p.notToday), blocks, minutes };
 }
 
 export type Intent = (typeof INTENTS)[number];
@@ -50,6 +84,8 @@ export interface ChatReply {
   intent?: Intent;
   lang?: 'ar' | 'en';
   goals?: Goal[];
+  /** Tasks the user mentioned, in their words. Only ones that appear in what they wrote survive. */
+  tasks?: string[];
   minutes?: number;
   /** Activities the model proposed. Only catalog IDs survive; the app filters them again before showing. */
   suggest?: { ids: string[]; why: string };
@@ -96,6 +132,8 @@ export function parseRequest(raw: unknown): ChatRequest {
         if (typeof f.id !== 'string' || !Object.hasOwn(CHALLENGES, f.id) || typeof f.net !== 'number' || !Number.isFinite(f.net)) return [];
         return [{ id: f.id, net: Math.max(-3, Math.min(3, Math.round(f.net))) }];
       }),
+      lastPlan: parseLastPlan(c.lastPlan),
+      prayer: parsePrayer(c.prayer),
       confirmed: (Array.isArray(c.confirmed) ? c.confirmed : []).filter((t): t is string => CONTEXT_TAGS.includes(t as string)),
       completed: num(c.completed),
       attempts: num(c.attempts),
@@ -114,7 +152,8 @@ const REFUSAL = /(can't|cannot|can not|can’t|won't|won’t|not able|unable|don
 const isDiagnosis = (reply: string) => reply.split(/[.،!؟?\n]+/).some((part) => DIAGNOSIS.test(part + '.') && !REFUSAL.test(part));
 
 // Final checks on what the model proposed. Anything unexpected is rejected rather than shown.
-export function acceptOutput(rawText: string, lang: 'ar-SA' | 'en' = 'ar-SA'): ChatReply {
+// `said` is what the user wrote in this conversation, used to keep only tasks they really mentioned.
+export function acceptOutput(rawText: string, lang: 'ar-SA' | 'en' = 'ar-SA', said = ''): ChatReply {
   let o: Record<string, unknown>;
   try {
     o = JSON.parse(rawText);
@@ -126,21 +165,26 @@ export function acceptOutput(rawText: string, lang: 'ar-SA' | 'en' = 'ar-SA'): C
   if (o.distress) return crisisReply(2, lang);
   if (isDiagnosis(reply)) throw new ChatError(502, 'unsafe_model_output');
   const c = (o.context ?? {}) as Record<string, unknown>;
-  const ctx = CONTEXT_TAGS.filter((t) => c[t] === true);
-  const low = c.low_energy === true;
+  const intent: Intent = INTENTS.includes(o.intent as Intent) ? (o.intent as Intent) : 'other';
+  // Asking for advice or a plan isn't a request to save anything, so no save card appears for it.
+  const asking = intent === 'advice' || intent === 'planning';
+  const ctx = asking ? [] : CONTEXT_TAGS.filter((t) => c[t] === true);
+  const low = !asking && c.low_energy === true;
   const goals = (Array.isArray(o.goals) ? o.goals : []).filter(isGoal).slice(0, 3);
   const s = (o.suggest ?? {}) as { challenge_ids?: unknown; reason?: unknown };
   // Only real catalog IDs, no repeats, at most three. The model can't invent an activity.
   const ids = [...new Set((Array.isArray(s.challenge_ids) ? s.challenge_ids : []).filter((id): id is string => typeof id === 'string' && Object.hasOwn(CHALLENGES, id)))].slice(0, 3);
   const why = typeof s.reason === 'string' ? s.reason.trim().slice(0, 240) : '';
+  const tasks = groundedTasks(o.tasks, said);
   const mins = typeof o.available_minutes === 'number' && Number.isFinite(o.available_minutes) && o.available_minutes > 0 ? Math.min(240, Math.round(o.available_minutes)) : undefined;
   return {
     reply,
     tone: o.tone === 'support' ? 'support' : 'friendly',
     source: 'ai',
-    intent: INTENTS.includes(o.intent as Intent) ? (o.intent as Intent) : 'other',
+    intent,
     lang: o.reply_language === 'en' ? 'en' : o.reply_language === 'ar' ? 'ar' : lang === 'en' ? 'en' : 'ar',
     goals,
+    ...(tasks.length ? { tasks } : {}),
     ...(mins ? { minutes: mins } : {}),
     ...(ids.length ? { suggest: { ids, why } } : {}),
     ...(ctx.length || low ? { pending: { ctx, low } } : {}),
@@ -157,6 +201,7 @@ function activities(lang: 'ar-SA' | 'en') {
     purpose: L.items[id].purpose,
     supports: CHALLENGE_META[id].goals,
     ...(CHALLENGE_META[id].onRequest ? { note: 'only if the user wants to reflect on their feelings' } : {}),
+    ...(id === 'seq' ? { note: "with the user's own tasks it becomes a personal planning board: now, later or not today, then time blocks if they know their time. Without tasks it shows a general example." } : {}),
   }));
 }
 
@@ -170,6 +215,10 @@ function contextBlock(c: ChatRequest['context'], replyLang: 'ar-SA' | 'en') {
     confirmed_today: c.confirmed,
     feedback: c.feedback.map((f) => ({ id: f.id, user_found_it: f.net > 0 ? 'helpful' : f.net < 0 ? 'not helpful' : 'mixed' })),
     activities: activities(replyLang),
+    prayer: c.prayer ? { next_prayer: c.prayer.next, minutes_until_next: c.prayer.minutesUntil, in_prayer_window: c.prayer.inWindow } : null,
+    last_plan: c.lastPlan
+      ? { day: c.lastPlan.day, now: c.lastPlan.now, later: c.lastPlan.later, not_today: c.lastPlan.notToday, time_blocks: c.lastPlan.blocks, minutes_available: c.lastPlan.minutes }
+      : null,
     results: {
       started_attempts: c.attempts,
       completed: c.completed,
@@ -253,5 +302,6 @@ export async function handleChat(raw: unknown, deps: ChatDeps): Promise<ChatRepl
     console.error(`OpenAI request failed with status ${res.status}`);
     throw new ChatError(res.status === 401 ? 503 : 502, res.status === 401 ? 'ai_auth_failed' : res.status === 429 ? 'ai_rate_limited' : 'ai_failed');
   }
-  return acceptOutput(outputText(await res.json()), lang);
+  const said = [...req.history.filter((h) => h.role === 'user').map((h) => h.text), req.message].join('\n');
+  return acceptOutput(outputText(await res.json()), lang, said);
 }

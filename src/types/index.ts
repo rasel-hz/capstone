@@ -3,7 +3,8 @@ export type Gender = 'm' | 'f';
 export type JourneyId = 'adhd' | 'anx' | 'ocd' | 'mood' | 'sleep' | 'soc' | 'aut' | 'gen';
 export type ChallengeId =
   | 'video' | 'mem' | 'seq' | 'time' | 'calm' | 'start2'
-  | 'attention_scene' | 'priority_board' | 'breakdown' | 'study_sprint' | 'emotion_map' | 'calm_landscape';
+  | 'attention_scene' | 'priority_board' | 'breakdown' | 'study_sprint' | 'emotion_map' | 'calm_landscape'
+  | 'micro_start' | 'thought_sort';
 export type ChallengeCategory = 'focus' | 'memory' | 'planning' | 'time' | 'relax' | 'real';
 export type Difficulty = 'easy' | 'normal';
 export type ContextTag = 'event' | 'work' | 'sleep';
@@ -45,6 +46,8 @@ export interface PlannedItem {
   id: ChallengeId;
   why: Why;
   diff: Difficulty;
+  /** Personal content for the game, validated before use. Without it a game shows its general example. */
+  cfg?: import('../features/plan/config').PlanConfig;
 }
 
 export interface MissionItem extends PlannedItem {
@@ -100,6 +103,8 @@ export interface ChatSuggestion {
   goal?: string;
   /** 'started' or 'dismissed' once answered, so an old card can't start anything. */
   st?: 'started' | 'dismissed';
+  /** The user's own tasks for the planning board, when they mentioned any. */
+  cfg?: import('../features/plan/config').PlanConfig;
 }
 
 export interface ChatMessage {
@@ -162,6 +167,33 @@ export interface AppState {
   lang: 'ar-SA' | 'en';
   /** Self-reported helpfulness of activities, used to adapt suggestions. Stays on the device. */
   fb: Feedback[];
+  /** Prayer-aware scheduling is on. The user can turn it off at any time. */
+  prayerOn: number;
+  /** Ask with a check-in during a prayer window. Off means no prompts at all. */
+  prayerAsk: number;
+  prayerMethod: import('../features/prayer/times').MethodId;
+  /** Asr: 0 standard, 1 Hanafi. */
+  prayerAsr: 0 | 1;
+  /** A detected location, rounded to about 1 km, with its time zone. Null when a city or nothing is used. */
+  loc: import('../features/prayer/times').PrayerPlace | null;
+  /**
+   * The answer to the check-in for one prayer window only. It is replaced by the next window's answer,
+   * so no prayer history builds up. It is the user's own report, never a verified fact, and earns nothing.
+   */
+  prayerAck: { key: string; v: 'prayed' | 'later' | 'back' } | null;
+  /** An optional break reminder. The timer is a personal reminder, not a measure of anything. */
+  prayerBreak: PrayerBreak | null;
+}
+
+export interface PrayerBreak {
+  /** The window it was started in, if any. */
+  key: string;
+  prayer: import('../features/prayer/times').PrayerId | null;
+  /** When the reminder started, and its length. */
+  start: number;
+  mins: number;
+  /** Milliseconds left, while the reminder is paused. */
+  pausedLeft?: number;
 }
 
 export interface GameResult {

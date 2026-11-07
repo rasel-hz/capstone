@@ -80,6 +80,12 @@
     "notNow": "Not now",
     "mission": "Or do all of them as one short mission, about {{mins}} min",
     "started": "Started {{name}}. If you leave it, you can pick it up from Home.",
-    "dismissed": "No problem. It's there whenever you want it."
+    "dismissed": "No problem. It's there whenever you want it.",
+    "planName": "Let's Organize Your Tasks",
+    "planMeta_one": "{{count}} of your tasks",
+    "planMeta_other": "{{count}} of your tasks",
+    "planWhy": "With what you mentioned: {{tasks}}. You choose what's for now, what's for later, and how to split your time.",
+    "planEmpty": "Add the things on your plate, then choose what's for now and what can wait. I won't fill in examples for you.",
+    "planStart": "Start planning"
   }
 }

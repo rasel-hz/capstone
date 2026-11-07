@@ -74,6 +74,8 @@ export function recommend(s: AppState, o: RecOptions = {}): Recommendation[] {
     score += help * 2;
     score -= playedToday(id);
     if (o.low && m.gentle) score += 2;
+    // On-request activities rank behind others unless the user or the AI asked for them by name.
+    if (m.onRequest && !asked) score -= 1;
     if (JOURNEYS.some((j) => s.needs.includes(j.id) && j.id !== 'gen' && j.a.includes(id))) score += 1;
 
     // Reasons, from what was actually said or recorded.

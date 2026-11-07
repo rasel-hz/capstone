@@ -14,6 +14,7 @@ interface Reply {
   intent?: string;
   lang?: string;
   goals?: string[];
+  tasks?: string[];
   suggest?: { ids: string[]; why: string };
   pending?: unknown;
   error?: string;
@@ -24,27 +25,52 @@ interface Case {
   message: string;
   app?: 'ar-SA' | 'en';
   energy?: 'low';
-  expect: { lang: 'ar' | 'en'; noPending?: boolean; suggestFrom?: string[]; noSuggest?: boolean; maxSuggest?: number; intents?: string[]; mentions?: RegExp };
+  prayer?: { next: string; minutesUntil: number; inWindow: boolean };
+  expect: {
+    lang: 'ar' | 'en'; noPending?: boolean; suggestFrom?: string[]; noSuggest?: boolean; maxSuggest?: number; intents?: string[]; mentions?: RegExp;
+    /** Each pattern must match one extracted task. */
+    tasks?: RegExp[];
+    /** No extracted task may match this. */
+    notTasks?: RegExp;
+    noTasks?: boolean;
+    mustSuggest?: string;
+    /** The reply must not match this, for example an invented prayer time. */
+    notMentions?: RegExp;
+  };
 }
+
+// Word for word from the brief, typos included.
+const BRIEF_RAW = "I hade a long day at work, what I did from 9 am to 5 pm. When I come back home I want to continue on my personal projects I have. One that is from Udacity course that is a lot advanced and that I am still paying for, which I really like and want to learn more about it. Next is learning about quantitative training because it interests me. And I have a lot of other interests like playing chess. I am having difficult to organize these times appropriately. What do you think?";
 
 const BRIEF = "I had a long day at work. I worked from 9 AM to 5 PM. When I get home, I want to continue my personal projects, including an advanced Udacity course that I am paying for. I am also interested in quantitative trading and playing chess. I have difficulty organizing my time appropriately. What do you think?";
 
+const PLAN_IDS = ['seq', 'priority_board', 'breakdown', 'start2', 'micro_start', 'study_sprint', 'thought_sort'];
+const NOT_THEIRS = /universit|lecture|exam|coffee|errand|appointment|class/i;
+
 const CASES: Case[] = [
-  { name: 'Brief: projects after work, English while the app is Arabic', message: BRIEF, app: 'ar-SA', expect: { lang: 'en', noPending: true, intents: ['advice', 'planning'], suggestFrom: ['priority_board', 'breakdown', 'seq', 'start2', 'study_sprint'], mentions: /\b(one|main|priorit|focus|evening|night)\b/i } },
-  { name: 'Overwhelmed, Saudi Arabic', message: 'عندي أشياء كثير وما أدري من وين أبدأ', expect: { lang: 'ar', suggestFrom: ['priority_board', 'breakdown', 'start2'] } },
-  { name: 'Hard to start studying', message: "I really want to study but can't get myself to begin.", app: 'en', expect: { lang: 'en', suggestFrom: ['start2', 'breakdown', 'study_sprint'] } },
+  { name: 'Test A: the brief, word for word', message: BRIEF_RAW, app: 'ar-SA', expect: { lang: 'en', noPending: true, intents: ['advice', 'planning'], suggestFrom: PLAN_IDS, tasks: [/udacity/i, /quantitative/i, /chess/i], notTasks: NOT_THEIRS, mentions: /\b(one|main|priorit|focus|evening|night)\b/i } },
+  { name: 'Test A: the shorter version', message: "I worked from 9 AM to 5 PM and want to continue my Udacity course, study quantitative training, and play chess, but I struggle to organize my time.", app: 'en', expect: { lang: 'en', noPending: true, suggestFrom: PLAN_IDS, tasks: [/udacity/i, /quantitative training/i, /chess/i], notTasks: NOT_THEIRS } },
+  { name: 'Brief: projects after work, English while the app is Arabic', message: BRIEF, app: 'ar-SA', expect: { lang: 'en', noPending: true, intents: ['advice', 'planning'], suggestFrom: PLAN_IDS, tasks: [/udacity/i, /chess/i], notTasks: NOT_THEIRS, mentions: /\b(one|main|priorit|focus|evening|night)\b/i } },
+  { name: 'Test B: bored, no tasks', message: "I'm bored. What can I do?", app: 'en', expect: { lang: 'en', noTasks: true } },
+  { name: 'Test C: exhausted and stressed after work', message: "I'm exhausted and stressed after work.", app: 'en', expect: { lang: 'en', maxSuggest: 1, suggestFrom: ['calm', 'calm_landscape'], noTasks: true } },
+  { name: 'Test D: asks for the memory game', message: 'I want to play the memory game.', app: 'en', expect: { lang: 'en', mustSuggest: 'mem', noTasks: true } },
+  { name: 'Test E: Arabic, lots to do after work, none named', message: 'عندي أشياء واجد أبي أسويها بعد الدوام وما أدري وش أبدأ فيه.', expect: { lang: 'ar', suggestFrom: PLAN_IDS, noTasks: true } },
+  { name: 'Overwhelmed, Saudi Arabic', message: 'عندي أشياء كثير وما أدري من وين أبدأ', expect: { lang: 'ar', suggestFrom: ['seq', 'priority_board', 'breakdown', 'start2', 'micro_start', 'thought_sort'], noTasks: true } },
+  { name: 'Hard to start studying', message: "I really want to study but can't get myself to begin.", app: 'en', expect: { lang: 'en', suggestFrom: ['micro_start', 'start2', 'breakdown', 'study_sprint'] } },
   { name: 'Stressed after a long day', message: "I'm feeling stressed after a long day.", app: 'en', expect: { lang: 'en', suggestFrom: ['calm', 'calm_landscape'] } },
-  { name: 'Winding down for sleep, Arabic', message: 'ما أقدر أهدى قبل النوم، أفكر كثير', expect: { lang: 'ar', suggestFrom: ['calm', 'calm_landscape', 'emotion_map'] } },
-  { name: 'Worry about what cannot be controlled', message: "I keep thinking about things I can't control.", app: 'en', expect: { lang: 'en', suggestFrom: ['calm', 'emotion_map', 'calm_landscape'] } },
-  { name: 'Exam and distraction', message: 'I have an exam and I keep getting distracted.', app: 'en', expect: { lang: 'en', suggestFrom: ['study_sprint', 'priority_board', 'video', 'attention_scene', 'mem', 'breakdown', 'start2'] } },
-  { name: 'Nervous about a meeting', message: "I'm nervous about talking during a meeting tomorrow.", app: 'en', expect: { lang: 'en', suggestFrom: ['seq', 'calm', 'calm_landscape', 'priority_board'] } },
+  { name: 'Winding down for sleep, Arabic', message: 'ما أقدر أهدى قبل النوم، أفكر كثير', expect: { lang: 'ar', suggestFrom: ['calm', 'calm_landscape', 'emotion_map', 'thought_sort'] } },
+  { name: 'Worry about what cannot be controlled', message: "I keep thinking about things I can't control.", app: 'en', expect: { lang: 'en', suggestFrom: ['thought_sort', 'calm', 'emotion_map', 'calm_landscape'] } },
+  { name: 'Exam and distraction', message: 'I have an exam and I keep getting distracted.', app: 'en', expect: { lang: 'en', suggestFrom: ['study_sprint', 'priority_board', 'video', 'attention_scene', 'mem', 'breakdown', 'start2', 'micro_start'] } },
+  { name: 'Nervous about a meeting', message: "I'm nervous about talking during a meeting tomorrow.", app: 'en', expect: { lang: 'en', suggestFrom: ['seq', 'calm', 'calm_landscape', 'priority_board', 'thought_sort'] } },
   { name: 'Exhausted, wants to rest', message: "I'm exhausted and don't feel like doing anything.", app: 'en', energy: 'low', expect: { lang: 'en', maxSuggest: 1, suggestFrom: ['calm', 'calm_landscape'], intents: ['rest', 'support', 'chat', 'advice'] } },
-  { name: 'Asks for a diagnosis', message: "Do I have ADHD? I can never focus on anything.", app: 'en', expect: { lang: 'en', suggestFrom: ['study_sprint', 'video', 'attention_scene', 'priority_board', 'breakdown', 'start2', 'mem'] } },
+  { name: 'Asks for a diagnosis', message: "Do I have ADHD? I can never focus on anything.", app: 'en', expect: { lang: 'en', suggestFrom: ['study_sprint', 'video', 'attention_scene', 'priority_board', 'breakdown', 'start2', 'micro_start', 'mem'] } },
   { name: 'Out of scope: code', message: 'Write me a Python script that sorts a list.', app: 'en', expect: { lang: 'en', noSuggest: true } },
   { name: 'Mixed Arabic and English', message: 'اليوم كان long day في الدوام وأبي أرتاح شوي', expect: { lang: 'ar', maxSuggest: 1, suggestFrom: ['calm', 'calm_landscape'] } },
   { name: 'Greeting only', message: 'هلا والله', expect: { lang: 'ar', noSuggest: true } },
-  { name: 'Asks about results with none recorded', message: 'How are my results so far?', app: 'en', expect: { lang: 'en', noSuggest: true, mentions: /\b(no|not yet|haven't|don't have|nothing)\b/i } },
-  { name: 'Only 20 minutes tonight', message: 'I have too many projects and only 20 minutes tonight.', app: 'en', expect: { lang: 'en', noPending: true, suggestFrom: ['priority_board', 'breakdown', 'start2', 'study_sprint'] } },
+  { name: 'Asks about results with none recorded', message: 'How are my results so far?', app: 'en', expect: { lang: 'en', noSuggest: true, mentions: /\b(no|not yet|haven['’]t|don['’]t have|nothing|aren['’]t|isn['’]t|none|0)\b/i } },
+  { name: 'Prayer: 20 minutes before Maghrib, times known', message: 'I only have 20 minutes before Maghrib. What can I do?', app: 'en', prayer: { next: 'maghrib', minutesUntil: 20, inWindow: false }, expect: { lang: 'en', notMentions: /did you pray|have you prayed/i } },
+  { name: 'Prayer: asks how long until Maghrib, times unknown', message: 'How long do I have until Maghrib?', app: 'en', expect: { lang: 'en', noSuggest: true, mentions: /\b(city|profile|don['’]t have|what time|tell me)\b/i, notMentions: /\b\d{1,2}:\d{2}\b|\b\d+\s*(minutes|mins)\s*(left|until|before)/i } },
+  { name: 'Only 20 minutes tonight', message: 'I have too many projects and only 20 minutes tonight.', app: 'en', expect: { lang: 'en', noPending: true, suggestFrom: ['seq', 'priority_board', 'breakdown', 'start2', 'micro_start', 'study_sprint'] } },
 ];
 
 async function ask(c: Case): Promise<Reply> {
@@ -54,7 +80,7 @@ async function ask(c: Case): Promise<Reply> {
     body: JSON.stringify({
       message: c.message,
       history: [],
-      context: { address: 'm', lang: c.app ?? 'ar-SA', lowEnergyToday: c.energy === 'low', energy: c.energy ?? null, confirmed: [], completed: 0, attempts: 0, avgAccuracy: null, byChallenge: [], feedback: [] },
+      context: { address: 'm', lang: c.app ?? 'ar-SA', lowEnergyToday: c.energy === 'low', energy: c.energy ?? null, confirmed: [], completed: 0, attempts: 0, avgAccuracy: null, byChallenge: [], feedback: [], prayer: c.prayer ?? null },
     }),
   });
   const body = (await res.json()) as Reply;
@@ -75,6 +101,12 @@ function check(c: Case, r: Reply): string[] {
   if (c.expect.intents && r.intent && !c.expect.intents.includes(r.intent)) problems.push(`intent was ${r.intent}`);
   if (c.expect.mentions && !c.expect.mentions.test(r.reply)) problems.push('reply missed the expected substance');
   if (/```/.test(r.reply)) problems.push('reply contains code');
+  const tasks = r.tasks ?? [];
+  c.expect.tasks?.forEach((re) => { if (!tasks.some((t) => re.test(t))) problems.push(`missed a task matching ${re}`); });
+  if (c.expect.notTasks && tasks.some((t) => c.expect.notTasks!.test(t))) problems.push(`invented a task: ${tasks.join(', ')}`);
+  if (c.expect.noTasks && tasks.length) problems.push(`extracted tasks the user didn't name: ${tasks.join(', ')}`);
+  if (c.expect.mustSuggest && !ids.includes(c.expect.mustSuggest)) problems.push(`didn't suggest ${c.expect.mustSuggest}`);
+  if (c.expect.notMentions?.test(r.reply)) problems.push('reply contains something it must not, such as an invented time');
   return problems;
 }
 
@@ -92,7 +124,7 @@ for (const c of CASES) {
   console.log(`\n${problems.length ? 'FAIL' : 'PASS'}  ${c.name}`);
   console.log(`  you:   ${c.message}`);
   console.log(`  reply: ${r.reply.replace(/\n/g, '\n         ')}`);
-  console.log(`  intent=${r.intent ?? '-'} goals=${(r.goals ?? []).join(',') || '-'} suggest=${(r.suggest?.ids ?? []).join(',') || '-'}${r.suggest?.why ? ` (${r.suggest.why})` : ''}${r.pending ? ' [asks to save]' : ''}`);
+  console.log(`  intent=${r.intent ?? '-'} goals=${(r.goals ?? []).join(',') || '-'} tasks=${(r.tasks ?? []).join(' | ') || '-'} suggest=${(r.suggest?.ids ?? []).join(',') || '-'}${r.suggest?.why ? ` (${r.suggest.why})` : ''}${r.pending ? ' [asks to save]' : ''}`);
   problems.forEach((p) => console.log(`  - ${p}`));
   // Stays under the server's 20 requests a minute.
   await new Promise((ok) => setTimeout(ok, 3200));

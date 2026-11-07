@@ -94,6 +94,18 @@
       "desc": "A calm oasis to interact with at your own pace.",
       "purpose": "A short visual break between tasks.",
       "instructions": "A calm oasis. Tap the lanterns, water and palm, or just look."
+    },
+    "micro_start": {
+      "name": "Just the First Step",
+      "desc": "Shrink the first step of a task until it feels easy, then try it.",
+      "purpose": "Makes starting smaller when a task feels too big to begin.",
+      "instructions": "Pick a task, make its first step smaller until it feels doable, then try it with a short timer or none."
+    },
+    "thought_sort": {
+      "name": "Let's Think It Through",
+      "desc": "Sort what's on your mind into what you can act on, what's uncertain and what can wait.",
+      "purpose": "Helps you see which worries have a next step and which you can set down for now.",
+      "instructions": "Write down what's on your mind, sort each one, then choose one small next step if you like. It stays on your device."
     }
   }
 }

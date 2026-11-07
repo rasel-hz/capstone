@@ -6,6 +6,7 @@ import { tr, type Msg } from '../../../i18n';
 import { shuffled } from '../../../utils';
 import type { GameProps } from '../types';
 import { useDrag } from './parts';
+import { PersonalPlanGame } from './PersonalPlanGame';
 
 interface Step { id: string; i: LucideIcon }
 interface SeqScene { id: string; s: Step[] }
@@ -17,7 +18,13 @@ const EVENT: SeqScene = { id: 'event', s: [{ id: 'confirm', i: CalendarCheck }, 
 const WORK: SeqScene = { id: 'work', s: [{ id: 'wake', i: Sunrise }, { id: 'schedule', i: CalendarCheck }, { id: 'breakfast', i: Coffee }, { id: 'leave', i: Briefcase }] };
 const STUDY: SeqScene = { id: 'study', s: [{ id: 'timetable', i: BookOpen }, { id: 'laptop', i: Laptop }, { id: 'coffee', i: Coffee }, { id: 'leave', i: Backpack }] };
 
-export function SequenceGame({ diff, env, onDone }: GameProps) {
+// With the user's own tasks from the chat, this is a personal planning board. Without them it is the
+// original sequencing exercise, labelled as an example, so generic content is never passed off as theirs.
+export function SequenceGame(props: GameProps) {
+  return props.cfg ? <PersonalPlanGame {...props} cfg={props.cfg} /> : <ExampleSequence {...props} />;
+}
+
+function ExampleSequence({ diff, env, onDone }: GameProps) {
   const { t } = useTranslation();
   const [scene] = useState(() => (env.hasEvent ? EVENT : env.sched === 'study' ? STUDY : WORK));
   const steps = diff === 'easy' ? [scene.s[0], scene.s[2], scene.s[3]] : scene.s;
@@ -107,6 +114,7 @@ export function SequenceGame({ diff, env, onDone }: GameProps) {
   return (
     <div className="scene seq">
       <div className="seq__head">
+        <span className="pp__tag pp__tag--ex">{t('games.plan.example')}</span>
         <h2 className="q__t">{t(`games.seq.scenes.${scene.id}.title`)}</h2>
         <p className="note flush">{t(`games.seq.scenes.${scene.id}.note`)} {t('games.seq.guide')}</p>
       </div>

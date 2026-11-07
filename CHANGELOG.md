@@ -1,5 +1,52 @@
 # Changelog
 
+## Unreleased: prayer check-in instead of a lock
+
+### Fixed
+- A prayer window no longer locks challenges. Someone who had already prayed was blocked for about half an hour with only an OK button.
+
+### Added
+- A once-per-window check-in («صلّيت؟»): "Yes, I've prayed" continues the saved mission, "Not yet" opens an optional break reminder with the mission saved, "Not now" continues. Each prayer is separate, only one answer is kept, and it earns nothing.
+- An optional break reminder: 10 to 30 minutes or custom, pause, change, cancel, "I'm back", and a welcome-back screen. It survives closing the app and switching language, and never claims anyone prayed.
+- During a game, the check-in waits for the result screen between challenges.
+- "Use My Location" with an explanation first, rounded to about 1 km and kept on the device, plus a searchable city list. Calculation method (9 options, Umm al-Qura default) and standard or Hanafi Asr. Sunrise shown apart.
+- Settings to turn off prompts or the whole feature. Turning it off removes the city, location and answers.
+- The companion knows the next prayer and minutes until it, only when set up, and says so instead of guessing when it isn't.
+- `docs/PRAYER.md`.
+
+### Changed
+- Home shows a compact next-prayer row instead of replacing the mission with «وقت صلاة».
+
+## Unreleased: two new activities
+
+### Added
+- **Just the First Step** (`micro_start`, بس أول خطوة): pick a task (including ones named in the chat), shrink its first step through five sizes or write your own, then try it with a 60-second timer, a 2-minute timer or none. No score; any answer to "did you start?" is fine.
+- **Let's Think It Through** (`thought_sort`, خلنا نفكّر فيها): write up to five concerns, sort them into "I can act on it", "uncertain" and "revisit later", then choose one small next step. Stays on the device and is never sent to the AI.
+- Both are in the catalog, journeys, recommendation engine and AI schema, with original art and full Arabic and English text. The real model now suggests them for "can't get started" and for worries.
+
+### Changed
+- On-request activities such as the feelings map rank behind others unless asked for by name.
+- Deleting typed text also removes concerns, next steps and first steps.
+
+## Unreleased: chat-to-game planning with your own tasks
+
+### Fixed
+- "رتبها يا وحش" showed a generic university morning after someone described their own projects, because games received nothing from the chat. It now receives the user's tasks.
+
+### Added
+- The AI lists the tasks the user named, in their own words. The server keeps only tasks whose words appear in what the user wrote, so it can't add lectures, exams or errands.
+- A personal planning mode in `seq`: the user's tasks in Now / Later / Not today, then optional time blocks checked against the time they gave. No score, because priorities have no wrong answer. An optional "break after work" appears only if they mentioned work, and is labelled as a suggestion.
+- With no tasks named, the board opens empty for the user to add their own.
+- What the user chose is saved, the chat follows up with exactly those choices, and the AI can answer "what did I decide?" from the saved plan.
+- Tests for the brief's acceptance cases A to I (`tests/pipeline.test.ts`), and six of them in `npm run eval:ai`.
+- An evaluation framework for each challenge in `docs/CHALLENGES.md`.
+
+### Changed
+- The general `seq` exercise is labelled "Example scenario".
+- Planning and advice replies never show the save card.
+- Starter chips show only in an empty chat.
+- Deleting typed text also removes planning tasks from the open mission and chat cards.
+
 ## Unreleased: helpful companion and a calmer Home
 
 ### Added

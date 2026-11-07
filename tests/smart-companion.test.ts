@@ -40,6 +40,13 @@ describe('model output checks', () => {
     expect(r.suggest).toBeUndefined();
   });
 
+  it('never shows a save card when the person asked for advice or a plan', () => {
+    const flags = { context: { event: false, work: true, sleep: false, low_energy: true } };
+    expect(acceptOutput(model({ ...flags, intent: 'planning' }), 'en').pending).toBeUndefined();
+    expect(acceptOutput(model({ ...flags, intent: 'advice' }), 'en').pending).toBeUndefined();
+    expect(acceptOutput(model({ ...flags, intent: 'support' }), 'en').pending).toEqual({ ctx: ['work'], low: true });
+  });
+
   it('accepts only sensible stated minutes', () => {
     expect(acceptOutput(model({ available_minutes: 20 }), 'en').minutes).toBe(20);
     expect(acceptOutput(model({ available_minutes: -5 }), 'en').minutes).toBeUndefined();
@@ -100,10 +107,10 @@ describe('offline replies, labelled as limited', () => {
 });
 
 describe('suggestion card', () => {
-  it('shows the prioritising board first for the brief message', () => {
+  it('offers the personal planning board, then the priority board, for an organising request', () => {
     const sug = buildSuggestion(defaultState(), { goals: ['prioritize'] });
-    expect(sug?.ids[0]).toBe('priority_board');
-    expect(sug?.goal).toBe('goal_prioritize');
+    expect(sug?.ids.slice(0, 2)).toEqual(['seq', 'priority_board']);
+    expect(sug?.cfg?.kind).toBe('personal');
   });
 
   it('puts the AI pick first, with its written reason', () => {
@@ -120,7 +127,7 @@ describe('suggestion card', () => {
   it('offers only gentle options on a low-energy day', () => {
     const s = { ...defaultState(), en: [{ d: today(), e: 'low' as const, ts: 1 }] };
     const sug = buildSuggestion(s, { goals: ['start'] });
-    expect(sug?.ids).toEqual(['start2']);
+    expect(sug?.ids.sort()).toEqual(['micro_start', 'start2']);
   });
 
   it('shows nothing while driving', () => {

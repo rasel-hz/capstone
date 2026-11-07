@@ -10,7 +10,8 @@ import { LanguageSwitcher } from '../../components/ui/LanguageSwitcher';
 import { useStore } from '../../context/AppStateContext';
 import { JourneyArt } from '../../features/challenges/ChallengeArt';
 import { JOURNEYS } from '../../features/challenges/catalog';
-import { CitySelect } from '../../features/prayer/PrayerCity';
+import { PrayerSetup } from '../../features/prayer/PrayerSetup';
+import type { PrayerPlace } from '../../features/prayer/times';
 import { iso, tr } from '../../i18n';
 import { useBackHandler } from '../../services/native';
 import type { Gender, JourneyId } from '../../types';
@@ -24,6 +25,7 @@ interface Draft {
   sleep: string;
   pp: number;
   city: string;
+  loc: PrayerPlace | null;
   snd: number;
   rm: number;
 }
@@ -37,7 +39,7 @@ export function Onboarding() {
   const { t } = useTranslation();
   const store = useStore();
   const [step, setStep] = useState(0);
-  const [tm, setTm] = useState<Draft>({ name: store.getState().name, g: 'm', needs: [], sched: 'work', pat: '', sleep: '', pp: 30, city: '', snd: 1, rm: 0 });
+  const [tm, setTm] = useState<Draft>({ name: store.getState().name, g: 'm', needs: [], sched: 'work', pat: '', sleep: '', pp: 30, city: '', loc: null, snd: 1, rm: 0 });
   const mascot = useMascot(MOODS[step]);
   const up = (p: Partial<Draft>) => setTm({ ...tm, ...p });
   // Android back goes to the previous step instead of closing the app.
@@ -100,9 +102,8 @@ export function Onboarding() {
       <h2>{t('onboarding.prayerTitle')}</h2>
       <p>{t('onboarding.prayerQ')}</p>
       <Segmented<number> className="seg--c" label={t('settings.protectLabel')} value={tm.pp} options={[0, 20, 30, 45].map((v) => ({ value: v, label: v ? t('common.minutes', { count: v }) : t('onboarding.prayerNone') }))} onChange={(pp) => up({ pp })} />
-      <p><label htmlFor="ob-city">{t('onboarding.cityQ')}</label></p>
-      <CitySelect id="ob-city" value={tm.city} onChange={(city) => up({ city })} />
-      <p className="note">{t(tm.city ? 'common.prayer.calcNote' : 'onboarding.prayerNote')}</p>
+      <PrayerSetup value={{ city: tm.city, loc: tm.loc }} onChange={(v) => up({ city: v.city, loc: v.loc })} />
+      <p className="note">{t(tm.city || tm.loc ? 'common.prayer.calcNote' : 'onboarding.prayerNote')}</p>
     </>,
     <>
       <h2>{t('onboarding.comfortTitle')}</h2>

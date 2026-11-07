@@ -38,6 +38,9 @@ const GOAL_PATTERNS: [Goal, RegExp][] = [
   ['memory', /ذاكرتي|أنسى|انسى|\b(memory|forgetful|keep forgetting)\b/i],
 ];
 
+/** The user mentioned work, so an optional break after it makes sense as a labelled suggestion. */
+export const mentionsWork = (v: string) => /دوام|الدوام|شغلي|\b(work|job|office|shift)\b/i.test(v);
+
 export function detectGoals(v: string): Goal[] {
   return GOAL_PATTERNS.filter(([, re]) => re.test(v)).map(([g]) => g);
 }

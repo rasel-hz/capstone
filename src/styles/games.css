@@ -200,6 +200,48 @@
   .pb__col { min-height: 0; }
 }
 
+/* Personal planning board: the user's own tasks, compact and touch-friendly. */
+.pp { display: flex; flex-direction: column; gap: 8px; max-width: 680px; margin: 0 auto; width: 100%; }
+.pp__head { text-align: center; }
+.pp__head .q__t { margin-bottom: 2px; }
+.pp__list { display: flex; flex-direction: column; gap: 6px; }
+.pp__list .crd { display: flex; touch-action: auto; cursor: default; }
+.pp__chip { display: inline-flex; align-items: center; gap: 2px; }
+.crd--sug { background: var(--sun-l); box-shadow: inset 0 0 0 1.5px rgba(255, 211, 110, .9); }
+.pp__tag { font-style: normal; font-size: 11.5px; font-weight: 700; color: #7A5A00; background: #fff; border-radius: 6px; padding: 0 6px; }
+.pp__tag--ex { display: inline-block; margin-bottom: 4px; background: var(--sun-l); }
+.pp__drop { width: 30px; height: 30px; border: 0; border-radius: 8px; background: none; color: var(--mut); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+.pp__drop:hover { background: var(--cr); }
+.pp__meter { position: relative; display: flex; gap: 7px; align-items: center; padding: 8px 12px; border-radius: 11px; background: var(--em-l); font-size: 14px; overflow: hidden; }
+.pp__meter span, .pp__meter svg { position: relative; z-index: 1; }
+.pp__meter i { position: absolute; inset-block: 0; inset-inline-start: 0; background: rgba(40, 120, 91, .18); transition: width var(--t-card) var(--ease); }
+.pp__meter.is-over { background: var(--cor-l); color: var(--cor-d); }
+.pp__meter.is-over i { background: rgba(255, 142, 131, .3); }
+.pp__blocks { display: flex; flex-direction: column; gap: 6px; }
+.pp__block { display: flex; align-items: center; gap: 8px; background: #fff; border-radius: 12px; padding: 6px 8px; box-shadow: var(--shadow-card); flex-wrap: wrap; }
+.pp__block .grow { min-width: 120px; font-weight: 500; }
+.pp__mins, .pp__move { display: inline-flex; align-items: center; gap: 2px; }
+.pp__mins output { min-width: 58px; text-align: center; font-variant-numeric: tabular-nums; font-size: 14px; }
+.pp__block button { width: 36px; height: 36px; border: 0; background: var(--cr); color: var(--ink); cursor: pointer; border-radius: 9px; display: inline-flex; align-items: center; justify-content: center; touch-action: manipulation; }
+.pp__block button:disabled { opacity: .35; cursor: default; }
+.pp .pb__col { min-height: 100px; }
+
+/* Just the first step: one step card that shrinks, with a ladder showing how small it is. */
+.ms { max-width: 560px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; gap: 10px; }
+.ms .q__t { margin-bottom: 0; }
+.ms__ladder { display: flex; justify-content: center; align-items: flex-end; gap: 6px; height: 34px; }
+.ms__ladder i { width: 14px; border-radius: 4px; background: var(--line); transition: background var(--t-card) var(--ease); }
+.ms__ladder i:nth-child(1) { height: 34px; } .ms__ladder i:nth-child(2) { height: 27px; } .ms__ladder i:nth-child(3) { height: 20px; }
+.ms__ladder i:nth-child(4) { height: 14px; } .ms__ladder i:nth-child(5) { height: 8px; }
+.ms__ladder i.on { background: var(--em); }
+.ms__step { display: flex; flex-direction: column; align-items: center; gap: 6px; background: #fff; border-radius: var(--r-md); box-shadow: var(--shadow-card); padding: 18px 16px; text-align: center; animation: rise var(--t-card) var(--ease); }
+.ms__step p { margin: 0; font-size: 19px; font-weight: 700; line-height: 1.5; }
+.ms__modes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.ms__modes .pace { gap: 2px; padding: 12px 8px; }
+@media (max-width: 480px) { .ms__modes { grid-template-columns: 1fr; } }
+.ts__col--act .pb__head b { color: var(--em-d); }
+.ts__col--unsure .pb__head b { color: var(--lav-d); }
+
 /* Breakdown */
 .bd__list { display: flex; flex-direction: column; gap: 6px; }
 .bd__list .crd { display: flex; background: var(--cr); box-shadow: none; touch-action: auto; cursor: default; }
