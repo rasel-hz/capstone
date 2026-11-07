@@ -1,5 +1,19 @@
 # Changelog
 
+## Unreleased: journeys as 7-day programs and today's goals
+
+### Added
+- A journey is now a 7-day program: one challenge a day, and a 1 to 5 self-rating on the first and last day. The result shows before and after, on the challenges page and in Progress. Missing a day never resets anything; the step waits.
+- Today's goals on Home, in the user's own words. A chat suggestion with the user's tasks can add them in one tap.
+- The buddy's energy for the day: each goal ticked or challenge completed adds one, up to five. Nothing takes it away; a new day starts fresh.
+- The buddy on Home rests until the first point of the day, then wakes up, reacts to each new point and celebrates a full bar.
+- A full bar suggests stopping: "you've done your part today", with a one-minute calm break.
+- Progress shows full days this week. Days that didn't fill up aren't recorded.
+- A warm "I missed you" after a gap of more than three days, saying nothing was lost.
+
+### Changed
+- Challenges and Journeys are one page: the journey in progress on top, then activities grouped by what the user wants to do now (arrange, get started, focus, calm down, think it through). Journeys open from the journey card instead of a sub-tab.
+
 ## Unreleased: prayer check-in instead of a lock
 
 ### Fixed

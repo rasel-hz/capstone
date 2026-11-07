@@ -2,6 +2,8 @@ import type { AppState, ChallengeId, GameResult, ItemStatus, Mission, MissionIte
 import { tr } from '../../i18n';
 import { level, today } from '../../utils';
 import { CHALLENGES } from '../challenges/catalog';
+import { addEnergy } from '../buddy/buddy';
+import { recordProgramDay } from '../program/program';
 import { isLowEnergy } from './planner';
 
 // All functions mutate a draft handed in by the store, so they stay plain and unit-testable.
@@ -80,6 +82,9 @@ export function completeItem(s: AppState, r: GameResult): FinishOutcome | null {
   s.xp += it.xp;
   M.xp = (M.xp || 0) + it.xp;
   record(s, it, 'COMPLETED', r.data);
+  recordProgramDay(s, it.id);
+  // Self-report check-ins give nothing, the same as for points.
+  if (!CHALLENGES[it.id].selfReport) addEnergy(s);
   return { xp: it.xp, leveledUp: level(s) > before, newLevel: level(s) };
 }
 

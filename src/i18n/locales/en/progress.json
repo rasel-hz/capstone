@@ -51,5 +51,17 @@
   "maybe": "Maybe:",
   "maybeText": "Shorter challenges suit you better. That's only a guess, and you decide.",
   "needMore": "I need at least 4 attempts before mentioning any pattern.",
-  "disclaimer": "Game results are for your own tracking. They don't show clinical improvement or a diagnosis."
+  "disclaimer": "Game results are for your own tracking. They don't show clinical improvement or a diagnosis.",
+  "programs": {
+    "title": "Your journey results",
+    "note": "Your own rating on the first and last day, not a medical measure.",
+    "row": "From {{before}} to {{after}}"
+  },
+  "fullDays": {
+    "title": "Your full days",
+    "week": "This week: {{n}} of 7",
+    "note": "A full day means the buddy's energy reached 5 of 5. Days that didn't fill up don't count against you.",
+    "dayFull": "{{day}}: full",
+    "dayNot": "{{day}}"
+  }
 }

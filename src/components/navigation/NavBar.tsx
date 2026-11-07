@@ -6,7 +6,8 @@ import { Mascot } from '../mascot/Mascot';
 import { LanguageSwitcher } from '../ui/LanguageSwitcher';
 import { LogoutButton } from '../../features/auth/AuthViews';
 
-// Six tabs, with the buddy raised. Journeys sit inside Challenges; rewards has its own tab and is still a sub-tab of Progress.
+// Six tabs, with the buddy raised. Journeys open from the Challenges page. Rewards has its own tab and is
+// still a sub-tab of Progress (see SubTabs).
 const TABS: [ViewId, LucideIcon][] = [
   ['home', House], ['chal', Gamepad2], ['chat', MessageCircle], ['prog', BarChart3], ['rew', Gift], ['set', UserRound],
 ];
@@ -34,8 +35,8 @@ export function NavBar({ view, onNavigate }: { view: ViewId; onNavigate(v: ViewI
   );
 }
 
-// Two pages that share one tab, such as Challenges and Journeys, switch here.
-const SUB: Partial<Record<ViewId, [ViewId, ViewId]>> = { chal: ['chal', 'journeys'], journeys: ['chal', 'journeys'], prog: ['prog', 'rew'], rew: ['prog', 'rew'] };
+// Two pages that share one tab switch here. Journeys aren't a sub-tab: they open from the journey card on Challenges.
+const SUB: Partial<Record<ViewId, [ViewId, ViewId]>> = { prog: ['prog', 'rew'], rew: ['prog', 'rew'] };
 
 export function SubTabs({ view, onNavigate }: { view: ViewId; onNavigate(v: ViewId): void }) {
   const { t } = useTranslation();

@@ -1,9 +1,6 @@
 {
   "title": "Challenges",
   "sub": "Short games to try at your own pace. They're for your own tracking, not a measure of your health.",
-  "featuredLabel": "A challenge to try",
-  "tryThis": "Try this",
-  "filterLabel": "Filter by type",
   "categories": {
     "all": "All",
     "focus": "Focus",
@@ -107,5 +104,14 @@
       "purpose": "Helps you see which worries have a next step and which you can set down for now.",
       "instructions": "Write down what's on your mind, sort each one, then choose one small next step if you like. It stays on your device."
     }
-  }
+  },
+  "groups": {
+    "all": "All",
+    "arrange": "Arrange",
+    "start": "Get started",
+    "focus": "Focus",
+    "calm": "Calm down",
+    "think": "Think it through"
+  },
+  "groupLabel": "What do you want to do now?"
 }

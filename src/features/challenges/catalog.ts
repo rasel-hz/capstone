@@ -20,6 +20,17 @@ export const CHALLENGES: Record<ChallengeId, Challenge> = {
 
 export const CATEGORIES: ChallengeCategory[] = ['focus', 'memory', 'planning', 'time', 'relax', 'real'];
 
+// How the challenges page groups activities: by what the user wants to do now, not by a condition.
+// Text lives under challenges.groups.<id>.
+export type GroupId = 'arrange' | 'start' | 'focus' | 'calm' | 'think';
+export const GROUPS: { id: GroupId; ids: ChallengeId[] }[] = [
+  { id: 'arrange', ids: ['seq', 'priority_board', 'time'] },
+  { id: 'start', ids: ['micro_start', 'start2', 'breakdown', 'study_sprint'] },
+  { id: 'focus', ids: ['video', 'attention_scene', 'mem'] },
+  { id: 'calm', ids: ['calm', 'calm_landscape'] },
+  { id: 'think', ids: ['thought_sort', 'emotion_map'] },
+];
+
 export const JOURNEYS: Journey[] = [
   { id: 'adhd', a: ['video', 'attention_scene', 'priority_board', 'seq', 'breakdown', 'micro_start', 'time', 'mem', 'start2', 'study_sprint'] },
   { id: 'anx', a: ['calm', 'calm_landscape', 'thought_sort', 'emotion_map', 'video', 'mem'] },
