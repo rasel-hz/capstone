@@ -15,7 +15,7 @@ const THREE_DAYS = 3 * 864e5;
 export const defaultState = (): AppState => ({
   started: 0, done: 0, name: '', g: 'm', needs: [], sched: 'work', pat: '', sleep: '', pp: 30, prayer: '',
   snd: 1, rm: 0, notif: 0, ctx: [], pend: null, hist: [], en: [], xp: 0, view: 'home', chat: [], mission: null,
-  pref: null, drive: 0, driving: 0, last: Date.now(), theme: '', comeback: 0, lastDaily: null, aiConsent: null, prayerDay: '', city: '', largeText: 0, lang: 'ar-SA',
+  pref: null, drive: 0, driving: 0, last: Date.now(), theme: '', comeback: 0, lastDaily: null, aiConsent: null, prayerDay: '', city: '', largeText: 0, lang: 'ar-SA', fb: [],
 });
 
 export const localRepository: StateRepository = {
@@ -50,5 +50,6 @@ export function hydrate(saved: Partial<AppState> | null, now = Date.now()): AppS
   if (s.prayer && s.prayerDay !== today()) s.prayer = '';
   if (typeof s.city !== 'string' || !Object.hasOwn(CITIES, s.city)) s.city = '';
   if (s.lang !== 'en') s.lang = 'ar-SA';
+  if (!Array.isArray(s.fb)) s.fb = [];
   return s;
 }

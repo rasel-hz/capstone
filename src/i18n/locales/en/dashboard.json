@@ -63,5 +63,21 @@
   "scheduleNone": "Not set",
   "editInProfile": "Edit in My Profile",
   "prayerCalc": "Calculated for {{city}} with Umm al-Qura, with {{mins}} minutes protected after each call to prayer.",
-  "prayerCityHint": "Want it automatic? Choose your city in your profile."
+  "prayerCityHint": "Want it automatic? Choose your city in your profile.",
+  "howToday": "How's your day going? Tell me your energy and I'll keep things to your pace.",
+  "nextStep": "Your next small step",
+  "pickUp": "Pick up where you left off",
+  "resumeShort": "This challenge restarts from the beginning. Your earlier attempts are saved.",
+  "otherOptions": "Other options",
+  "missionReady": "Your mission is ready",
+  "stepsAbout_one": "{{count}} short step · about {{n}} min",
+  "stepsAbout_other": "{{count}} short steps · about {{n}} min",
+  "seeSteps": "See the steps",
+  "chooseAnother": "Choose something else",
+  "oneMore": "Want one more small thing?",
+  "restIsFine": "Resting is fine too. You've already done today's mission.",
+  "talkTitle": "What's on your mind today?",
+  "talkSub": "Tell your buddy, and get help planning your day",
+  "progressLabel": "Level {{n}}, {{done}} done today. Open your progress",
+  "doneToday": "{{count}} done today"
 }

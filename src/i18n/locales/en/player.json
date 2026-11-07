@@ -89,5 +89,12 @@
     "headDaily": "That's today's mission done!",
     "headPartial": "The mission has ended.",
     "chat": "{{head}} {{lines}}. {{suggestion}} Want to tell me a bit about your day?"
+  },
+  "feedback": {
+    "q": "Did this suit you?",
+    "yes": "It suited me",
+    "some": "It was okay",
+    "no": "Not for me",
+    "thanks": "Thanks. I'll keep that in mind when I suggest something next time."
   }
 }

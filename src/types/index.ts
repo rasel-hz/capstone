@@ -36,6 +36,8 @@ export interface WhyPart {
   k: string;
   acc?: number;
   journey?: JourneyId;
+  /** Minutes, for reasons such as "fits the 10 minutes you have". */
+  n?: number;
 }
 export type Why = string | WhyPart[];
 
@@ -86,10 +88,32 @@ export interface EnergyCheckin {
   ts: number;
 }
 
+/** An activity the companion suggested in chat. The user decides whether and when it starts. */
+export interface ChatSuggestion {
+  /** Approved challenge IDs, best first. */
+  ids: ChallengeId[];
+  /** Which one is showing, after "choose another". */
+  i: number;
+  /** The reason, grounded in what the user said. Written by the AI or taken from the locale files. */
+  why?: string;
+  /** Reason code used when there is no written reason, so it follows the language. */
+  goal?: string;
+  /** 'started' or 'dismissed' once answered, so an old card can't start anything. */
+  st?: 'started' | 'dismissed';
+}
+
 export interface ChatMessage {
   t: string;
   b?: 1;
   card?: 1;
+  sug?: ChatSuggestion;
+}
+
+/** Optional "was this helpful?" answer after an activity: 1 helpful, 0 somewhat, -1 not helpful. */
+export interface Feedback {
+  id: ChallengeId;
+  v: 1 | 0 | -1;
+  ts: number;
 }
 
 export interface PendingContext {
@@ -136,6 +160,8 @@ export interface AppState {
   largeText: number;
   /** Interface language. */
   lang: 'ar-SA' | 'en';
+  /** Self-reported helpfulness of activities, used to adapt suggestions. Stays on the device. */
+  fb: Feedback[];
 }
 
 export interface GameResult {

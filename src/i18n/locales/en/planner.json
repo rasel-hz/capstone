@@ -13,7 +13,21 @@
     "journey": "From your journey: {{journey}}",
     "self": "You chose this",
     "break": "You chose to take a break",
-    "fromJourney": "From {{journey}}"
+    "fromJourney": "From {{journey}}",
+    "goal_prioritize": "You mentioned juggling several things, and this helps you pick what comes first",
+    "goal_start": "You mentioned that getting started is hard, and this keeps the first step small",
+    "goal_focus": "You mentioned wanting to focus, and this is a short focus exercise",
+    "goal_stress": "You mentioned feeling stressed, and this is an optional short break",
+    "goal_sleep": "You mentioned winding down for sleep, and this is slow and calm",
+    "goal_worry": "You mentioned things on your mind, and this gives you a quiet moment",
+    "goal_social": "You mentioned a meeting or get-together, and this helps you plan the steps",
+    "goal_rest": "You wanted something light, so this is a short break",
+    "goal_memory": "You asked for a memory exercise",
+    "goal_time": "You mentioned time slipping away, and this practises estimating time",
+    "helped": "you said it suited you last time",
+    "gentle": "it's gentle, to suit your energy today",
+    "fits": "it fits the {{n}} minutes you have",
+    "chat": "Suggested in your chat"
   },
   "reason": {
     "low": "at your energy today",

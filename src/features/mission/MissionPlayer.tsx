@@ -346,6 +346,35 @@ export function MissionPlayer({ start, onClose, onNavigate }: { start: PlayerSta
   );
 }
 
+// Optional, one tap, and only what the user says. It shapes later suggestions and is never read as a health signal.
+function Helpful() {
+  const { t } = useTranslation();
+  const s = useAppState();
+  const store = useStore();
+  const [answered, setAnswered] = useState(false);
+  const ids = [...new Set(s.mission!.items.filter((i) => i.status === 'COMPLETED' && !CHALLENGES[i.id].selfReport).map((i) => i.id))];
+  if (!ids.length) return null;
+  if (answered) return <p className="note" role="status">{t('player.feedback.thanks')}</p>;
+  const answer = (v: 1 | 0 | -1) => {
+    store.update((d) => {
+      ids.forEach((id) => d.fb.push({ id, v, ts: Date.now() }));
+      // Keeps the record small; only recent answers are used.
+      d.fb = d.fb.slice(-60);
+    });
+    setAnswered(true);
+  };
+  return (
+    <div className="fbq" role="group" aria-labelledby="fbq-t">
+      <p id="fbq-t" className="fbq__q">{t('player.feedback.q', { count: ids.length })}</p>
+      <div className="row row--c">
+        <button type="button" className="btn sm alt" onClick={() => answer(1)}>{t('player.feedback.yes')}</button>
+        <button type="button" className="btn sm alt" onClick={() => answer(0)}>{t('player.feedback.some')}</button>
+        <button type="button" className="btn sm alt" onClick={() => answer(-1)}>{t('player.feedback.no')}</button>
+      </div>
+    </div>
+  );
+}
+
 function Completion({ summary, mascotState, onClose, onNavigate }: { summary: MissionSummary; mascotState: MascotState; onClose(): void; onNavigate(v: ViewId): void }) {
   const { t } = useTranslation();
   const s = useAppState();
@@ -379,6 +408,7 @@ function Completion({ summary, mascotState, onClose, onNavigate }: { summary: Mi
             </>
           )}
           <p>{summaryLines(summary)}{t('common.sentenceEnd')}</p>
+          {!quiet && <Helpful />}
           {!quiet && <h3>{t('player.done.tomorrow')}</h3>}
           <p>{summarySuggestion(summary)}</p>
           {s.prayer && <p className="note">{t('player.done.prayer')}</p>}

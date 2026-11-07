@@ -1,5 +1,25 @@
 # Changelog
 
+## Unreleased: helpful companion and a calmer Home
+
+### Added
+- The AI answers what the person asked first, with practical advice, and suggests an activity only when it helps. It returns an intent, goals, stated minutes and up to 3 activity IDs with a reason, all checked by the server. See `docs/AI.md`.
+- A recommendation engine in `src/features/recommend/`: filters first (catalog only, fits the time, gentle on low-energy days, nothing twice marked unhelpful), then an explainable score and a reason from what was said.
+- A compact suggestion card in the chat: Start, Another, Not now, or all of them as one short mission. Nothing starts on its own.
+- An optional "Did this suit you?" question after a mission. Answers stay on the device and shape later suggestions.
+- `npm run eval:ai`: 15 real conversations checked against the brief's rules. 15 of 15 passed on 2026-11-07.
+- `docs/CHALLENGES.md`: what each activity is for, when it's suggested, and its limits.
+
+### Changed
+- Replies follow the language the person writes in, not only the app's language, including the support message and offline replies.
+- Offline replies recognise goals such as prioritising, getting started, focus and rest, give reviewed advice, and offer a fitting activity. They are labelled on screen as limited mode, not AI.
+- The context card no longer appears when someone is mainly asking for advice.
+- Home shows one next step, a way to talk, and a small progress line. The shortcut grid, recent attempts and empty day cards are gone, and prayer time entry lives in ملفي.
+- Your own long messages fold behind "Show more". Replies never fold.
+
+### Fixed
+- The chat on the Android emulator fell back to rules with no visible reason when the laptop server wasn't connected. The limited-mode label now says so.
+
 ## Unreleased: five-tab navigation
 
 ### Changed

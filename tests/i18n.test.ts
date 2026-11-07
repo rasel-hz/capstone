@@ -241,11 +241,14 @@ describe('server language', () => {
     expect(parseRequest({ message: 'hi' }).context.lang).toBe('ar-SA');
   });
 
-  it('answers crisis wording in the requested language, without calling the AI', async () => {
+  it('answers crisis wording in the language the user wrote in, without calling the AI', async () => {
     const r = await handleChat({ message: 'I want to die', context: { lang: 'en' } }, {});
     expect(r.reply).toContain('997');
     expect(/[؀-ۿ]/.test(r.reply)).toBe(false);
-    const a = await handleChat({ message: 'I want to die', context: {} }, {});
+    // English typed while the app is in Arabic still gets English, and the other way round.
+    const e = await handleChat({ message: 'I want to die', context: {} }, {});
+    expect(/[؀-ۿ]/.test(e.reply)).toBe(false);
+    const a = await handleChat({ message: 'أبي أموت', context: { lang: 'en' } }, {});
     expect(/[؀-ۿ]/.test(a.reply)).toBe(true);
     void key;
   });
@@ -275,7 +278,7 @@ describe('server language', () => {
       return Response.json({ status: 'completed', output: [{ type: 'message', content: [{ type: 'output_text', text: JSON.stringify({ reply: 'Hi', tone: 'friendly', distress: false, context: {} }) }] }] });
     }) as unknown as typeof fetch;
     await handleChat({ message: 'hello', context: { lang: 'en', byChallenge: [{ id: 'mem', count: 1 }] } }, { ...key, fetch: f });
-    expect(bodies[0].input[0].content).toContain('"reply_language":"English"');
+    expect(bodies[0].input[0].content).toContain('"app_language":"English"');
     expect(bodies[0].input[0].content).toContain('What Do You Remember?');
   });
 });

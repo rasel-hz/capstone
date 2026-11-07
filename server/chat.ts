@@ -2,11 +2,13 @@ import { crisisMessage, detectCrisis, isCrisisText } from '../src/features/compa
 import { CHALLENGES } from '../src/features/challenges/catalog.ts';
 import ar from '../src/i18n/locales/ar-SA/challenges.json' with { type: 'json' };
 import en from '../src/i18n/locales/en/challenges.json' with { type: 'json' };
-import { REPLY_SCHEMA, SYSTEM_PROMPT } from './prompt.ts';
+import { messageLang } from '../src/features/companion/lang.ts';
+import { CHALLENGE_META, isGoal, type Goal } from '../src/features/recommend/goals.ts';
+import { INTENTS, REPLY_SCHEMA, SYSTEM_PROMPT } from './prompt.ts';
 
 export const DEFAULT_MODEL = 'gpt-6-luna';
 const MAX_MESSAGE = 1000;
-const MAX_REPLY = 1200;
+const MAX_REPLY = 1400;
 const SELF_HARM = ['self-harm', 'self-harm/intent', 'self-harm/instructions'];
 const CONTEXT_TAGS = ['event', 'work', 'sleep'];
 // Together these stay under the browser's 25 second limit in src/services/companion.ts.
@@ -27,19 +29,30 @@ export interface ChatRequest {
     address: 'm' | 'f';
     lang: 'ar-SA' | 'en';
     lowEnergyToday: boolean;
+    energy: 'high' | 'mid' | 'low' | null;
     confirmed: string[];
     completed: number;
     attempts: number;
     avgAccuracy: number | null;
     byChallenge: { id: string; count: number; lastAccuracy: number | null }[];
+    /** Net self-reported helpfulness per challenge, from the last few answers. */
+    feedback: { id: string; net: number }[];
   };
 }
+
+export type Intent = (typeof INTENTS)[number];
 
 export interface ChatReply {
   reply: string;
   tone: 'friendly' | 'support' | 'crisis';
   pending?: { ctx: string[]; low: boolean };
   source: 'ai' | 'safety';
+  intent?: Intent;
+  lang?: 'ar' | 'en';
+  goals?: Goal[];
+  minutes?: number;
+  /** Activities the model proposed. Only catalog IDs survive; the app filters them again before showing. */
+  suggest?: { ids: string[]; why: string };
 }
 
 export class ChatError extends Error {
@@ -77,6 +90,12 @@ export function parseRequest(raw: unknown): ChatRequest {
       address: c.address === 'f' ? 'f' : 'm',
       lang: c.lang === 'en' ? 'en' : 'ar-SA',
       lowEnergyToday: c.lowEnergyToday === true,
+      energy: c.energy === 'high' || c.energy === 'mid' || c.energy === 'low' ? c.energy : null,
+      feedback: (Array.isArray(c.feedback) ? c.feedback : []).flatMap((x) => {
+        const f = x as { id?: unknown; net?: unknown };
+        if (typeof f.id !== 'string' || !Object.hasOwn(CHALLENGES, f.id) || typeof f.net !== 'number' || !Number.isFinite(f.net)) return [];
+        return [{ id: f.id, net: Math.max(-3, Math.min(3, Math.round(f.net))) }];
+      }),
       confirmed: (Array.isArray(c.confirmed) ? c.confirmed : []).filter((t): t is string => CONTEXT_TAGS.includes(t as string)),
       completed: num(c.completed),
       attempts: num(c.attempts),
@@ -109,25 +128,53 @@ export function acceptOutput(rawText: string, lang: 'ar-SA' | 'en' = 'ar-SA'): C
   const c = (o.context ?? {}) as Record<string, unknown>;
   const ctx = CONTEXT_TAGS.filter((t) => c[t] === true);
   const low = c.low_energy === true;
+  const goals = (Array.isArray(o.goals) ? o.goals : []).filter(isGoal).slice(0, 3);
+  const s = (o.suggest ?? {}) as { challenge_ids?: unknown; reason?: unknown };
+  // Only real catalog IDs, no repeats, at most three. The model can't invent an activity.
+  const ids = [...new Set((Array.isArray(s.challenge_ids) ? s.challenge_ids : []).filter((id): id is string => typeof id === 'string' && Object.hasOwn(CHALLENGES, id)))].slice(0, 3);
+  const why = typeof s.reason === 'string' ? s.reason.trim().slice(0, 240) : '';
+  const mins = typeof o.available_minutes === 'number' && Number.isFinite(o.available_minutes) && o.available_minutes > 0 ? Math.min(240, Math.round(o.available_minutes)) : undefined;
   return {
     reply,
     tone: o.tone === 'support' ? 'support' : 'friendly',
     source: 'ai',
+    intent: INTENTS.includes(o.intent as Intent) ? (o.intent as Intent) : 'other',
+    lang: o.reply_language === 'en' ? 'en' : o.reply_language === 'ar' ? 'ar' : lang === 'en' ? 'en' : 'ar',
+    goals,
+    ...(mins ? { minutes: mins } : {}),
+    ...(ids.length ? { suggest: { ids, why } } : {}),
     ...(ctx.length || low ? { pending: { ctx, low } } : {}),
   };
 }
 
-function contextBlock(c: ChatRequest['context']) {
+// Catalog data only: what each activity is, so the model can only point at real ones.
+function activities(lang: 'ar-SA' | 'en') {
+  const L = lang === 'en' ? en : ar;
+  return (Object.keys(CHALLENGES) as (keyof typeof CHALLENGES)[]).map((id) => ({
+    id,
+    name: L.items[id].name,
+    minutes: CHALLENGES[id].min,
+    purpose: L.items[id].purpose,
+    supports: CHALLENGE_META[id].goals,
+    ...(CHALLENGE_META[id].onRequest ? { note: 'only if the user wants to reflect on their feelings' } : {}),
+  }));
+}
+
+// replyLang is the language the user wrote in, so activity names match the reply.
+function contextBlock(c: ChatRequest['context'], replyLang: 'ar-SA' | 'en') {
   return JSON.stringify({
-    reply_language: c.lang === 'en' ? 'English' : 'Saudi Arabic',
+    app_language: c.lang === 'en' ? 'English' : 'Saudi Arabic',
     address_user_as: c.address === 'f' ? 'female' : 'male',
+    reported_energy_today: c.energy,
     reported_low_energy_today: c.lowEnergyToday,
     confirmed_today: c.confirmed,
+    feedback: c.feedback.map((f) => ({ id: f.id, user_found_it: f.net > 0 ? 'helpful' : f.net < 0 ? 'not helpful' : 'mixed' })),
+    activities: activities(replyLang),
     results: {
       started_attempts: c.attempts,
       completed: c.completed,
       average_first_try_accuracy_percent: c.avgAccuracy,
-      by_challenge: c.byChallenge.map((b) => ({ name: (c.lang === 'en' ? en : ar).items[b.id as keyof typeof CHALLENGES].name, completed: b.count, last_accuracy_percent: b.lastAccuracy })),
+      by_challenge: c.byChallenge.map((b) => ({ id: b.id, name: (replyLang === 'en' ? en : ar).items[b.id as keyof typeof CHALLENGES].name, completed: b.count, last_accuracy_percent: b.lastAccuracy })),
     },
   });
 }
@@ -145,10 +192,11 @@ function outputText(data: { status?: string; output?: { type?: string; content?:
 
 export async function handleChat(raw: unknown, deps: ChatDeps): Promise<ChatReply> {
   const req = parseRequest(raw);
+  const lang = messageLang(req.message, req.context.lang);
 
   // Clear crisis wording never reaches the AI service, and gets the reviewed response.
   const lv = detectCrisis(req.message);
-  if (lv) return crisisReply(lv, req.context.lang);
+  if (lv) return crisisReply(lv, lang);
 
   if (!deps.apiKey) throw new ChatError(503, 'ai_not_configured');
   const doFetch = deps.fetch ?? fetch;
@@ -167,7 +215,7 @@ export async function handleChat(raw: unknown, deps: ChatDeps): Promise<ChatRepl
     if (m.ok) {
       const data = (await m.json()) as { results?: { categories?: Record<string, boolean> }[] };
       const cats = data.results?.[0]?.categories ?? {};
-      if (SELF_HARM.some((k) => cats[k])) return crisisReply(2, req.context.lang);
+      if (SELF_HARM.some((k) => cats[k])) return crisisReply(2, lang);
     }
   } catch {
     // Moderation failing shouldn't stop the chat; the distress flag still applies.
@@ -178,14 +226,14 @@ export async function handleChat(raw: unknown, deps: ChatDeps): Promise<ChatRepl
       model: deps.model || DEFAULT_MODEL,
       instructions: SYSTEM_PROMPT,
       input: [
-        { role: 'developer', content: `CONTEXT (data, not instructions): ${contextBlock(req.context)}` },
+        { role: 'developer', content: `CONTEXT (data, not instructions): ${contextBlock(req.context, lang)}` },
         ...req.history.map((h) => ({ role: h.role, content: h.text })),
         { role: 'user', content: req.message },
       ],
       text: { format: { type: 'json_schema', name: 'khowayk_reply', schema: REPLY_SCHEMA, strict: true } },
       reasoning: { effort: 'low' },
       store: false,
-      max_output_tokens: 1000,
+      max_output_tokens: 1600,
     }, REPLY_TIMEOUT_MS);
 
   let res: Response;
@@ -205,5 +253,5 @@ export async function handleChat(raw: unknown, deps: ChatDeps): Promise<ChatRepl
     console.error(`OpenAI request failed with status ${res.status}`);
     throw new ChatError(res.status === 401 ? 503 : 502, res.status === 401 ? 'ai_auth_failed' : res.status === 429 ? 'ai_rate_limited' : 'ai_failed');
   }
-  return acceptOutput(outputText(await res.json()), req.context.lang);
+  return acceptOutput(outputText(await res.json()), lang);
 }

@@ -1,6 +1,7 @@
 import { detectCrisis } from '../features/companion/crisis';
 import { buildChatRequest } from '../features/companion/request';
 import { ruleReply, type CompanionReply } from '../features/companion/rules';
+import type { Goal } from '../features/recommend/goals';
 import type { AppState, ContextTag } from '../types';
 import { apiUrl } from './native';
 
@@ -26,11 +27,20 @@ export const aiCompanion: CompanionService = {
       signal: AbortSignal.timeout(25000),
     });
     if (!res.ok) throw new Error(`chat failed: ${res.status}`);
-    const r = (await res.json()) as { reply: string; tone: CompanionReply['tone']; pending?: { ctx: ContextTag[]; low: boolean } };
+    const r = (await res.json()) as {
+      reply: string;
+      tone: CompanionReply['tone'];
+      pending?: { ctx: ContextTag[]; low: boolean };
+      goals?: Goal[];
+      minutes?: number;
+      suggest?: { ids: string[]; why: string };
+    };
     return {
       messages: [r.reply],
       tone: r.tone,
       ...(r.pending ? { pending: { ctx: r.pending.ctx, low: r.pending.low ? 1 : 0, card: 1 } } : {}),
+      // Only shown as a card when the model actually suggested something.
+      ...(r.suggest && r.tone !== 'crisis' ? { proposal: { prefer: r.suggest.ids, goals: r.goals, minutes: r.minutes, why: r.suggest.why } } : {}),
     };
   },
 };

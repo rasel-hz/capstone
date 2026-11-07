@@ -96,7 +96,7 @@ describe('model output', () => {
     ['refusal', { status: 'completed', output: [{ type: 'message', content: [{ type: 'refusal', refusal: 'no' }] }] }, 'model_refused'],
     ['cut off', { status: 'incomplete', output: [] }, 'incomplete_model_output'],
     ['empty reply', reply({ ...good, reply: ' ' }), 'bad_model_output'],
-    ['too long', reply({ ...good, reply: 'ا'.repeat(1300) }), 'bad_model_output'],
+    ['too long', reply({ ...good, reply: 'ا'.repeat(1500) }), 'bad_model_output'],
   ])('rejects %s', async (_n, body, expected) => {
     expect(await code(run(mock(body)))).toBe(expected);
   });

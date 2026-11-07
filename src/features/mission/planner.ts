@@ -46,7 +46,7 @@ export function whyChosen(s: AppState, id: ChallengeId, index = 0, named = new S
 
 export function whyText(why: Why): string {
   if (typeof why === 'string') return why;
-  return formatList(why.map((p) => tr(`planner.why.${p.k}`, { acc: p.acc, journey: p.journey ? tr(`journeys.items.${p.journey}.name`) : '' })));
+  return formatList(why.map((p) => tr(`planner.why.${p.k}`, { acc: p.acc, n: p.n, count: p.n, journey: p.journey ? tr(`journeys.items.${p.journey}.name`) : '' })));
 }
 
 // The mission-level line, built only from what the user told us.

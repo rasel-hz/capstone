@@ -15,10 +15,22 @@
     "results": "You have {{total}} attempts on record and completed {{done}}{{avg}}. This is just for your own tracking and doesn't measure your health.",
     "greet": "Hey there! I'm doing well. How about you? How's your sleep and your day?",
     "thanks": "You're welcome! I'm here if you need me, and don't forget time with the people you love.",
-    "fallback": "I hear you. Want to tell me more about your day? If you'd like to try something light, you can start today's mission from Home."
+    "fallback": "I hear you. Want to tell me more about your day? If you'd like to try something light, you can start today's mission from Home.",
+    "advice": {
+      "prioritize": "That's a lot to fit around a full day. One way in: pick the one thing that matters most tonight, give it a short, fixed slot, and treat the rest as optional. Your other interests can each get their own evening in the week. If you like, the activity below helps you sort what comes first.",
+      "start": "Starting is often the hardest part. Shrink the first step until it feels almost too easy, like opening the file or writing one line, and give it two minutes. Once you've started, carrying on is easier.",
+      "focus": "For focus, one thing at a time helps: put your phone out of reach, choose one small piece of the material, and work in a short block with a break after. Short and finished beats long and scattered.",
+      "stress": "Sounds like a heavy day. It's fine to pause before anything else: a few slow breaths, some water or a short walk. There's a short, optional break below if you'd like it.",
+      "sleep": "Winding down works best as a routine: dim the lights, put screens away a little before bed, and do something slow and calm. If trouble sleeping goes on for weeks, it's worth talking to a doctor.",
+      "worry": "When thoughts keep circling, it can help to split them in two: what you can do something about, and what you can't. For the first, pick one small next step. For the second, it's okay to set it down for now.",
+      "social": "Feeling nervous before speaking up is really common. Preparing one or two points, and especially your first sentence, can make starting easier.",
+      "rest": "Then rest is a perfectly good plan. You don't have to do anything else today. If you want something light later, there's a short break you can try.",
+      "memory": "Here's a light memory round you can try if you like.",
+      "time": "If time keeps slipping away, try a timer for each task and notice how long things really take. It makes planning your evening more realistic."
+    }
   },
   "statusAi": "Replies come from an AI model (OpenAI) and can be wrong",
-  "statusRules": "Replies come from rules inside the app, not an AI model",
+  "statusRules": "Limited mode: simple rules in the app, not AI. I may miss what you mean.",
   "disclaimer": "I'm not a therapist and I don't diagnose. I don't replace your family, friends or professionals.",
   "consent": {
     "title": "Turn on smart replies?",
@@ -52,9 +64,22 @@
     "late": "I slept late today",
     "low": "I've got no energy today",
     "event": "I have a family dinner tonight",
-    "results": "How are my results?"
+    "results": "How are my results?",
+    "overwhelmed": "I have too much to do and don't know where to start",
+    "start": "I want to study but can't get myself to start"
   },
   "inputLabel": "Your message to your buddy",
   "inputPh": "Write to your buddy...",
-  "send": "Send"
+  "send": "Send",
+  "more": "Show more",
+  "less": "Show less",
+  "sug": {
+    "label": "Suggested activity",
+    "eyebrow": "Something that might help",
+    "another": "Another",
+    "notNow": "Not now",
+    "mission": "Or do all of them as one short mission, about {{mins}} min",
+    "started": "Started {{name}}. If you leave it, you can pick it up from Home.",
+    "dismissed": "No problem. It's there whenever you want it."
+  }
 }

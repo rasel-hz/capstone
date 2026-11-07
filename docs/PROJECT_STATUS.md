@@ -11,13 +11,14 @@ This file lists what has been done and what still needs doing. For how to run th
 | App | React, TypeScript and Vite, with all screens working |
 | Languages | Saudi Arabic and English, switchable at any time, including mid-game |
 | Challenges | 12 playable |
-| Chat | Connected to OpenAI, with keyword rules as the fallback |
+| Chat | OpenAI, helpful-first, follows the language you write in, and suggests activities through an explainable engine. Offline fallback is labelled limited mode |
+| Home | One next step, a chat entry and a small progress line |
 | Mascot | A clip for all 11 states |
 | Prayer times | Calculated on the device for 20 Saudi cities |
 | Navigation | 5 tabs, with خويّك raised in the middle on phones |
 | Android app | Built with Capacitor and running on the Android emulator. Games and chat not yet tried there. See [ANDROID.md](ANDROID.md) |
 | Data | Saved in the browser only, with no accounts or database |
-| Tests | 124 unit tests, type check and build all pass |
+| Tests | 157 unit tests, type check and build all pass. `npm run eval:ai` passed 15 of 15 real-model cases |
 | Public launch | **Not ready.** See "Before any public launch" below |
 
 All work so far is on `main`. Start new work on a new branch from `main`.
@@ -77,7 +78,22 @@ All work so far is on `main`. Start new work on a new branch from `main`.
 - Ran it on the Android emulator: onboarding in both languages, the mascot and the back button work.
 - **Tip:** don't keep the project in a OneDrive folder. OneDrive turns build files into cloud placeholders, which breaks the Android build. Use a plain folder such as `C:\dev\Khaweyak`.
 
+### 10. Helpful companion and a calmer Home
+- The AI answers the actual request first, then suggests an activity only when it helps. Every suggestion is checked against the catalog, the time available, energy and past feedback.
+- Recommendation engine, chat suggestion cards, optional "Did this suit you?" feedback, and an AI evaluation script. See [AI.md](AI.md) and [CHALLENGES.md](CHALLENGES.md).
+- Home simplified to one next step.
+
 ## What we need to do
+
+### Companion and recommendations
+- [ ] Build the next activities from the brief: `micro_start`, `grounding_54321`, `sleep_winddown`, `thought_sort`. See [CHALLENGES.md](CHALLENGES.md).
+- [ ] Let the AI help build a weekly plan step by step when the person asks for one, and save it only with consent.
+- [ ] Use the AI's goals for the daily mission too, not only chat suggestions.
+- [ ] Stream replies so long answers appear as they're written.
+- [ ] Grow `npm run eval:ai` into a scored dataset with repeats, and run it before each release.
+- [ ] Move to typed tool calls (reference §11.3) and server-side memory with provenance (§7, §11.4) once there are accounts.
+- [ ] Have Saudi speakers and a clinician review the new offline advice lines.
+- [ ] Try the "Did this suit you?" question by finishing a mission on a phone. It's covered by code review, not a live run.
 
 ### Android app
 - [x] Install Android Studio and run the app on an emulator.

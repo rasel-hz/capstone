@@ -63,9 +63,9 @@ export const tr = (key: string, options?: Record<string, unknown>) => i18n.t(key
 export type Msg = string | (() => string);
 export const msg = (m?: Msg | null): string => (typeof m === 'function' ? m() : m ? tr(m) : '');
 
-const dateLocale = () => (isRtl() ? 'ar-SA-u-ca-gregory' : 'en-GB');
+const dateLocale = (l: Lang = currentLang()) => (isRtl(l) ? 'ar-SA-u-ca-gregory' : 'en-GB');
 export const formatDate = (d: Date | number, o: Intl.DateTimeFormatOptions) => new Date(d).toLocaleDateString(dateLocale(), o);
-export const formatList = (a: string[]) => new Intl.ListFormat(dateLocale(), { style: 'long', type: 'conjunction' }).format(a);
+export const formatList = (a: string[], l?: Lang) => new Intl.ListFormat(dateLocale(l), { style: 'long', type: 'conjunction' }).format(a);
 
 // Keeps a name or typed text in its own direction inside a sentence in the other language.
 export const iso = (text: string) => `⁨${text}⁩`;

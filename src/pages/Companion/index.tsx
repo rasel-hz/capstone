@@ -6,11 +6,32 @@ import type { MascotState } from '../../components/mascot/manifest';
 import { useMascot } from '../../components/mascot/useMascot';
 import { useAppState, useStore } from '../../context/AppStateContext';
 import { tr } from '../../i18n';
+import { SuggestionCard } from '../../features/companion/SuggestionCard';
+import { buildSuggestion } from '../../features/recommend/suggest';
 import { aiCompanion, isAiAvailable, ruleCompanion } from '../../services/companion';
 import type { ContextTag } from '../../types';
 import { today } from '../../utils';
 
-const SUGGEST = ['late', 'low', 'event', 'results'];
+const SUGGEST = ['overwhelmed', 'start', 'low', 'results'];
+const LONG = 280;
+
+// The user's long messages fold so the conversation stays readable; the full text is one tap away.
+// Replies never fold, because the advice is the point.
+function Bubble({ text, bot }: { text: string; bot: boolean }) {
+  const { t } = useTranslation();
+  const [open, setOpen] = useState(false);
+  const long = !bot && text.length > LONG;
+  return (
+    <div className={`m ${bot ? 'b' : 'u'} ${long && !open ? 'm--fold' : ''}`} dir="auto">
+      {long && !open ? `${text.slice(0, LONG).trimEnd()}…` : text}
+      {long && (
+        <button type="button" className="m__more" aria-expanded={open} onClick={() => setOpen(!open)}>
+          {t(open ? 'companion.less' : 'companion.more')}
+        </button>
+      )}
+    </div>
+  );
+}
 
 export function Companion() {
   const { t } = useTranslation();
@@ -60,8 +81,11 @@ export function Companion() {
       setFellBack(true);
     }
     setWaiting(false);
+    // Any proposed activity goes through the same filters as every recommendation before it is shown.
+    const sug = reply.proposal ? buildSuggestion(store.getState(), reply.proposal) : undefined;
     store.update((d) => {
       reply.messages.forEach((m) => d.chat.push({ b: 1, t: m }));
+      if (sug) d.chat.push({ b: 1, t: '', sug });
       if (reply.pending) {
         d.pend = { ctx: reply.pending.ctx, low: reply.pending.low };
         // The card's words come from the locale files when shown, because it is still a live control.
@@ -110,7 +134,7 @@ export function Companion() {
         <Mascot state={mascot.state} size={72} label={t('common.brand')} />
         <div className="grow">
           <h1>{t('nav.chat')}</h1>
-          <span className={`status ${useAi ? 'status--ai' : ''}`}><Bot size={14} aria-hidden="true" /> {t(useAi ? 'companion.statusAi' : 'companion.statusRules')}</span>
+          <span className={`status ${useAi ? 'status--ai' : 'status--limited'}`}><Bot size={14} aria-hidden="true" /> {t(useAi ? 'companion.statusAi' : 'companion.statusRules')}</span>
         </div>
       </header>
       <p className="note chat-disc">{t('companion.disclaimer')}</p>
@@ -151,8 +175,10 @@ export function Companion() {
                 <button type="button" className="btn sm alt" onClick={() => answerCard(0)}>{t('companion.card.no')}</button>
               </div>
             </div>
+          ) : m.sug ? (
+            <SuggestionCard key={i} index={i} sug={m.sug} />
           ) : (
-            <div key={i} className={`m ${m.b ? 'b' : 'u'}`} dir="auto">{m.t}</div>
+            <Bubble key={i} text={m.t} bot={!!m.b} />
           )))}
           {waiting && <div className="m b m--typing" role="status" aria-label={t('companion.typing')}><i /><i /><i /></div>}
         </div>
