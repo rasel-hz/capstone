@@ -36,7 +36,7 @@ This file is intended for product managers, UI/UX designers, frontend engineers,
 | English interface | CURRENT | Every screen and challenge in Saudi Arabic and English, with RTL and LTR, switchable mid-game. See `docs/I18N.md`. |
 | Animated mascot | CURRENT | Approved 2D character with a clip for each of its 11 states, tied to real app events. Safari and reduced motion use the still image. See `docs/MASCOT.md`. |
 | Onboarding | CURRENT | 5 steps for name/pronouns, chosen journeys, routine/sleep, prayer buffer, sound/motion. |
-| Home | CURRENT | Greeting, energy check-in, mission timeline with reasons, progress, quick actions, «ترتيب يومك» (manual prayer time, confirmed context, schedule). The driving card moved to settings; if the user set driving, the mission is replaced by a safety notice. |
+| Home | CURRENT | Greeting, energy check-in, mission timeline with reasons, progress, quick actions, «ترتيب يومك» (next calculated prayer or manual prayer time, confirmed context, schedule). The driving card moved to settings; if the user set driving, the mission is replaced by a safety notice. |
 | Journey selection | CURRENT | 8 journey definitions with a detail map of shared challenges; not 8 distinct clinical programs. |
 | Challenges | CURRENT | 12 playable types: the 6 in §8 plus `attention_scene`, `priority_board`, `breakdown`, `study_sprint`, `emotion_map` and `calm_landscape` from §9. Library has categories, real status and original art. |
 | Connected mission player | CURRENT | Focused full-screen player: intro, automatic progression, round indicator, feedback, skip/end/pause/exit, result, final summary. Mid-game state isn't restored: a resumed challenge restarts, and says so. |
@@ -46,7 +46,7 @@ This file is intended for product managers, UI/UX designers, frontend engineers,
 | Progress dashboard | CURRENT | Locally calculated completion, accuracy, week and month chart, per-challenge results (scored and unscored kept apart), self-reports, and basic pattern statements. |
 | XP and achievements | CURRENT | Points, level = floor(XP/100)+1, achievements, challenge card collection, lavender theme and mascot hat unlocks. `emotion_map` earns no XP and counts toward nothing (§14.2). |
 | External brand rewards | TARGET / EXTERNAL | No live vouchers, contracts, inventory, or redemption partners. |
-| Prayer times | CURRENT (manual) | User manually enters upcoming prayer time; configured protection interval. No automatic location/time API. |
+| Prayer times | CURRENT (calculated) | User picks one of 20 Saudi cities and times are calculated on the device with Umm al-Qura (Isha +30 min in Ramadan); every prayer is protected for the configured interval. No location is read. Manual entry remains when no city is chosen. |
 | Traffic, calendar, weather | TARGET / EXTERNAL | Not connected; driving hours and event context are user-entered/keyword captured. |
 | Persistent backend | TARGET | Prototype stores JSON in browser `localStorage` under `kw2`. |
 | Authentication/multi-device sync | TARGET | Not implemented in supplied file. |
@@ -166,7 +166,7 @@ Use meaningful color contrast, soft layered gradients, shadows, animated scene d
 1. Name/alias + grammatical address (male/female in current UI).
 2. Select any of 8 support journeys.
 3. Work/study/flexible, morning/evening, optional sleep pattern.
-4. Manually configured prayer-protection interval: 0/20/30/45 minutes; prayer time later manually entered.
+4. Manually configured prayer-protection interval: 0/20/30/45 minutes, and an optional city for calculated prayer times; without a city, the prayer time is entered manually later.
 5. Sound on/off and normal/reduced motion.
 
 **[TARGET] expand carefully:** goals, available time today, optional energy/mood, sensory/accessibility preferences, optional calendar integration, optional prayer city/method, notification consent, optional sleep and commute patterns, preferred companion tone, personal reward preference. **Do not turn onboarding into a long clinical questionnaire.** Ask progressively when information is needed. Allow view/edit/delete/withdraw consent.
@@ -359,7 +359,7 @@ If user mentions self-harm or immediate danger, respond supportively, prioritize
 
 | Integration | CURRENT | TARGET / implementation notes |
 |---|---|---|
-| Prayer | Manual next prayer `HH:MM` and post-adhan buffer | City/time zone and verified prayer-times provider; user-selected calculation method; next five prayers, travel adjustments, protected windows, optional notifications; avoid assuming practice |
+| Prayer | City-based Umm al-Qura calculation on the device (20 cities), or manual next prayer `HH:MM`, plus post-adhan buffer | City/time zone and verified prayer-times provider; user-selected calculation method; next five prayers, travel adjustments, protected windows, optional notifications; avoid assuming practice |
 | Traffic | Manual “أنا أسوق الحين” and hours driven | Opt-in maps ETA/traffic; no screen interaction while driving; arrival-based suggestions; do not claim access to driving telemetry |
 | Calendar | Context tags from confirmed chat only | Google/Microsoft/Apple calendar via authorized integration; least-privilege read; event confirmation; handle private titles carefully |
 | Weather | Landing states not connected | Verified forecast provider; adjust optional outdoor suggestions only; cite freshness in UI |
@@ -649,7 +649,7 @@ Server must reject unknown challenge IDs, unavailable content, unsafe schedules,
 - Some results do not preserve real task input (`start2`).
 - Current mission completion screen may show “mission finished” even if some items skipped; report precise status.
 - Scoring and reward eligibility need server validation and idempotency.
-- Current prayer time is manually entered and may be stale next day; auto calculation not implemented.
+- Calculated prayer times cover 20 preset cities only, use one method, and can differ from a local mosque by a minute or two. Manual times are dropped the next day.
 - Current driving hours are manually entered; do not infer telemetry.
 - Some HTML interpolates user text into markup without robust escaping; **XSS risk** when migrating.
 - Current level progress and demo values are illustrative on landing; must stay clearly labeled.

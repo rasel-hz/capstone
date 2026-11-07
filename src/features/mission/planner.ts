@@ -2,6 +2,7 @@ import { formatList, tr } from '../../i18n';
 import type { AppState, ChallengeId, PlannedItem, Why, WhyPart } from '../../types';
 import { today } from '../../utils';
 import { JOURNEYS } from '../challenges/catalog';
+import { inCalculatedWindow } from '../prayer/times';
 
 export function isLowEnergy(s: AppState): boolean {
   const e = s.en[s.en.length - 1];
@@ -9,6 +10,8 @@ export function isLowEnergy(s: AppState): boolean {
 }
 
 export function inPrayerWindow(s: AppState, now = new Date()): boolean {
+  // A chosen city protects every prayer of the day; otherwise only the time the user entered.
+  if (s.city) return inCalculatedWindow(s.city, s.pp, now);
   if (!s.prayer || !s.pp) return false;
   const [h, m] = s.prayer.split(':').map(Number);
   const x = now.getHours() * 60 + now.getMinutes() - (h * 60 + m);

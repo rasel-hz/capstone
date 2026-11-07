@@ -48,5 +48,5 @@ Start with [docs/PROJECT_STATUS.md](docs/PROJECT_STATUS.md) for what is done and
 
 - App data stays in the browser under the `kw2` key. There is no database or account system.
 - The chat uses OpenAI only when a key is set and the user consents. Otherwise it uses keyword rules, and the screen says which. See [docs/AI.md](docs/AI.md), which also covers setting up your key.
-- Prayer time, driving and events are entered by the user. Nothing is connected to a live service.
+- Prayer times are calculated on the device from a city the user chooses, or entered by hand. Driving and events are entered by the user. Nothing is connected to a live service.
 - Rewards are in-app only. There are no partners or vouchers.

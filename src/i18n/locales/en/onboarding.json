@@ -19,7 +19,7 @@
   "prayerTitle": "Prayer",
   "prayerQ": "How many minutes should we protect after the call to prayer?",
   "prayerNone": "None",
-  "prayerNote": "No prayer-time service is connected. You can enter the next prayer time yourself on Home or in your profile.",
+  "prayerNote": "Without a city, you can enter the next prayer time yourself on Home or in your profile.",
   "comfortTitle": "Your comfort",
   "soundOn": "On",
   "soundOff": "Off",
@@ -34,5 +34,6 @@
     "prayer": "Prayer",
     "comfort": "Comfort"
   },
-  "finish": "All done"
+  "finish": "All done",
+  "cityQ": "Which city are you in? We'll calculate prayer times for you (optional)"
 }

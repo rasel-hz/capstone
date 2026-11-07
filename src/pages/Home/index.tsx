@@ -10,6 +10,7 @@ import { currentItem, hasOpenMission } from '../../features/mission/engine';
 import { MissionTimeline } from '../../features/mission/MissionTimeline';
 import { useMissions } from '../../features/mission/MissionProvider';
 import { generateMission, inPrayerWindow, isLowEnergy, missionReason } from '../../features/mission/planner';
+import { NextPrayerLine } from '../../features/prayer/PrayerCity';
 import { progressStats } from '../../features/progress/stats';
 import { useCountUp } from '../../hooks/useCountUp';
 import { formatDate, iso } from '../../i18n';
@@ -168,14 +169,23 @@ export function Home({ onNavigate }: { onNavigate(v: ViewId): void }) {
 
       <section className="panel dayctx" aria-labelledby="day-t">
         <SectionTitle title={t('dashboard.dayTitle')} sub={t('dashboard.daySub')} icon={MapPin} />
-        <div className="dayctx__row">
-          <label htmlFor="prayer-time">{t('dashboard.nextPrayer')} <span className="note">{t('dashboard.youEnterIt')}</span></label>
-          <div className="row">
-            <input id="prayer-time" type="time" value={prayer} onChange={(e) => setPrayer(e.target.value)} />
-            <button type="button" className="btn sm alt" onClick={() => store.update((d) => { d.prayer = prayer; d.prayerDay = today(); })}>{t('common.save')}</button>
+        {s.city ? (
+          <div className="dayctx__row">
+            <span>{t('dashboard.nextPrayer')}</span>
+            <NextPrayerLine city={s.city} />
+            <p className="note flush">{t('dashboard.prayerCalc', { city: t(`common.cities.${s.city}`), mins: s.pp })}</p>
           </div>
-          {s.prayer && <p className="note flush">{t('dashboard.prayerSaved', { time: s.prayer, mins: s.pp })}</p>}
-        </div>
+        ) : (
+          <div className="dayctx__row">
+            <label htmlFor="prayer-time">{t('dashboard.nextPrayer')} <span className="note">{t('dashboard.youEnterIt')}</span></label>
+            <div className="row">
+              <input id="prayer-time" type="time" value={prayer} onChange={(e) => setPrayer(e.target.value)} />
+              <button type="button" className="btn sm alt" onClick={() => store.update((d) => { d.prayer = prayer; d.prayerDay = today(); })}>{t('common.save')}</button>
+            </div>
+            {s.prayer && <p className="note flush">{t('dashboard.prayerSaved', { time: s.prayer, mins: s.pp })}</p>}
+            <p className="note flush">{t('dashboard.prayerCityHint')}</p>
+          </div>
+        )}
         <div className="dayctx__row">
           <span>{t('dashboard.approved')}</span>
           {s.ctx.length ? <div className="tags">{s.ctx.map((c) => <span key={c} className="tag">{t(`common.context.${c}`)}</span>)}</div> : <p className="note flush">{t('dashboard.approvedEmpty')}</p>}

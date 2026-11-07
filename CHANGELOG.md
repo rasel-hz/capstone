@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased: calculated prayer times
+
+### Added
+- Prayer times calculated on the device for 20 Saudi cities, with the Umm al-Qura method and Isha 30 minutes later in Ramadan. The user picks a city in onboarding or ملفي; no location is read and nothing is sent. Uses the MIT-licensed `adhan` library.
+- With a city chosen, every prayer of the day is protected for the chosen minutes, and Home shows the next prayer. ملفي shows today's five times.
+
+### Changed
+- Entering the next prayer time by hand still works when no city is chosen, and is unchanged.
+- Screens that said no prayer times are connected now say they're calculated on the device and can differ from a local mosque by a minute or two.
+
 ## Unreleased: mascot animations
 
 ### Added

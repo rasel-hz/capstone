@@ -48,5 +48,41 @@
   "evening": "Evening",
   "errorTitle": "Something went wrong on our side",
   "errorText": "It's not you. Your data is safe, so try reloading the page.",
-  "errorReload": "Reload the page"
+  "errorReload": "Reload the page",
+  "prayer": {
+    "city": "Your city for prayer times",
+    "manual": "No city, I'll enter the time myself",
+    "next": "{{prayer}} {{time}}",
+    "today": "Today's prayer times in {{city}}",
+    "calcNote": "Times are calculated on your device with the Umm al-Qura method, without reading your location. They can differ from your mosque by a minute or two.",
+    "names": {
+      "fajr": "Fajr",
+      "dhuhr": "Dhuhr",
+      "asr": "Asr",
+      "maghrib": "Maghrib",
+      "isha": "Isha"
+    }
+  },
+  "cities": {
+    "riyadh": "Riyadh",
+    "jeddah": "Jeddah",
+    "makkah": "Makkah",
+    "madinah": "Madinah",
+    "dammam": "Dammam",
+    "khobar": "Khobar",
+    "jubail": "Jubail",
+    "ahsa": "Al-Ahsa",
+    "taif": "Taif",
+    "buraidah": "Buraidah",
+    "hail": "Hail",
+    "tabuk": "Tabuk",
+    "abha": "Abha",
+    "khamis": "Khamis Mushait",
+    "jazan": "Jazan",
+    "najran": "Najran",
+    "baha": "Al-Baha",
+    "yanbu": "Yanbu",
+    "sakaka": "Sakaka",
+    "arar": "Arar"
+  }
 }

@@ -95,7 +95,7 @@ The app works without an API key, using keyword rules and saying so on screen. T
 - Never claim that games improve attention or treat a condition.
 - Never read mood or health from game scores.
 - No fake AI: the screen says "AI" only when AI is actually in use (§21).
-- Never invent prayer times, traffic, weather, calendar data, partners or offers. None of these are connected.
+- Never invent prayer times, traffic, weather, calendar data, partners or offers. Prayer times come only from the on-device Umm al-Qura calculation in `src/features/prayer/times.ts` or from the user; the rest aren't connected.
 - No task suggestions, XP or gamification in reply to a crisis message.
 - Nothing interactive while driving.
 
