@@ -1,6 +1,6 @@
 # خويّك | KHOWAYK: project status
 
-Last updated 2026-11-07, on the `faris-branch` branch.
+Last updated 2026-11-07, when `faris-branch` (with Raseel's `raseel` branch merged in) was pushed to `main`.
 
 This file lists what has been done and what still needs doing. For how to run the project and its rules, see [HANDOFF.md](HANDOFF.md). For product requirements, see [KHOWAYK_REFERENCE.md](../KHOWAYK_REFERENCE.md), which is the source of truth.
 
@@ -13,12 +13,14 @@ This file lists what has been done and what still needs doing. For how to run th
 | Challenges | 12 playable |
 | Chat | Connected to OpenAI, with keyword rules as the fallback |
 | Mascot | A clip for all 11 states |
-| Android app | Project built with Capacitor, not yet run on a device. See [ANDROID.md](ANDROID.md) |
+| Prayer times | Calculated on the device for 20 Saudi cities |
+| Navigation | 5 tabs, with خويّك raised in the middle on phones |
+| Android app | Built with Capacitor and running on the Android emulator. Games and chat not yet tried there. See [ANDROID.md](ANDROID.md) |
 | Data | Saved in the browser only, with no accounts or database |
-| Tests | 103 unit tests, type check and build all pass |
+| Tests | 124 unit tests, type check and build all pass |
 | Public launch | **Not ready.** See "Before any public launch" below |
 
-`faris-branch` isn't merged into `main` yet. It's waiting on [PR #1](https://github.com/rasel-hz/capstone/pull/1).
+All work so far is on `main`. Start new work on a new branch from `main`.
 
 ## What we've done
 
@@ -67,10 +69,20 @@ This file lists what has been done and what still needs doing. For how to run th
 ### 8. Navigation
 - Cut the bar from 7 tabs to 5, with خويّك raised in the middle on phones. Journeys and rewards became sub-tabs of Challenges and Progress.
 
+### 9. Android app
+- Wrapped the web app with Capacitor as `com.khowayk.app`, in `android/`.
+- The phone's back button closes dialogs, leaves challenges, steps back through onboarding and journeys, and only then leaves the app.
+- Pages leave room for the status bar and gesture bar, and the Arabic font is bundled so the app works offline.
+- In the app, chat goes to the laptop's server over USB (`npm run android:connect`). The server only accepts the app's own origins.
+- Ran it on the Android emulator: onboarding in both languages, the mascot and the back button work.
+- **Tip:** don't keep the project in a OneDrive folder. OneDrive turns build files into cloud placeholders, which breaks the Android build. Use a plain folder such as `C:\dev\Khaweyak`.
+
 ## What we need to do
 
 ### Android app
-- [ ] Install Android Studio, run the app on an emulator and a real phone, and fix anything that shows up.
+- [x] Install Android Studio and run the app on an emulator.
+- [ ] Try every game, the AI chat and the new 5-tab bar on the emulator.
+- [ ] Run it on a real phone.
 - [ ] Make the app icon and splash screen.
 - [ ] Decide how the demo reaches the AI: over USB from a laptop, or a hosted server with a limited key.
 - [ ] Later: iPhone (needs a Mac and Xcode) and Google Play.
@@ -140,6 +152,8 @@ This file lists what has been done and what still needs doing. For how to run th
 - [ ] How the sound options actually sound.
 - [ ] The chat on the production build in English. It was tested in Arabic on the production build, and in English on the dev server.
 - [ ] Automated browser tests. Current tests cover rules and data, not screens.
+- [ ] The 5-tab navigation in the desktop sidebar.
+- [ ] Blocking challenges at a calculated prayer time, live in the app. It's covered by unit tests only.
 
 ### Performance
 - [ ] Split the code. The main bundle is about 690 KB (215 KB gzipped), which triggers a build warning.
@@ -147,4 +161,4 @@ This file lists what has been done and what still needs doing. For how to run th
 
 ### Project housekeeping
 - [x] Update the title and description of PR #1, which predate most of this work.
-- [ ] Review and merge PR #1 into `main`.
+- [x] Merge `faris-branch` and `raseel` into `main`.
