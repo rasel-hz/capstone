@@ -105,6 +105,8 @@ export interface ChatSuggestion {
   st?: 'started' | 'dismissed';
   /** The user's own tasks for the planning board, when they mentioned any. */
   cfg?: import('../features/plan/config').PlanConfig;
+  /** The user's tasks were added to today's goals. */
+  goals?: 1;
 }
 
 export interface ChatMessage {
@@ -183,6 +185,50 @@ export interface AppState {
   prayerAck: { key: string; v: 'prayed' | 'later' | 'back' } | null;
   /** An optional break reminder. The timer is a personal reminder, not a measure of anything. */
   prayerBreak: PrayerBreak | null;
+  /** The journey program in progress: one challenge a day for a set number of days. */
+  prog: Program | null;
+  /** Finished programs, with the user's own rating before and after. */
+  progDone: ProgramResult[];
+  /** Today's goals, in the user's words. Replaced when the day changes. */
+  goals: DayGoals | null;
+  /** The buddy's energy today, from 0 to ENERGY_FULL. Nothing takes it away; a new day starts fresh. */
+  nrg: number;
+  /** The day nrg belongs to. */
+  nrgD: string;
+  /** Days the energy filled up, as today() strings, newest last. Days that didn't fill aren't recorded at all. */
+  fullDays: string[];
+  /** Show a warm welcome back once after a long gap. */
+  missed: number;
+}
+
+export interface Program {
+  id: JourneyId;
+  /** Days with that day's step done, as today() strings. Gaps don't matter; the next step simply waits. */
+  days: string[];
+  /** Self-rating from 1 to 5 at the start. */
+  before: number;
+  started: string;
+}
+
+export interface ProgramResult {
+  id: JourneyId;
+  before: number;
+  after: number;
+  end: string;
+}
+
+export interface Goal {
+  id: string;
+  /** Exactly as the user wrote it. */
+  text: string;
+  done: 0 | 1;
+  /** Energy was already given for this goal, so ticking it again gives nothing more. */
+  e?: 1;
+}
+
+export interface DayGoals {
+  d: string;
+  items: Goal[];
 }
 
 export interface PrayerBreak {

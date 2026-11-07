@@ -4,47 +4,36 @@ import { useTranslation } from 'react-i18next';
 import { PageHeader } from '../../components/ui/kit';
 import { useAppState } from '../../context/AppStateContext';
 import { ChallengeCard } from '../../features/challenges/ChallengeCard';
-import { CATEGORIES, CHALLENGES } from '../../features/challenges/catalog';
+import { CHALLENGES, GROUPS, type GroupId } from '../../features/challenges/catalog';
 import { useMissions } from '../../features/mission/MissionProvider';
-import type { AppState, ChallengeCategory, ChallengeId } from '../../types';
+import { ProgramCard } from '../../features/program/ProgramCard';
+import type { ChallengeId, ViewId } from '../../types';
 
-const IDS = Object.keys(CHALLENGES) as ChallengeId[];
+const IDS = GROUPS.flatMap((g) => g.ids);
 
-// Features something the user hasn't tried yet, or their least recent one. It's a browsing aid, not a recommendation engine.
-function featuredId(s: AppState): ChallengeId {
-  const untried = IDS.find((id) => !s.hist.some((h) => h.id === id && h.status === 'COMPLETED'));
-  if (untried) return untried;
-  const lastPlayed = (id: ChallengeId) => Math.max(0, ...s.hist.filter((h) => h.id === id).map((h) => h.ts));
-  return [...IDS].sort((a, b) => lastPlayed(a) - lastPlayed(b))[0];
-}
-
-export function Challenges() {
+// One page for both: the journey in progress on top, then every activity grouped by what the user wants to do now.
+export function Challenges({ onNavigate }: { onNavigate(v: ViewId): void }) {
   const { t } = useTranslation();
   const s = useAppState();
   const missions = useMissions();
-  const [filter, setFilter] = useState<'all' | ChallengeCategory>('all');
-  const [featured] = useState(() => featuredId(s));
-  const list = IDS.filter((id) => (filter === 'all' ? id !== featured : CHALLENGES[id].cat === filter));
+  const [group, setGroup] = useState<'all' | GroupId>('all');
+  const list = group === 'all' ? IDS : GROUPS.find((g) => g.id === group)!.ids;
   const play = (id: ChallengeId) => missions.start([{ id, why: [{ k: 'self' }], diff: 'normal' }]);
   return (
     <>
       <PageHeader title={t('challenges.title')} sub={t('challenges.sub')} />
-      {filter === 'all' && (
-        <section aria-label={t('challenges.featuredLabel')} className="feat">
-          <p className="eyebrow">{t('challenges.tryThis')}</p>
-          <ChallengeCard id={featured} state={s} onPlay={() => play(featured)} featured />
-        </section>
-      )}
-      <div className="filters" role="group" aria-label={t('challenges.filterLabel')}>
-        {(['all', ...CATEGORIES] as const).map((c) => (
-          <button key={c} type="button" className={`flt ${filter === c ? 'on' : ''}`} aria-pressed={filter === c} onClick={() => setFilter(c)}>
-            {filter === c && <motion.span layoutId="flt-active" className="flt__pill" transition={{ type: 'spring', stiffness: 420, damping: 36 }} />}
-            <span className="flt__t">{t(`challenges.categories.${c}`)}</span>
+      <ProgramCard onNavigate={onNavigate} />
+      <h2 className="chal-groups__t">{t('challenges.groupLabel')}</h2>
+      <div className="filters" role="group" aria-label={t('challenges.groupLabel')}>
+        {(['all', ...GROUPS.map((g) => g.id)] as const).map((c) => (
+          <button key={c} type="button" className={`flt ${group === c ? 'on' : ''}`} aria-pressed={group === c} onClick={() => setGroup(c)}>
+            {group === c && <motion.span layoutId="flt-active" className="flt__pill" transition={{ type: 'spring', stiffness: 420, damping: 36 }} />}
+            <span className="flt__t">{t(`challenges.groups.${c}`)}</span>
           </button>
         ))}
       </div>
       <div className="cc-grid">
-        {list.map((id) => <ChallengeCard key={id} id={id} state={s} onPlay={() => play(id)} />)}
+        {list.filter((id) => id in CHALLENGES).map((id) => <ChallengeCard key={id} id={id} state={s} onPlay={() => play(id)} />)}
       </div>
     </>
   );

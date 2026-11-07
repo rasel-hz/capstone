@@ -1,34 +1,31 @@
-import { ArrowRight, Check, ChevronLeft, Compass, Play, Plus, Sparkles } from 'lucide-react';
+import { ArrowRight, Check, ChevronLeft, Compass, Play } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PageHeader, ProgressBar } from '../../components/ui/kit';
-import { Mascot } from '../../components/mascot/Mascot';
 import { useAppState, useStore } from '../../context/AppStateContext';
 import { ChallengeArt, JourneyArt } from '../../features/challenges/ChallengeArt';
 import { JOURNEYS } from '../../features/challenges/catalog';
-import { useMissions } from '../../features/mission/MissionProvider';
+import { RatingPicker } from '../../features/program/ProgramCard';
+import { PROGRAM_DAYS, programSteps, startProgram } from '../../features/program/program';
 import { useBackHandler } from '../../services/native';
-import type { AppState, Journey, JourneyId } from '../../types';
+import type { Journey, JourneyId, ViewId } from '../../types';
 
-const tried = (s: AppState, j: Journey) => j.a.filter((a) => s.hist.some((h) => h.id === a && h.status === 'COMPLETED'));
-
-function useToggle() {
-  const store = useStore();
-  return (id: JourneyId) => store.update((d) => {
-    d.needs = d.needs.includes(id) ? d.needs.filter((x) => x !== id) : [...d.needs, id];
-    if (!d.needs.length) d.needs = ['gen'];
-  });
-}
-
-function JourneyDetail({ j, onBack }: { j: Journey; onBack(): void }) {
+function JourneyDetail({ j, onBack, onNavigate }: { j: Journey; onBack(): void; onNavigate(v: ViewId): void }) {
   const { t } = useTranslation();
   const s = useAppState();
-  const missions = useMissions();
-  const toggle = useToggle();
-  const done = tried(s, j);
-  const nextId = j.a.find((a) => !done.includes(a));
-  const on = s.needs.includes(j.id);
+  const store = useStore();
+  const [asking, setAsking] = useState(false);
+  const [before, setBefore] = useState<number | null>(null);
+  const mine = s.prog?.id === j.id ? s.prog : null;
+  const other = s.prog && !mine ? s.prog : null;
+  const suggesting = s.needs.includes(j.id);
   useBackHandler(onBack);
+
+  const toggleSuggest = () => store.update((d) => {
+    d.needs = d.needs.includes(j.id) ? d.needs.filter((x) => x !== j.id) : [...d.needs, j.id];
+    if (!d.needs.length) d.needs = ['gen'];
+  });
+
   return (
     <>
       <button type="button" className="btn-link back" onClick={onBack}><ArrowRight size={17} className="flip" aria-hidden="true" /> {t('journeys.all')}</button>
@@ -37,77 +34,90 @@ function JourneyDetail({ j, onBack }: { j: Journey; onBack(): void }) {
         <div className="jd__txt">
           <h1>{t(`journeys.items.${j.id}.name`)}</h1>
           <p>{t(`journeys.items.${j.id}.desc`)}</p>
-          <ProgressBar value={done.length} max={j.a.length} label={t('journeys.progressLabel')} />
-          <p className="note">{done.length ? t('journeys.doneOf', { n: done.length, total: j.a.length }) : t('journeys.notStartedOf', { count: j.a.length })}</p>
-          <button type="button" className={`btn sm ${on ? 'alt' : ''}`} aria-pressed={on} onClick={() => toggle(j.id)}>{on ? <><Check size={15} aria-hidden="true" /> {t('journeys.activeBtn')}</> : <><Plus size={15} aria-hidden="true" /> {t('journeys.addLong')}</>}</button>
+          <p className="note">{t('journeys.program.how')}</p>
+          {mine ? (
+            <>
+              <span className="tag tag--ok"><Check size={13} aria-hidden="true" /> {t('journeys.program.activeHere')}</span>
+              <ProgressBar value={mine.days.length} max={PROGRAM_DAYS} label={t('journeys.program.daysLabel')} />
+              <button type="button" className="btn sm" onClick={() => onNavigate('chal')}><Play size={14} aria-hidden="true" /> {t('journeys.backToChal')}</button>
+            </>
+          ) : !asking && (
+            <button type="button" className="btn" onClick={() => setAsking(true)}><Compass size={16} aria-hidden="true" /> {t('journeys.program.startBtn')}</button>
+          )}
         </div>
       </header>
-      <p className="note">{t('journeys.disclaimerDetail')}</p>
+
+      {asking && !mine && (
+        <section className="panel prog-start" aria-labelledby="ps-t">
+          <h2 id="ps-t">{t('journeys.program.startTitle')}</h2>
+          <RatingPicker journey={j.id} value={before} onChange={setBefore} />
+          {other && <p className="note">{t('journeys.program.replaceNote', { name: t(`journeys.items.${other.id}.name`) })}</p>}
+          <div className="row">
+            <button type="button" className="btn" disabled={before == null} onClick={() => { store.update((d) => startProgram(d, j.id, before!)); onNavigate('chal'); }}>{t('journeys.program.start')}</button>
+            <button type="button" className="btn alt" onClick={() => setAsking(false)}>{t('journeys.program.back')}</button>
+          </div>
+        </section>
+      )}
+
       <ol className="path">
-        {j.a.map((a, i) => {
-          const isDone = done.includes(a);
-          const isNext = a === nextId;
-          const name = t(`challenges.items.${a}.name`);
+        {programSteps(j.id).map((a, i) => {
+          const isDone = !!mine && i < mine.days.length;
+          const isNext = !!mine && i === mine.days.length;
           return (
-            <li key={a} className={`path__n ${isDone ? 'is-done' : ''} ${isNext ? 'is-next' : ''}`}>
+            <li key={i} className={`path__n ${isDone ? 'is-done' : ''} ${isNext ? 'is-next' : ''}`}>
               <span className="path__dot" aria-hidden="true">{isDone ? <Check size={18} /> : i + 1}</span>
               <div className="path__card">
                 <div className="path__art"><ChallengeArt id={a} /></div>
                 <div className="grow">
                   <div className="tl__t">
-                    <b>{name}</b>
+                    <b>{t('journeys.program.dayN', { n: i + 1 })}: {t(`challenges.items.${a}.name`)}</b>
                     {isDone && <span className="tag tag--ok">{t('journeys.tagDone')}</span>}
                     {isNext && <span className="tag tag--cur">{t('journeys.tagNext')}</span>}
                   </div>
                   <p className="note flush">{t(`challenges.items.${a}.purpose`)}</p>
                 </div>
-                <button type="button" className={`btn sm ${isNext ? '' : 'alt'}`} aria-label={t('challenges.playName', { name })} onClick={() => missions.start([{ id: a, why: [{ k: 'fromJourney', journey: j.id }], diff: 'normal' }])}><Play size={14} aria-hidden="true" /> {t('challenges.play')}</button>
               </div>
             </li>
           );
         })}
       </ol>
-      {!nextId && (
-        <div className="path__end">
-          <Mascot state="happy" size={80} />
-          <div><h3><Sparkles size={16} aria-hidden="true" /> {t('journeys.allDone')}</h3><p className="note flush">{t('journeys.allDoneNote')}</p></div>
-        </div>
-      )}
+      <p className="note">{t('journeys.disclaimerDetail')}</p>
+      <button type="button" className="btn-link" aria-pressed={suggesting} onClick={toggleSuggest}>{t(suggesting ? 'journeys.suggestOff' : 'journeys.suggestOn')}</button>
     </>
   );
 }
 
-export function Journeys() {
+export function Journeys({ onNavigate }: { onNavigate(v: ViewId): void }) {
   const { t } = useTranslation();
   const s = useAppState();
-  const toggle = useToggle();
   const [open, setOpen] = useState<JourneyId | null>(null);
   const j = JOURNEYS.find((x) => x.id === open);
-  if (j) return <JourneyDetail j={j} onBack={() => setOpen(null)} />;
+  if (j) return <JourneyDetail j={j} onBack={() => setOpen(null)} onNavigate={onNavigate} />;
   return (
     <>
+      <button type="button" className="btn-link back" onClick={() => onNavigate('chal')}><ArrowRight size={17} className="flip" aria-hidden="true" /> {t('journeys.backToChal')}</button>
       <PageHeader title={t('journeys.title')} sub={t('journeys.sub')} />
       <div className="jgrid">
         {JOURNEYS.map((x) => {
-          const on = s.needs.includes(x.id);
-          const n = tried(s, x).length;
+          const mine = s.prog?.id === x.id ? s.prog : null;
           const name = t(`journeys.items.${x.id}.name`);
           return (
-            <article key={x.id} className={`jc jw jw--${x.id} ${on ? 'is-on' : ''}`}>
+            <article key={x.id} className={`jc jw jw--${x.id} ${mine ? 'is-on' : ''}`}>
               <button type="button" className="jc__open" onClick={() => setOpen(x.id)} aria-label={t('journeys.exploreName', { name })}>
                 <div className="jc__art"><JourneyArt id={x.id} /></div>
-                {on && <span className="tag tag--ok jc__badge"><Check size={13} aria-hidden="true" /> {t('journeys.active')}</span>}
+                {mine && <span className="tag tag--ok jc__badge"><Check size={13} aria-hidden="true" /> {t('journeys.program.activeHere')}</span>}
               </button>
               <div className="jc__b">
                 <h2>{name}</h2>
                 <p className="note flush">{t(`journeys.items.${x.id}.desc`)}</p>
-                <div className="jc__p">
-                  <ProgressBar value={n} max={x.a.length} label={t('journeys.cardProgress', { name })} />
-                  <span className="note">{n ? t('journeys.ofTotal', { n, total: x.a.length }) : t('journeys.notStarted')}</span>
-                </div>
+                {mine && (
+                  <div className="jc__p">
+                    <ProgressBar value={mine.days.length} max={PROGRAM_DAYS} label={t('journeys.cardProgress', { name })} />
+                    <span className="note">{t('journeys.ofTotal', { n: mine.days.length, total: PROGRAM_DAYS })}</span>
+                  </div>
+                )}
                 <div className="row">
                   <button type="button" className="btn sm" onClick={() => setOpen(x.id)}><Compass size={15} aria-hidden="true" /> {t('journeys.explore')} <ChevronLeft size={15} className="flip" aria-hidden="true" /></button>
-                  <button type="button" className="btn sm alt" aria-pressed={on} onClick={() => toggle(x.id)}>{t(on ? 'journeys.remove' : 'journeys.add')}</button>
                 </div>
               </div>
             </article>

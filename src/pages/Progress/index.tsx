@@ -1,3 +1,4 @@
+import { Zap } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { EmptyState, PageHeader, Segmented } from '../../components/ui/kit';
@@ -6,6 +7,7 @@ import { useMascot } from '../../components/mascot/useMascot';
 import { useAppState } from '../../context/AppStateContext';
 import { ChallengeArt } from '../../features/challenges/ChallengeArt';
 import { CHALLENGES } from '../../features/challenges/catalog';
+import { fullDaysIn } from '../../features/buddy/buddy';
 import { progressStats } from '../../features/progress/stats';
 import { useCountUp } from '../../hooks/useCountUp';
 import { formatDate, formatList, isRtl } from '../../i18n';
@@ -133,6 +135,38 @@ export function Progress({ onNavigate }: { onNavigate(v: ViewId): void }) {
         </div>
         <ActivityChart rows={range === 'month' && st.hasMonth ? st.month : st.days} max={range === 'month' && st.hasMonth ? st.maxMonth : st.maxDay} />
       </section>
+
+      {s.fullDays.length > 0 && (() => {
+        const week = fullDaysIn(s);
+        return (
+          <section className="panel">
+            <h2>{t('progress.fullDays.title')}</h2>
+            <p className="flush">{t('progress.fullDays.week', { n: week.filter((d) => d.full).length })}</p>
+            <ol className="fdays">
+              {week.map(({ date, full }) => {
+                const day = formatDate(date, { weekday: 'short' });
+                return <li key={date.toDateString()} className={full ? 'is-full' : ''} aria-label={t(full ? 'progress.fullDays.dayFull' : 'progress.fullDays.dayNot', { day })}><i aria-hidden="true">{full ? <Zap size={14} /> : null}</i><span aria-hidden="true">{day}</span></li>;
+              })}
+            </ol>
+            <p className="note flush">{t('progress.fullDays.note')}</p>
+          </section>
+        );
+      })()}
+
+      {s.progDone.length > 0 && (
+        <section className="panel">
+          <h2>{t('progress.programs.title')}</h2>
+          <p className="note">{t('progress.programs.note')}</p>
+          <ul className="pres-list">
+            {[...s.progDone].reverse().map((r) => (
+              <li key={`${r.id}${r.end}`}>
+                <b>{t(`journeys.items.${r.id}.name`)}</b>
+                <span className={r.after > r.before ? 'pres-list__up' : ''}>{t('progress.programs.row', { before: r.before, after: r.after })}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       {scored.length > 0 && (
         <section className="panel">

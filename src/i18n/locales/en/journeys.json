@@ -1,58 +1,95 @@
 {
   "title": "My Journeys",
-  "sub": "Pick one or more. No diagnosis needed. These are for support and practice, not treatment.",
+  "sub": "Short journeys, 7 days each. They are support and practice, not treatment, and no diagnosis is needed.",
   "all": "All journeys",
-  "progressLabel": "Journey challenges completed",
-  "doneOf": "You've completed {{n}} of {{total}} challenges in this journey.",
-  "notStartedOf_one": "Not started yet. It has {{count}} challenge.",
-  "notStartedOf_other": "Not started yet. It has {{count}} challenges.",
-  "activeBtn": "Active journey",
-  "addLong": "Add to my journeys",
   "disclaimerDetail": "This is a journey for support and practice, not a treatment program or a diagnosis. It shares challenges with other journeys.",
   "tagDone": "Completed",
   "tagNext": "Next",
-  "allDone": "You've tried every challenge in this journey",
-  "allDoneNote": "You can replay any of them, and more challenges will be added over time.",
   "exploreName": "Explore {{name}}",
-  "active": "Active",
   "cardProgress": "{{name}}: completed challenges",
   "ofTotal": "{{n}} of {{total}}",
-  "notStarted": "Not started yet",
   "explore": "Explore",
-  "remove": "Remove",
-  "add": "Add",
   "items": {
     "adhd": {
       "name": "Focus & Organization",
-      "desc": "Starting tasks, setting priorities and estimating time"
+      "desc": "Starting tasks, setting priorities and estimating time",
+      "ask": "How would you rate your focus and organisation lately?"
     },
     "anx": {
       "name": "Calm & Anxiety Support",
-      "desc": "Quiet pauses and gentle choices, which you can skip"
+      "desc": "Quiet pauses and gentle choices, which you can skip",
+      "ask": "How would you rate your calm and peace of mind lately?"
     },
     "ocd": {
       "name": "Navigating Uncertainty",
-      "desc": "Educational content only. Any treatment program belongs with a professional"
+      "desc": "Educational content only. Any treatment program belongs with a professional",
+      "ask": "How would you rate how you handle uncertain things?"
     },
     "mood": {
       "name": "Mood & Motivation",
-      "desc": "Small, doable steps with no pressure"
+      "desc": "Small, doable steps with no pressure",
+      "ask": "How would you rate your mood and motivation lately?"
     },
     "sleep": {
       "name": "Sleep & Routine",
-      "desc": "Winding down and arranging your routine"
+      "desc": "Winding down and arranging your routine",
+      "ask": "How would you rate your sleep and routine lately?"
     },
     "soc": {
       "name": "Social Confidence",
-      "desc": "Getting ready for gatherings. Conversation challenges aren't built yet"
+      "desc": "Getting ready for gatherings. Conversation challenges aren't built yet",
+      "ask": "How would you rate your confidence with people lately?"
     },
     "aut": {
       "name": "Comfortable Routines",
-      "desc": "A clear schedule, with motion and sound as you choose"
+      "desc": "A clear schedule, with motion and sound as you choose",
+      "ask": "How comfortable are you with your daily routine?"
     },
     "gen": {
       "name": "General Wellbeing",
-      "desc": "A bit of everything"
+      "desc": "A bit of everything",
+      "ask": "How would you rate how you're doing overall lately?"
     }
-  }
+  },
+  "program": {
+    "eyebrow": "Your journey",
+    "dayOf": "Day {{day}} of {{total}}",
+    "daysLabel": "Journey days done",
+    "todayStep": "Today's step",
+    "play": "Start today's step",
+    "doneToday": "Today's step is done. We'll carry on tomorrow.",
+    "noRush": "Missing a day costs nothing. The step waits for you.",
+    "change": "Change journey",
+    "leave": "Stop the journey",
+    "leaveQ": "Stop it? The days you've done in it will be lost.",
+    "leaveYes": "Yes, stop it",
+    "keep": "No, keep going",
+    "emptyTitle": "Pick a short journey",
+    "emptyText": "7 days, just one challenge a day. We ask one question at the start and the end so you can see the difference.",
+    "choose": "Pick a journey",
+    "endTitle": "You finished all seven days!",
+    "endSave": "See the difference",
+    "rateLabel": "Your rating from 1 to 5",
+    "scaleLow": "1 = poor",
+    "scaleHigh": "5 = great",
+    "startTitle": "Before we start",
+    "start": "Start the journey",
+    "back": "Back",
+    "how": "7 days, one challenge a day. One question on the first day and one on the last.",
+    "startBtn": "Start a 7-day journey",
+    "replaceNote": "This stops your {{name}} journey and starts this one.",
+    "activeHere": "This is your journey now",
+    "dayN": "Day {{n}}",
+    "resultTitle": "{{name}} journey result",
+    "before": "First day",
+    "after": "Last day",
+    "up": "Your rating went up from {{before}} to {{after}}. Nice work!",
+    "same": "Your rating stayed the same ({{before}}). What matters is you finished it.",
+    "down": "Your rating is {{after}}, from {{before}}. That's okay, days differ, and you can do it again any time.",
+    "selfNote": "This is your own rating, not a medical measure.",
+    "again": "Start another journey"
+  },
+  "backToChal": "Back to Challenges",
+  "suggestOn": "Let the buddy suggest from it",
+  "suggestOff": "Stop suggesting from it"
 }

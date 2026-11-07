@@ -1,0 +1,26 @@
+{
+  "goals": {
+    "title": "Today's goals",
+    "sub": "Small things you want to do today. Each one done gives the buddy energy.",
+    "add": "Add",
+    "addLabel": "New goal",
+    "placeholder": "For example: reply to my manager's email",
+    "empty": "No goals yet. One small goal is enough.",
+    "remove": "Remove: {{text}}",
+    "full": "That's {{n}} goals, enough for today.",
+    "fromChat": "You can also tell the buddy what you have on, and it puts them here."
+  },
+  "energy": {
+    "label": "Buddy's energy",
+    "of": "{{n}} of {{total}}",
+    "full": "You've done your part today, and the buddy is proud of you.",
+    "restNote": "You deserve a break. A calm one-minute pause?",
+    "rest": "Take a one-minute break"
+  },
+  "missed": {
+    "title": "I missed you, {{name}}!",
+    "titleNoName": "I missed you!",
+    "text": "Nothing is lost. Everything is saved as you left it, and we start at your pace.",
+    "ok": "Good to see you"
+  }
+}

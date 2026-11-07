@@ -1,5 +1,5 @@
 import { BatteryFull, BatteryLow, BatteryMedium, ChevronDown, Clock, MessageCircle, Play, Shuffle, Timer, type LucideIcon } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ProgressBar, Segmented } from '../../components/ui/kit';
 import { Mascot } from '../../components/mascot/Mascot';
@@ -7,6 +7,8 @@ import { useMascot } from '../../components/mascot/useMascot';
 import { useAppState, useStore } from '../../context/AppStateContext';
 import { CHALLENGES } from '../../features/challenges/catalog';
 import { ChallengeArt } from '../../features/challenges/ChallengeArt';
+import { buddyMood, ENERGY_FULL, energyToday as buddyEnergy } from '../../features/buddy/buddy';
+import { GoalsCard, MissedYou } from '../../features/buddy/BuddyCards';
 import { currentItem, hasOpenMission } from '../../features/mission/engine';
 import { MissionTimeline } from '../../features/mission/MissionTimeline';
 import { useMissions } from '../../features/mission/MissionProvider';
@@ -28,7 +30,7 @@ const ENERGY: { value: EnergyLevel; icon: LucideIcon }[] = [
 ];
 let greeted = false;
 
-// One calm screen: a greeting, one next step, a way to talk, and a small progress line.
+// One calm screen: a greeting, one next step, today's goals with the buddy's energy, a way to talk, and a small progress line.
 // Everything else lives in its own tab, so the dashboard helps decide instead of adding decisions.
 export function Home({ onNavigate }: { onNavigate(v: ViewId): void }) {
   const { t } = useTranslation();
@@ -36,7 +38,10 @@ export function Home({ onNavigate }: { onNavigate(v: ViewId): void }) {
   const store = useStore();
   const missions = useMissions();
   const low = isLowEnergy(s);
-  const mascot = useMascot(low ? 'resting' : 'idle');
+  // The buddy wakes up as today's energy comes in, and reacts to each new point.
+  const mascot = useMascot(buddyMood(s, low));
+  const nrg = buddyEnergy(s);
+  const lastNrg = useRef(nrg);
   const [steps, setSteps] = useState(false);
   const [options, setOptions] = useState(false);
   const h = new Date().getHours();
@@ -60,6 +65,12 @@ export function Home({ onNavigate }: { onNavigate(v: ViewId): void }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mascot.play]);
 
+  useEffect(() => {
+    if (nrg > lastNrg.current) mascot.play(nrg >= ENERGY_FULL ? 'celebrating' : 'happy');
+    lastNrg.current = nrg;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [nrg]);
+
   function checkIn(e: EnergyLevel) {
     store.update((d) => {
       d.en = d.en.filter((y) => y.d !== today());
@@ -79,6 +90,8 @@ export function Home({ onNavigate }: { onNavigate(v: ViewId): void }) {
           <Segmented<EnergyLevel> className="seg--energy seg--compact" label={t('dashboard.energyLabel')} value={energyToday} options={ENERGY.map((e) => ({ ...e, label: t(`dashboard.energy.${e.value}`) }))} onChange={checkIn} />
         </div>
       </section>
+
+      <MissedYou />
 
       {s.prayerBreak && !s.driving && <BreakRow onOpen={() => missions.openBreak(null)} />}
       {askWindow && !s.prayerBreak && !s.driving && (
@@ -107,6 +120,8 @@ export function Home({ onNavigate }: { onNavigate(v: ViewId): void }) {
       ) : (
         DailyMission({ steps, onSteps: () => setSteps(!steps), onNavigate })
       )}
+
+      {!s.driving && <GoalsCard />}
 
       <button type="button" className="talk" onClick={() => onNavigate('chat')}>
         <span className="talk__icon"><MessageCircle size={20} aria-hidden="true" /></span>

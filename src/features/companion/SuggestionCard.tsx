@@ -1,9 +1,10 @@
-import { Clock, ListChecks, Play, RefreshCw, X } from 'lucide-react';
+import { Check, Clock, ListChecks, Play, Plus, RefreshCw, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { CHALLENGES } from '../challenges/catalog';
 import { ChallengeArt } from '../challenges/ChallengeArt';
 import { useMissions } from '../mission/MissionProvider';
 import { isLowEnergy, whyText } from '../mission/planner';
+import { addGoals } from '../buddy/buddy';
 import { formatList, iso } from '../../i18n';
 import { useAppState, useStore } from '../../context/AppStateContext';
 import type { ChatSuggestion, PlannedItem } from '../../types';
@@ -20,6 +21,8 @@ export function SuggestionCard({ index, sug }: { index: number; sug: ChatSuggest
   const plan = id === 'seq' ? sug.cfg : undefined;
   const mine = plan?.tasks.filter((x) => x.src === 'user').map((x) => x.text) ?? [];
   const name = plan ? t('companion.sug.planName') : t(`challenges.items.${id}.name`);
+  // Whatever activity is showing, the tasks the user named can become today's goals on Home.
+  const named = sug.cfg?.tasks.filter((x) => x.src === 'user').map((x) => x.text) ?? [];
 
   const setCard = (patch: Partial<ChatSuggestion>) =>
     store.update((d) => {
@@ -70,6 +73,15 @@ export function SuggestionCard({ index, sug }: { index: number; sug: ChatSuggest
             <X size={14} aria-hidden="true" /> {t('companion.sug.notNow')}
           </button>
         </div>
+        {named.length > 0 && (sug.goals ? (
+          <p className="note flush sugc__goals"><Check size={14} aria-hidden="true" /> {t('companion.sug.goalsAdded')}</p>
+        ) : (
+          <button type="button" className="btn-link sugc__goals" onClick={() => store.update((d) => {
+            addGoals(d, named);
+            const m = d.chat[index];
+            if (m?.sug) m.sug.goals = 1;
+          })}><Plus size={14} aria-hidden="true" /> {t('companion.sug.toGoals')}</button>
+        ))}
         {sug.ids.length > 1 && !plan && (
           <button type="button" className="btn-link sugc__mission" disabled={blocked} onClick={() => { setCard({ st: 'started' }); missions.start(sug.ids.map((x, i) => item(x, i === 0))); }}>
             {t('companion.sug.mission', { mins: sug.ids.reduce((n, x) => n + CHALLENGES[x].min, 0) })}
