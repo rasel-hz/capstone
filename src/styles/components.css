@@ -24,7 +24,21 @@ nav button.on:hover { background: none; }
   nav button { padding: 6px 1px 5px; font-size: 10.5px; flex: 1 1 0; min-width: 0; flex-direction: column; gap: 2px; min-height: 52px; justify-content: center; line-height: 1.2; }
   nav button:hover { background: none; }
   .nav-pill { inset: 1px 3px; }
+  nav button { font-size: 11.5px; }
+  /* The buddy sits raised in the middle, as the mascot rather than an icon. */
+  .nav-buddy .nav-icon { display: none; }
+  .nav-buddy .nav-pill { display: none; }
+  .nav-buddy__face {
+    position: relative; display: flex; align-items: center; justify-content: center; width: 58px; height: 58px; margin-top: -26px;
+    border-radius: 50%; background: #fff; box-shadow: var(--shadow-lift); border: 3px solid var(--surface);
+  }
+  .nav-buddy.on .nav-buddy__face { box-shadow: 0 0 0 3px var(--em), var(--shadow-lift); }
+  .nav-buddy.on { color: var(--em-d); font-weight: 700; }
 }
+.nav-buddy__face { display: none; }
+@media (max-width: 860px) { .nav-buddy__face { display: flex; } }
+.subtabs { display: flex; width: fit-content; margin-bottom: 14px; }
+.subtabs .seg__b { padding-inline: 18px; }
 
 /* Page furniture */
 .page-head { display: flex; gap: 14px; align-items: center; margin-bottom: 18px; }
@@ -124,13 +138,6 @@ input[type='time'] { width: auto; }
 .tgl.on { background: var(--em); }
 .tgl.on i { inset-inline-start: 23px; }
 
-.fab {
-  position: fixed; inset-inline-end: 18px; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); width: 60px; height: 60px; border-radius: 50%;
-  background: #fff; border: 0; box-shadow: var(--shadow-lift); cursor: pointer; z-index: 5; padding: 4px;
-  display: flex; align-items: center; justify-content: center; transition: transform var(--t-micro) var(--ease);
-}
-.fab:hover { transform: translateY(-2px); }
-@media (max-width: 860px) { .fab { display: none; } }
 
 /* Dialogs */
 .ov { position: fixed; inset: 0; background: rgba(38, 61, 55, .55); display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 40; animation: fade .2s var(--ease); }

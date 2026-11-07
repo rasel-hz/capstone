@@ -104,7 +104,7 @@ Use meaningful color contrast, soft layered gradients, shadows, animated scene d
 
 ## 4. Complete information architecture
 
-**[CURRENT] navigation:** `الرئيسية` (`home`), `رحلاتي` (`journeys`), `تحدياتي` (`chal`), `خويّك` (`chat`), `تطوري` (`prog`), `مكافآتي` (`rew`), `ملفي` (`set`). Floating companion entry point on non-chat screens. Desktop sidebar, mobile bottom bar.
+**[CURRENT] navigation:** five tabs: `الرئيسية` (`home`), `تحدياتي` (`chal`), `خويّك` (`chat`, in the middle, shown as the mascot on phones), `تطوري` (`prog`), `ملفي` (`set`). `رحلاتي` (`journeys`) is a sub-tab of `تحدياتي`, and `مكافآتي` (`rew`) a sub-tab of `تطوري`. Desktop sidebar, mobile bottom bar.
 
 **[TARGET] additional UX surfaces:** account/sign-in and guest mode, consent/privacy center, calendar & integrations manager, notification preferences, challenge history/detail, saved personal plan, reward wallet and redemption history, accessible help and support, and administrator/partner management (separate restricted interface). Avoid overcrowding main navigation.
 

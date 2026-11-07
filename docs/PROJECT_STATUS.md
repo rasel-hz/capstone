@@ -63,6 +63,9 @@ This file lists what has been done and what still needs doing. For how to run th
 - Calculated on the device for 20 Saudi cities with the Umm al-Qura method, with Isha 30 minutes later in Ramadan. No location is read.
 - With a city chosen, every prayer of the day is protected, Home shows the next prayer, and ملفي shows today's five times. Manual entry still works without a city.
 
+### 8. Navigation
+- Cut the bar from 7 tabs to 5, with خويّك raised in the middle on phones. Journeys and rewards became sub-tabs of Challenges and Progress.
+
 ## What we need to do
 
 ### Team decisions first

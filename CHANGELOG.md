@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased: five-tab navigation
+
+### Changed
+- The navigation has 5 tabs instead of 7: الرئيسية، تحدياتي، خويّك، تطوري، ملفي. Journeys became a sub-tab of Challenges, and rewards a sub-tab of Progress, so every page is still one or two taps away.
+- On phones, خويّك sits raised in the middle of the bar as the mascot.
+
+### Removed
+- The floating خويّك button on desktop, which repeated the chat tab.
+
 ## Unreleased: calculated prayer times
 
 ### Added
