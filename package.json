@@ -12,6 +12,7 @@
     "start": "node server/index.ts",
     "eval:ai": "node scripts/ai-eval.ts",
     "db:migrate": "node scripts/db-migrate.ts",
+    "db:backup": "node scripts/db-backup.ts",
     "android": "npm run build && npx cap sync android && npx cap open android",
     "android:sync": "npm run build && npx cap sync android",
     "android:connect": "adb reverse tcp:8765 tcp:8765"
