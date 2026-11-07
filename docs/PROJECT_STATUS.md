@@ -13,6 +13,7 @@ This file lists what has been done and what still needs doing. For how to run th
 | Challenges | 12 playable |
 | Chat | Connected to OpenAI, with keyword rules as the fallback |
 | Mascot | A clip for all 11 states |
+| Android app | Project built with Capacitor, not yet run on a device. See [ANDROID.md](ANDROID.md) |
 | Data | Saved in the browser only, with no accounts or database |
 | Tests | 103 unit tests, type check and build all pass |
 | Public launch | **Not ready.** See "Before any public launch" below |
@@ -60,6 +61,12 @@ This file lists what has been done and what still needs doing. For how to run th
 - Reactions now play their full length, including during games.
 
 ## What we need to do
+
+### Android app
+- [ ] Install Android Studio, run the app on an emulator and a real phone, and fix anything that shows up.
+- [ ] Make the app icon and splash screen.
+- [ ] Decide how the demo reaches the AI: over USB from a laptop, or a hosted server with a limited key.
+- [ ] Later: iPhone (needs a Mac and Xcode) and Google Play.
 
 ### Team decisions first
 
@@ -130,5 +137,5 @@ This file lists what has been done and what still needs doing. For how to run th
 - [ ] Check the landing page on a phone, because it plays up to 9 clips at once. They could play only when on screen.
 
 ### Project housekeeping
-- [ ] Update the title and description of PR #1, which predate most of this work.
+- [x] Update the title and description of PR #1, which predate most of this work.
 - [ ] Review and merge PR #1 into `main`.

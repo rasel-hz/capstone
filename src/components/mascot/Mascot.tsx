@@ -1,6 +1,7 @@
 import { memo, useId, useState, type CSSProperties } from 'react';
 import { useReducedMotion } from 'motion/react';
 import { useAppSelector } from '../../context/AppStateContext';
+import { isIos } from '../../services/native';
 import { level } from '../../utils';
 import { legacySvg } from './legacySvg';
 import { BASE_IMAGE, CLIPS, EXPRESSIONS, isOneShot, SIZES, type MascotSize, type MascotState } from './manifest';
@@ -19,8 +20,11 @@ interface MascotProps {
   onClick?: () => void;
 }
 
+const BLANK = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+
 // Safari doesn't reliably show transparency in WebM, so it gets the still artwork with CSS movement.
-const canPlayAlphaWebm = typeof navigator !== 'undefined' && !/^((?!chrome|android|crios|fxios).)*safari/i.test(navigator.userAgent);
+// The iOS app's web view doesn't always call itself Safari, so it's checked separately.
+const canPlayAlphaWebm = typeof navigator !== 'undefined' && !isIos() && !/^((?!chrome|android|crios|fxios).)*safari/i.test(navigator.userAgent);
 
 export const Mascot = memo(function Mascot({ state = 'idle', size = 'medium', interactive, still, label, className = '', onClick }: MascotProps) {
   const px = typeof size === 'number' ? size : SIZES[size];
@@ -63,6 +67,9 @@ export const Mascot = memo(function Mascot({ state = 'idle', size = 'medium', in
           autoPlay
           playsInline
           preload="auto"
+          // Android shows a grey play button until a video starts. This keeps the clip invisible until then.
+          poster={BLANK}
+          style={videoReady ? undefined : { opacity: 0 }}
           onPlaying={() => setPlayingSrc(clip.src)}
           onError={() => setPlayingSrc(null)}
         />

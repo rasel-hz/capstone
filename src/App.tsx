@@ -3,6 +3,7 @@ import { MotionConfig } from 'motion/react';
 import { useTranslation } from 'react-i18next';
 import { AppShell } from './components/layout/AppShell';
 import { preloadClips } from './components/mascot/manifest';
+import { listenForBack } from './services/native';
 import { useAppSelector, useStore } from './context/AppStateContext';
 import { MissionProvider } from './features/mission/MissionProvider';
 import { Landing } from './pages/Landing';
@@ -38,6 +39,15 @@ export default function App() {
   }, [rm, theme, done, largeText]);
 
   useEffect(preloadClips, []);
+
+  // Android back button: move to Home, or report nothing left to do so the app goes to the background.
+  useEffect(() => listenForBack(() => {
+    const st = store.getState();
+    if (!st.done || st.view === 'home') return false;
+    store.update((d) => { d.view = 'home'; });
+    window.scrollTo(0, 0);
+    return true;
+  }), [store]);
 
   const navigate = useCallback((v: ViewId) => {
     store.update((d) => { d.view = v; });

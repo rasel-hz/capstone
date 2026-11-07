@@ -8,7 +8,7 @@ body {
   background: var(--iv);
   color: var(--ink);
   min-height: 100vh;
-  padding-bottom: env(safe-area-inset-bottom, 0);
+  padding-bottom: var(--sab);
 }
 img, svg { max-width: 100%; }
 h1, h2, h3 { line-height: 1.35; margin: 0; font-weight: 700; }
@@ -22,7 +22,7 @@ b { font-weight: 700; }
 button { font-family: inherit; }
 
 #app { display: flex; min-height: 100vh; background: var(--iv); }
-main { flex: 1; padding: 26px 28px 96px; max-width: 1180px; margin: 0 auto; width: 100%; min-width: 0; }
+main { flex: 1; padding: calc(26px + var(--sat)) 28px 96px; max-width: 1180px; margin: 0 auto; width: 100%; min-width: 0; }
 
 .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 .row--c { justify-content: center; }
@@ -37,5 +37,5 @@ main { flex: 1; padding: 26px 28px 96px; max-width: 1180px; margin: 0 auto; widt
 
 @media (max-width: 860px) {
   #app { flex-direction: column-reverse; }
-  main { padding: 16px 16px 104px; }
+  main { padding: calc(16px + var(--sat)) 16px 104px; }
 }

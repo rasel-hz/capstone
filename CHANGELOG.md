@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased: Android app
+
+### Added
+- An Android app built with Capacitor from the same code, in `android/`. See `docs/ANDROID.md`. Not yet run on a device.
+- Android back button handling: it closes the top screen, goes Home, then leaves the app in the background.
+- The server accepts requests from the installed app's own origins. Other websites are still rejected.
+
+### Changed
+- The font is bundled instead of loaded from Google Fonts, so the app and website look right with no internet.
+- Mascot clips are switched off in the iOS app, because its web view may not show WebM transparency.
+
 ## Unreleased: mascot animations
 
 ### Added

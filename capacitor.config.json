@@ -1,0 +1,8 @@
+{
+  "appId": "com.khowayk.app",
+  "appName": "Khowayk",
+  "webDir": "dist",
+  "server": {
+    "androidScheme": "http"
+  }
+}

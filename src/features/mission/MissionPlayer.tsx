@@ -11,6 +11,7 @@ import { Overlay } from '../../components/ui/Overlay';
 import { useAppState, useStore } from '../../context/AppStateContext';
 import { useCountUp } from '../../hooks/useCountUp';
 import { useTimers } from '../../hooks/useTimers';
+import { useBackHandler } from '../../services/native';
 import { msg, type Msg } from '../../i18n';
 import type { Difficulty, GameResult, ViewId } from '../../types';
 import { level } from '../../utils';
@@ -200,6 +201,13 @@ export function MissionPlayer({ start, onClose, onNavigate }: { start: PlayerSta
     onClose();
   }
 
+  // Android back button: close whatever is on top, otherwise leave and save, the same as Exit.
+  useBackHandler(() => {
+    if (confirmEnd) setConfirmEnd(false);
+    else if (paused) resume();
+    else exit();
+  }, phase !== 'finish');
+
   const rm = !!s.rm || prefersReduced();
   const env: GameEnv = useMemo(
     () => ({ paused: held, g: s.g, hasEvent: s.ctx.includes('event'), sched: s.sched, rm, snd: !!s.snd, say, sfx, round: reportRound }),
@@ -347,6 +355,7 @@ function Completion({ summary, mascotState, onClose, onNavigate }: { summary: Mi
     onClose();
     onNavigate(v);
   };
+  useBackHandler(() => leave('home'));
   const title = quiet ? 'player.done.quiet' : all ? (s.g === 'f' ? 'player.done.all_f' : 'player.done.all_m') : doneCount ? 'player.done.partial' : 'player.done.none';
   return (
     <div className="mp mp--finish">

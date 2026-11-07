@@ -2,6 +2,7 @@ import { detectCrisis } from '../features/companion/crisis';
 import { buildChatRequest } from '../features/companion/request';
 import { ruleReply, type CompanionReply } from '../features/companion/rules';
 import type { AppState, ContextTag } from '../types';
+import { apiUrl } from './native';
 
 export interface CompanionService {
   readonly isAI: boolean;
@@ -18,7 +19,7 @@ export const aiCompanion: CompanionService = {
   async respond(text, state) {
     // Clear crisis wording is answered on the device and never sent anywhere.
     if (detectCrisis(text)) return ruleReply(text, state);
-    const res = await fetch('/v1/chat/messages', {
+    const res = await fetch(apiUrl('/v1/chat/messages'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(buildChatRequest(text, state)),
@@ -37,7 +38,7 @@ export const aiCompanion: CompanionService = {
 // True only when the server confirms a key is configured, so the app never claims AI that isn't connected.
 export async function isAiAvailable(): Promise<boolean> {
   try {
-    const res = await fetch('/v1/health', { signal: AbortSignal.timeout(5000) });
+    const res = await fetch(apiUrl('/v1/health'), { signal: AbortSignal.timeout(5000) });
     return res.ok && ((await res.json()) as { ai?: boolean }).ai === true;
   } catch {
     return false;

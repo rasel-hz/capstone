@@ -7,6 +7,7 @@ import { useAppState, useStore } from '../../context/AppStateContext';
 import { ChallengeArt, JourneyArt } from '../../features/challenges/ChallengeArt';
 import { JOURNEYS } from '../../features/challenges/catalog';
 import { useMissions } from '../../features/mission/MissionProvider';
+import { useBackHandler } from '../../services/native';
 import type { AppState, Journey, JourneyId } from '../../types';
 
 const tried = (s: AppState, j: Journey) => j.a.filter((a) => s.hist.some((h) => h.id === a && h.status === 'COMPLETED'));
@@ -27,6 +28,7 @@ function JourneyDetail({ j, onBack }: { j: Journey; onBack(): void }) {
   const done = tried(s, j);
   const nextId = j.a.find((a) => !done.includes(a));
   const on = s.needs.includes(j.id);
+  useBackHandler(onBack);
   return (
     <>
       <button type="button" className="btn-link back" onClick={onBack}><ArrowRight size={17} className="flip" aria-hidden="true" /> {t('journeys.all')}</button>

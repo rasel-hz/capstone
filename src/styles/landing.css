@@ -1,5 +1,5 @@
 .lp { background: var(--iv); overflow-x: clip; width: 100%; }
-.lt { position: sticky; top: 0; z-index: 10; display: flex; justify-content: space-between; align-items: center; padding: 9px 22px; background: rgba(255, 253, 248, .92); border-bottom: 1px solid var(--line); }
+.lt { position: sticky; top: 0; z-index: 10; display: flex; justify-content: space-between; align-items: center; padding: calc(9px + var(--sat)) 22px 9px; background: rgba(255, 253, 248, .92); border-bottom: 1px solid var(--line); }
 .brand { font-size: 23px; color: var(--em); }
 
 .lh { position: relative; min-height: min(78vh, 640px); display: flex; align-items: center; overflow: hidden; padding: 36px 22px 90px; }

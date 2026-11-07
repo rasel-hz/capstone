@@ -1,6 +1,6 @@
 /* Focused player: covers the app navigation, so the game is the only thing on screen. */
 .mp { position: fixed; inset: 0; z-index: 30; background: var(--iv); overflow: auto; animation: fade .25s var(--ease); display: flex; flex-direction: column; }
-.gh { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 8px; padding: 8px 14px; background: rgba(255, 255, 255, .95); border-bottom: 1px solid var(--line); }
+.gh { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 8px; padding: calc(8px + var(--sat)) 14px 8px; background: rgba(255, 255, 255, .95); border-bottom: 1px solid var(--line); }
 .gh__mid { flex: 1; min-width: 0; text-align: center; }
 .gh__t { display: block; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .gh__p { display: flex; gap: 10px; justify-content: center; align-items: center; min-height: 16px; }
@@ -14,7 +14,7 @@
 .dots i.on { background: var(--em); }
 .dots i.off { background: #B9C2BE; }
 .dots i.cur { background: var(--sun); }
-.mpw { max-width: 780px; margin: 0 auto; padding: 12px 16px 28px; width: 100%; flex: 1; display: flex; flex-direction: column; }
+.mpw { max-width: 780px; margin: 0 auto; padding: 12px 16px calc(28px + var(--sab)); width: 100%; flex: 1; display: flex; flex-direction: column; }
 .cb { display: flex; gap: 11px; align-items: center; margin-bottom: 12px; }
 .cb--small { margin-bottom: 8px; }
 .bub { background: #fff; border-radius: 15px; padding: 9px 14px; box-shadow: var(--shadow-card); flex: 1; min-height: 44px; font-size: 14.5px; }
@@ -48,7 +48,7 @@
 .form .q__t { margin-bottom: 4px; }
 .form h3 { font-weight: 500; margin-top: 8px; }
 @media (max-width: 620px) {
-  .gh { padding: 4px 6px; gap: 2px; }
+  .gh { padding: calc(4px + var(--sat)) 6px 4px; gap: 2px; }
   .gh__b span, .gh .lang-sw span { display: none; }
   .gh .lang-sw { min-width: 40px; padding: 4px; }
   .gh__b { padding: 4px; min-width: 40px; }

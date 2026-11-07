@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useBackHandler } from '../../services/native';
 import { Mascot } from '../../components/mascot/Mascot';
 import { Overlay } from '../../components/ui/Overlay';
 import { useStore } from '../../context/AppStateContext';
@@ -83,6 +84,8 @@ export function MissionProvider({ children, onNavigate }: { children: ReactNode;
     }
     begin(items);
   }, [store, guard, resume, begin]);
+
+  useBackHandler(() => setBlocker(null), !!blocker);
 
   const api = useMemo(() => ({ start, resume }), [start, resume]);
 

@@ -29,10 +29,15 @@ function readBody(req: IncomingMessage): Promise<string> {
   });
 }
 
+// The installed Android and iOS apps load from these addresses, which no website on the internet can use.
+const APP_ORIGINS = ['http://localhost', 'https://localhost', 'capacitor://localhost'];
+const isApp = (req: IncomingMessage) => APP_ORIGINS.includes(req.headers.origin ?? '');
+
 // A page on another site can't use this server to spend the key.
 function sameOrigin(req: IncomingMessage) {
   const origin = req.headers.origin;
   if (!origin) return true;
+  if (isApp(req)) return true;
   try {
     return new URL(origin).host === req.headers.host;
   } catch {
@@ -54,6 +59,17 @@ export function createApi(deps: ChatDeps) {
 
   return async function api(req: IncomingMessage, res: ServerResponse, next: Next) {
     const path = (req.url ?? '').split('?')[0];
+    if (path.startsWith('/v1/') && isApp(req)) {
+      res.setHeader('Access-Control-Allow-Origin', req.headers.origin as string);
+      res.setHeader('Vary', 'Origin');
+      res.setHeader('Access-Control-Allow-Methods', 'GET, POST');
+      res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    }
+    if (path.startsWith('/v1/') && req.method === 'OPTIONS') {
+      res.statusCode = isApp(req) ? 204 : 403;
+      res.end();
+      return;
+    }
     if (path === '/v1/health' && req.method === 'GET') return send(res, 200, { ai: !!deps.apiKey });
     if (path !== '/v1/chat/messages') return next();
     if (req.method !== 'POST') return send(res, 405, { error: 'method_not_allowed' });

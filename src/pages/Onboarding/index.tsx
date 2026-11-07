@@ -11,6 +11,7 @@ import { useStore } from '../../context/AppStateContext';
 import { JourneyArt } from '../../features/challenges/ChallengeArt';
 import { JOURNEYS } from '../../features/challenges/catalog';
 import { iso, tr } from '../../i18n';
+import { useBackHandler } from '../../services/native';
 import type { Gender, JourneyId } from '../../types';
 
 interface Draft {
@@ -37,6 +38,8 @@ export function Onboarding() {
   const [tm, setTm] = useState<Draft>({ name: store.getState().name, g: 'm', needs: [], sched: 'work', pat: '', sleep: '', pp: 30, snd: 1, rm: 0 });
   const mascot = useMascot(MOODS[step]);
   const up = (p: Partial<Draft>) => setTm({ ...tm, ...p });
+  // Android back goes to the previous step instead of closing the app.
+  useBackHandler(() => setStep((s) => s - 1), step > 0);
 
   useEffect(() => {
     mascot.play('greeting');

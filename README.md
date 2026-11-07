@@ -40,6 +40,7 @@ Then open http://localhost:8765.
 | `public/mascot/` | Mascot artwork |
 | `prototype/` | The original single-file app, kept for reference |
 | `src/i18n/` | Language setup and all interface text |
+| `android/` | The Android app, built with Capacitor. See [docs/ANDROID.md](docs/ANDROID.md) |
 | `docs/` | Architecture, language system, AI, mascot guide and task catalog |
 
 Start with [docs/PROJECT_STATUS.md](docs/PROJECT_STATUS.md) for what is done and what is left, and [KHOWAYK_REFERENCE.md](KHOWAYK_REFERENCE.md) for product requirements. Then read [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). To add or change text, see [docs/I18N.md](docs/I18N.md). To add mascot animations, see [docs/MASCOT.md](docs/MASCOT.md). To add challenges, see [docs/TASK_CATALOG.md](docs/TASK_CATALOG.md).
