@@ -15,6 +15,8 @@ import type { PrayerPlace } from '../../features/prayer/times';
 import { iso, tr } from '../../i18n';
 import { useBackHandler } from '../../services/native';
 import type { Gender, JourneyId } from '../../types';
+import { useAuth } from '../../features/auth/AuthProvider';
+import { AccountStep } from '../../features/auth/AuthViews';
 
 interface Draft {
   name: string;
@@ -30,16 +32,23 @@ interface Draft {
   rm: number;
 }
 
-const MOODS: MascotState[] = ['idle', 'listening', 'curious', 'calm', 'idle'];
-const STEP_NAMES = ['about', 'journeys', 'day', 'prayer', 'comfort'];
+const MOODS: MascotState[] = ['idle', 'happy', 'listening', 'curious', 'calm', 'idle'];
+const STEP_NAMES = ['about', 'account', 'journeys', 'day', 'prayer', 'comfort'];
 // These steps are optional, so they can be skipped outright.
-const OPTIONAL = [false, true, true, true, true];
+const OPTIONAL = [false, false, true, true, true, true];
+// The account tab. Nothing after it can be reached without an account.
+export const ACCOUNT_STEP = 1;
+const LAST = STEP_NAMES.length - 1;
 
-export function Onboarding() {
+export function Onboarding({ initialStep = 0 }: { initialStep?: number }) {
   const { t } = useTranslation();
   const store = useStore();
-  const [step, setStep] = useState(0);
-  const [tm, setTm] = useState<Draft>({ name: store.getState().name, g: 'm', needs: [], sched: 'work', pat: '', sleep: '', pp: 30, city: '', loc: null, snd: 1, rm: 0 });
+  const auth = useAuth();
+  const [step, setStep] = useState(initialStep);
+  const [tm, setTm] = useState<Draft>({ name: store.getState().name, g: store.getState().g, needs: [], sched: 'work', pat: '', sleep: '', pp: 30, city: '', loc: null, snd: 1, rm: 0 });
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState(false);
+  const signedIn = auth.status === 'signedIn';
   const mascot = useMascot(MOODS[step]);
   const up = (p: Partial<Draft>) => setTm({ ...tm, ...p });
   // Android back goes to the previous step instead of closing the app.
@@ -49,12 +58,23 @@ export function Onboarding() {
     mascot.play('greeting');
   }, [mascot.play]);
 
-  function next() {
+  async function next() {
     const name = step === 0 ? tm.name.trim() || tr('onboarding.defaultName', { context: tm.g }) : tm.name;
-    if (step < 4) {
+    if (step < LAST) {
       up({ name });
       setStep(step + 1);
       mascot.play('encouraging');
+      return;
+    }
+    // Onboarding counts as finished only once the account says so, so another device skips it too.
+    if (saving) return;
+    setSaving(true);
+    setSaveError(false);
+    try {
+      await auth.finishOnboarding({ firstName: name, addressForm: tm.g });
+    } catch {
+      setSaveError(true);
+      setSaving(false);
       return;
     }
     fireConfetti(!!tm.rm);
@@ -74,6 +94,12 @@ export function Onboarding() {
       <Segmented<Gender> className="seg--c" label={t('settings.address')} value={tm.g} options={[{ value: 'm', label: t('common.masculine') }, { value: 'f', label: t('common.feminine') }]} onChange={(g) => up({ g })} />
       <p className="note ob-priv"><Lock size={13} aria-hidden="true" /> {t('onboarding.privacy')}</p>
     </>,
+    <AccountStep
+      firstName={tm.name}
+      addressForm={tm.g}
+      onCelebrate={() => { fireConfetti(!!tm.rm); mascot.play('celebrating'); }}
+      onCreated={() => setStep(ACCOUNT_STEP + 1)}
+    />,
     <>
       <h2>{t('onboarding.journeysQ')}</h2>
       <p className="note">{t('onboarding.journeysNote')}</p>
@@ -131,9 +157,11 @@ export function Onboarding() {
           <div className="scene" key={step}>{steps[step]}</div>
           <div className="ob-act">
             {step > 0 && <button type="button" className="btn alt" onClick={() => setStep(step - 1)}><ArrowRight size={16} className="flip" aria-hidden="true" /> {t('common.back')}</button>}
-            {OPTIONAL[step] && step < 4 && <button type="button" className="btn-link" onClick={next}>{t('common.skip')}</button>}
-            <button type="button" className="btn" onClick={next}>{t(step === 4 ? 'onboarding.finish' : 'common.next')}</button>
+            {OPTIONAL[step] && step < LAST && <button type="button" className="btn-link" onClick={() => void next()}>{t('common.skip')}</button>}
+            {/* The account tab has its own button. Next appears there only once the account exists. */}
+            {(step !== ACCOUNT_STEP || signedIn) && <button type="button" className="btn" disabled={saving} onClick={() => void next()}>{t(step === LAST ? 'onboarding.finish' : 'common.next')}</button>}
           </div>
+          {saveError && <p className="hint auth-err" role="alert">{t('auth.errors.saveFailed')}</p>}
         </div>
       </main>
     </div>

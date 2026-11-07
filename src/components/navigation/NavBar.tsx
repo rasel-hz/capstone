@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import type { ViewId } from '../../types';
 import { Mascot } from '../mascot/Mascot';
 import { LanguageSwitcher } from '../ui/LanguageSwitcher';
+import { LogoutButton } from '../../features/auth/AuthViews';
 
 // Five tabs, with the buddy in the middle. Journeys sit inside Challenges and rewards inside Progress (see SubTabs).
 const TABS: [ViewId, LucideIcon][] = [
@@ -28,6 +29,7 @@ export function NavBar({ view, onNavigate }: { view: ViewId; onNavigate(v: ViewI
         </button>
       ))}
       <LanguageSwitcher />
+      <LogoutButton />
     </nav>
   );
 }

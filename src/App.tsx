@@ -7,7 +7,9 @@ import { listenForBack } from './services/native';
 import { useAppSelector, useStore } from './context/AppStateContext';
 import { MissionProvider } from './features/mission/MissionProvider';
 import { Landing } from './pages/Landing';
-import { Onboarding } from './pages/Onboarding';
+import { ACCOUNT_STEP, Onboarding } from './pages/Onboarding';
+import { useAuth } from './features/auth/AuthProvider';
+import { AuthLoading, WelcomeBack } from './features/auth/AuthViews';
 import type { ViewId } from './types';
 
 // Tells screen readers about a language change, in the new language.
@@ -33,6 +35,7 @@ export default function App() {
   const theme = useAppSelector((s) => s.theme);
   const largeText = useAppSelector((s) => s.largeText);
   const lang = useAppSelector((s) => s.lang);
+  const auth = useAuth();
 
   useEffect(() => {
     document.body.className = [done ? theme : '', rm ? 'rm' : '', largeText ? 'lg' : ''].filter(Boolean).join(' ');
@@ -57,13 +60,19 @@ export default function App() {
   return (
     <MotionConfig reducedMotion={rm ? 'always' : 'user'}>
       <LanguageAnnouncer lang={lang} />
-      {!started ? (
+      {auth.status === 'loading' ? (
+        <AuthLoading />
+      ) : auth.status === 'signedOut' && !started ? (
         <Landing />
-      ) : !done ? (
-        <Onboarding />
+      ) : auth.status === 'signedOut' || !done ? (
+        // Signed out: onboarding up to the account tab. Saved answers from before accounts existed start
+        // at the account tab. Signed in but unfinished: carry on after it. One element, so creating the
+        // account in the middle of onboarding keeps its state.
+        <Onboarding initialStep={auth.status === 'signedIn' ? ACCOUNT_STEP + 1 : done ? ACCOUNT_STEP : 0} />
       ) : (
         <MissionProvider onNavigate={navigate}>
           <AppShell onNavigate={navigate} />
+          {auth.welcome && <WelcomeBack name={auth.welcome} onContinue={() => { auth.dismissWelcome(); navigate('home'); }} />}
         </MissionProvider>
       )}
     </MotionConfig>

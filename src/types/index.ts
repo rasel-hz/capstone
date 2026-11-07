@@ -183,6 +183,8 @@ export interface AppState {
   prayerAck: { key: string; v: 'prayed' | 'later' | 'back' } | null;
   /** An optional break reminder. The timer is a personal reminder, not a measure of anything. */
   prayerBreak: PrayerBreak | null;
+  /** The Supabase account this saved data belongs to. Missing before an account is created. */
+  uid?: string;
 }
 
 export interface PrayerBreak {
