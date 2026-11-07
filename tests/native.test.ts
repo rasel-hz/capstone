@@ -82,6 +82,8 @@ describe('API key', () => {
   it('is never given a browser-visible name in the example settings', async () => {
     const { readFileSync } = await import('node:fs');
     const example = readFileSync('.env.example', 'utf8');
-    expect(example).not.toMatch(/^VITE_.*KEY/m);
+    // The Supabase anon (publishable) key is the one exception: it is public by design and protected by RLS.
+    expect(example).not.toMatch(/^VITE_(?!SUPABASE_ANON_KEY=).*KEY/m);
+    expect(example).not.toMatch(/^VITE_.*(OPENAI|SERVICE_ROLE|SECRET)/m);
   });
 });

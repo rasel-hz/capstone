@@ -29,6 +29,7 @@ import {
   abandonItem, advance, beginItem, completeItem, exitMission, finishMission, isPastEnd, pauseItem, resumeItem,
   shouldOfferEasier, skipItem, summaryLines, summarySuggestion, type MissionSummary,
 } from './engine';
+import { reportComplete, reportDailyMissionDone, reportStart } from '../../services/points';
 import { MissionTimeline } from './MissionTimeline';
 
 type Phase = 'intro' | 'preroll' | 'game' | 'result' | 'easier' | 'finish';
@@ -94,6 +95,7 @@ export function MissionPlayer({ start, onClose, onNavigate }: { start: PlayerSta
     let sum: MissionSummary | null = null;
     store.update((d) => { sum = finishMission(d); });
     const r = sum as unknown as MissionSummary;
+    if (r.all && !r.solo && !r.quiet) reportDailyMissionDone(store.getState().mission!.id);
     setSummary(r);
     setPhase('finish');
     if (r.quiet) {
@@ -118,6 +120,8 @@ export function MissionPlayer({ start, onClose, onNavigate }: { start: PlayerSta
     store.update(beginItem);
     const st = store.getState();
     const id = st.mission!.items[st.mission!.idx].id;
+    // The server records the start time, so a completion can be checked before points are awarded.
+    reportStart(st.mission!.id, st.mission!.idx, id, !st.mission!.solo);
     setResult(null);
     setRound(null);
     setRunKey((k) => k + 1);
@@ -156,6 +160,7 @@ export function MissionPlayer({ start, onClose, onNavigate }: { start: PlayerSta
     store.update((d) => { out = completeItem(d, r); });
     const o = out as ReturnType<typeof completeItem>;
     if (!o) return;
+    reportComplete(store.getState().mission!.id, store.getState().mission!.idx);
     // The companion follows up only on what was actually chosen and saved.
     if (isPlanResult(r.data)) {
       const plan = r.data;

@@ -1,18 +1,18 @@
 import { motion } from 'motion/react';
-import { BarChart3, Gamepad2, House, MessageCircle, UserRound, type LucideIcon } from 'lucide-react';
+import { BarChart3, Gamepad2, Gift, House, MessageCircle, UserRound, type LucideIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { ViewId } from '../../types';
 import { Mascot } from '../mascot/Mascot';
 import { LanguageSwitcher } from '../ui/LanguageSwitcher';
 import { LogoutButton } from '../../features/auth/AuthViews';
 
-// Five tabs, with the buddy in the middle. Journeys sit inside Challenges and rewards inside Progress (see SubTabs).
+// Six tabs, with the buddy raised. Journeys sit inside Challenges; rewards has its own tab and is still a sub-tab of Progress.
 const TABS: [ViewId, LucideIcon][] = [
-  ['home', House], ['chal', Gamepad2], ['chat', MessageCircle], ['prog', BarChart3], ['set', UserRound],
+  ['home', House], ['chal', Gamepad2], ['chat', MessageCircle], ['prog', BarChart3], ['rew', Gift], ['set', UserRound],
 ];
 
 // The tab that stays lit for a view reached through a sub-tab.
-export const TAB_OF: Partial<Record<ViewId, ViewId>> = { journeys: 'chal', rew: 'prog' };
+export const TAB_OF: Partial<Record<ViewId, ViewId>> = { journeys: 'chal' };
 
 export function NavBar({ view, onNavigate }: { view: ViewId; onNavigate(v: ViewId): void }) {
   const { t } = useTranslation();
