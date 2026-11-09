@@ -16,19 +16,26 @@ export const CHALLENGES: Record<ChallengeId, Challenge> = {
   calm_landscape: { cat: 'relax', min: 1, xp: 10, k: 'l', hasEasy: false, scored: false },
   micro_start: { cat: 'real', min: 2, xp: 20, k: 'u', hasEasy: true, scored: false },
   thought_sort: { cat: 'relax', min: 3, xp: 15, k: 'o', hasEasy: true, scored: false },
+  // Dhikr. The texts are verified and generated (src/features/dhikr/content.json, docs/dhikr-challenges.md).
+  dhikr_morning: { cat: 'relax', min: 5, xp: 15, k: 'r', hasEasy: false, scored: false },
+  dhikr_evening: { cat: 'relax', min: 5, xp: 15, k: 'g', hasEasy: false, scored: false },
+  dhikr_calm_heart: { cat: 'relax', min: 3, xp: 15, k: 'h', hasEasy: false, scored: false },
+  dhikr_moment: { cat: 'relax', min: 2, xp: 10, k: 'n', hasEasy: false, scored: false },
+  dhikr_sleep: { cat: 'relax', min: 5, xp: 15, k: 'z', hasEasy: false, scored: false, quiet: true },
 };
 
 export const CATEGORIES: ChallengeCategory[] = ['focus', 'memory', 'planning', 'time', 'relax', 'real'];
 
 // How the challenges page groups activities: by what the user wants to do now, not by a condition.
 // Text lives under challenges.groups.<id>.
-export type GroupId = 'arrange' | 'start' | 'focus' | 'calm' | 'think';
+export type GroupId = 'arrange' | 'start' | 'focus' | 'calm' | 'think' | 'dhikr';
 export const GROUPS: { id: GroupId; ids: ChallengeId[] }[] = [
   { id: 'arrange', ids: ['seq', 'priority_board', 'time'] },
   { id: 'start', ids: ['micro_start', 'start2', 'breakdown', 'study_sprint'] },
   { id: 'focus', ids: ['video', 'attention_scene', 'mem'] },
   { id: 'calm', ids: ['calm', 'calm_landscape'] },
   { id: 'think', ids: ['thought_sort', 'emotion_map'] },
+  { id: 'dhikr', ids: ['dhikr_morning', 'dhikr_evening', 'dhikr_calm_heart', 'dhikr_moment', 'dhikr_sleep'] },
 ];
 
 export const JOURNEYS: Journey[] = [

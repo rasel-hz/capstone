@@ -47,7 +47,8 @@ export function Companion() {
   const [supportive, setSupportive] = useState<MascotState | null>(null);
   const list = useRef<HTMLDivElement>(null);
   const driving = !!s.driving;
-  const useAi = aiReady && s.aiConsent === 1;
+  // Smart replies run whenever the AI service is available. The status line under the title says so.
+  const useAi = aiReady;
 
   // Thinking shows only while a real request is pending; listening only while the user is typing.
   const mascot = useMascot(waiting ? 'thinking' : supportive ?? (focused || text ? 'listening' : 'idle'));
@@ -140,17 +141,6 @@ export function Companion() {
         </div>
       </header>
       <p className="note chat-disc">{t('companion.disclaimer')}</p>
-
-      {aiReady && s.aiConsent == null && (
-        <div className="panel consent">
-          <h3>{t('companion.consent.title')}</h3>
-          <p>{t('companion.consent.text')}</p>
-          <div className="row">
-            <button type="button" className="btn sm" onClick={() => store.update((d) => { d.aiConsent = 1; })}>{t('companion.consent.yes')}</button>
-            <button type="button" className="btn sm alt" onClick={() => store.update((d) => { d.aiConsent = 0; })}>{t('companion.consent.no')}</button>
-          </div>
-        </div>
-      )}
 
       <div className="chat-box">
         <div className="chat" ref={list} role="log" aria-live="polite" tabIndex={0} aria-label={t('companion.logLabel')}>

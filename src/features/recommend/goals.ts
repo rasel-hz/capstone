@@ -11,6 +11,11 @@ export interface ChallengeMeta {
   onRequest?: boolean;
   /** Fine to suggest when energy is low. */
   gentle?: boolean;
+  /**
+   * Dhikr: only when the user or the companion asks for it by name, and only at a fitting time of day.
+   * Never picked on its own, so feeling stressed doesn't bring a dhikr suggestion every time.
+   */
+  dhikr?: boolean;
 }
 
 // Which everyday goals each challenge supports. See docs/CHALLENGES.md for purposes and limits.
@@ -30,6 +35,11 @@ export const CHALLENGE_META: Record<ChallengeId, ChallengeMeta> = {
   calm: { goals: ['stress', 'sleep', 'worry'], gentle: true },
   calm_landscape: { goals: ['rest', 'stress', 'sleep'], gentle: true },
   emotion_map: { goals: ['worry'], onRequest: true, gentle: true },
+  dhikr_morning: { goals: ['rest'], gentle: true, dhikr: true },
+  dhikr_evening: { goals: ['rest'], gentle: true, dhikr: true },
+  dhikr_calm_heart: { goals: ['worry', 'stress'], gentle: true, dhikr: true },
+  dhikr_moment: { goals: ['rest', 'stress'], gentle: true, dhikr: true },
+  dhikr_sleep: { goals: ['sleep'], gentle: true, dhikr: true },
 };
 
 export const isGoal = (v: unknown): v is Goal => typeof v === 'string' && (GOALS as readonly string[]).includes(v);

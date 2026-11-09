@@ -32,12 +32,6 @@
   "statusAi": "Replies come from an AI model (OpenAI) and can be wrong",
   "statusRules": "Limited mode: simple rules in the app, not AI. I may miss what you mean.",
   "disclaimer": "I'm not a therapist and I don't diagnose. I don't replace your family, friends or professionals.",
-  "consent": {
-    "title": "Turn on smart replies?",
-    "text": "If you agree, your messages and a summary of your results go to OpenAI to write replies. You can turn this off any time in My Profile.",
-    "yes": "I agree",
-    "no": "No, keep using the rules"
-  },
   "logLabel": "Conversation",
   "empty": "Tell me about your day: your sleep, your work, or anything on your mind.",
   "card": {

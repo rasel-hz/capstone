@@ -74,9 +74,7 @@
     "methodNote": "Umm al-Qura is the default in Saudi Arabia. Pick the one your community follows.",
     "asr": "Asr time",
     "asrOpt": { "0": "Standard", "1": "Hanafi (later)" },
-    "protectNote": "How long after each call to prayer the check-in can appear.",
-    "ask": "Ask me before pausing challenges",
-    "askNote": "On: at prayer time we ask once, and you choose to continue or take a break. Off: no prompts, ever."
+    "protectNote": "How long after each call to prayer the check-in can appear."
   },
   "methods": {
     "umm_al_qura": "Umm al-Qura, Makkah",

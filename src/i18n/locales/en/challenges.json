@@ -103,6 +103,36 @@
       "desc": "Sort what's on your mind into what you can act on, what's uncertain and what can wait.",
       "purpose": "Helps you see which worries have a next step and which you can set down for now.",
       "instructions": "Write down what is on your mind, sort each one, then choose one small next step if you like. It is saved in your private account."
+    },
+    "dhikr_morning": {
+      "name": "Start your day with dhikr",
+      "desc": "Morning adhkar with a counter, each with its source.",
+      "purpose": "The established morning adhkar, with their text, source and number of times.",
+      "instructions": "Read each dhikr and tap the counter each time you say it. When the count is reached you move on, and you can skip any of them."
+    },
+    "dhikr_evening": {
+      "name": "End your day with dhikr",
+      "desc": "Evening adhkar with a counter, each with its source.",
+      "purpose": "The established evening adhkar, with their text, source and number of times.",
+      "instructions": "Read each dhikr and tap the counter each time you say it. When the count is reached you move on, and you can skip any of them."
+    },
+    "dhikr_calm_heart": {
+      "name": "Ease your heart",
+      "desc": "Established supplications for worry and distress, at your own pace.",
+      "purpose": "Established supplications and dhikr for worry, distress and fear. Remembrance and prayer, not treatment and not a substitute for a professional.",
+      "instructions": "Read each supplication slowly and tap the counter when you say it. There is no timer, and you can skip any of them."
+    },
+    "dhikr_moment": {
+      "name": "Take a moment of dhikr",
+      "desc": "A minute of remembrance between tasks.",
+      "purpose": "A short pause with established remembrance from the Sunnah.",
+      "instructions": "Say the dhikr as many times as you like; the counter keeps count. Move on whenever you want."
+    },
+    "dhikr_sleep": {
+      "name": "Before you sleep",
+      "desc": "Bedtime adhkar, quietly, with no sounds or celebration.",
+      "purpose": "The established bedtime adhkar, with their text, source and number of times.",
+      "instructions": "Read each dhikr and tap the counter gently. Everything here stays quiet to help you wind down."
     }
   },
   "groups": {
@@ -111,7 +141,8 @@
     "start": "Get started",
     "focus": "Focus",
     "calm": "Calm down",
-    "think": "Think it through"
+    "think": "Think it through",
+    "dhikr": "Dhikr"
   },
   "groupLabel": "What do you want to do now?"
 }

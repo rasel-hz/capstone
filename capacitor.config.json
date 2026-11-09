@@ -1,6 +1,6 @@
 {
   "appId": "com.khowayk.app",
-  "appName": "Khowayk",
+  "appName": "Zaho",
   "webDir": "dist",
   "server": {
     "androidScheme": "http"

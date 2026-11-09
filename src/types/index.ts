@@ -4,7 +4,8 @@ export type JourneyId = 'adhd' | 'anx' | 'ocd' | 'mood' | 'sleep' | 'soc' | 'aut
 export type ChallengeId =
   | 'video' | 'mem' | 'seq' | 'time' | 'calm' | 'start2'
   | 'attention_scene' | 'priority_board' | 'breakdown' | 'study_sprint' | 'emotion_map' | 'calm_landscape'
-  | 'micro_start' | 'thought_sort';
+  | 'micro_start' | 'thought_sort'
+  | 'dhikr_morning' | 'dhikr_evening' | 'dhikr_calm_heart' | 'dhikr_moment' | 'dhikr_sleep';
 export type ChallengeCategory = 'focus' | 'memory' | 'planning' | 'time' | 'relax' | 'real';
 export type Difficulty = 'easy' | 'normal';
 export type ContextTag = 'event' | 'work' | 'sleep';
@@ -25,6 +26,8 @@ export interface Challenge {
   scored: boolean;
   /** Self-report only: no XP and no achievements, and its results stay on the device (reference 14.2). */
   selfReport?: boolean;
+  /** Ends without a sound, confetti or a cheering mascot, such as dhikr before sleep. */
+  quiet?: boolean;
 }
 
 export interface Journey {
@@ -211,6 +214,8 @@ export interface AppState {
   path: import('../features/path/planner').PathPlan | null;
   /** Days the user chose to rest, as YYYY-MM-DD. */
   rest: string[];
+  /** Streak days Supabase found in the account's completed challenges, as YYYY-MM-DD, so other devices count. */
+  streakDays: string[];
   /** Show the streak. Off hides it everywhere. */
   streakOn: number;
   /** Protect one unplanned missed day in any 7. */

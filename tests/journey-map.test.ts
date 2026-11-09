@@ -20,7 +20,7 @@ function play(s: AppState) {
 const save = (s: AppState) => hydrate(JSON.parse(JSON.stringify(s)));
 
 describe('world layout', () => {
-  const plans = [buildPlan(student), buildPlan(worker), buildPlan(emptyProfile()), buildPlan(prof({ goals: ['stress'], style: 'talk' }))];
+  const plans = [buildPlan(student), buildPlan(worker), buildPlan(emptyProfile()), buildPlan(prof({ goals: ['stress'], style: ['talk'] }))];
 
   it('places every step inside the world, in order, with room between them', () => {
     for (const p of plans) {

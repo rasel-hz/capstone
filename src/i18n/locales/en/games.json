@@ -613,5 +613,32 @@
       "sort": "Let's sort them gently.",
       "step": "Just one small step."
     }
+  },
+  "dhikr": {
+    "intro": {
+      "dhikr_morning": "Good morning. Let us start the day with the remembrance of Allah.",
+      "dhikr_evening": "Good evening. Let us end the day with dhikr.",
+      "dhikr_calm_heart": "Take a breath, and say it slowly.",
+      "dhikr_moment": "A minute for you, at your own pace.",
+      "dhikr_sleep": "Take your time, quietly."
+    },
+    "round": "Dhikr",
+    "progress": "Said {{n}} of {{total}}",
+    "thisOne": "This dhikr",
+    "countOf": "{{label}}: {{n}} of {{total}}",
+    "countFree": "{{label}}: {{n}} times",
+    "of": "of {{total}}",
+    "reached": "Count reached",
+    "reset": "Start the count again",
+    "free": "No fixed number: say it as many times as you like.",
+    "skip": "Skip this one",
+    "skipLast": "Skip this one",
+    "next": "Next",
+    "finish": "Done",
+    "needOne": "Say at least one dhikr for it to count, or leave with the Skip button above.",
+    "done": "May Allah accept it from you.",
+    "doneNight": "Good night.",
+    "quranSource": "Quran text from {{name}}",
+    "ayah": "﴿{{n}}﴾"
   }
 }

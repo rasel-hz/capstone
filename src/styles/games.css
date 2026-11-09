@@ -274,3 +274,45 @@
 
 .preview { background: #fff; border-radius: var(--r-lg); padding: 20px; box-shadow: var(--shadow-card); max-width: 640px; margin: 0 auto; }
 .cf { position: fixed; top: -20px; width: 12px; height: 12px; border-radius: 3px; animation: fall 2.6s linear forwards; z-index: 90; pointer-events: none; }
+
+/* Dhikr: the words first, large and readable; the counter is a single calm tap target. */
+.dk { display: flex; flex-direction: column; align-items: center; gap: 12px; max-width: 600px; margin: 0 auto; width: 100%; }
+.dk-bar { width: 100%; height: 6px; border-radius: 99px; background: var(--line); overflow: hidden; }
+.dk-bar span { display: block; height: 100%; background: var(--em); border-radius: inherit; transition: width var(--t-card, .3s) ease; }
+.dk-card { margin: 0; width: 100%; padding: 18px 16px; border-radius: 18px; background: var(--em-l); text-align: center; }
+.dk-words { margin: 0; font-size: clamp(19px, 3.2vw, 24px); line-height: 2.1; font-weight: 500; color: var(--ink); }
+.dk-quran__part + .dk-quran__part { margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--line); }
+.dk-quran__basmala { margin: 0 0 2px; font-size: 16px; color: var(--mut); }
+.dk-ayah { font-size: .8em; color: var(--em-d); }
+.dk-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.dk-steps li { opacity: .45; }
+.dk-steps li.is-now { opacity: 1; }
+.dk-steps li.is-done { opacity: .7; text-decoration: line-through; text-decoration-color: var(--em); }
+.dk-ref { margin: 10px 0 0; font-size: 13px; color: var(--em-d); }
+.dk-ref a { color: inherit; }
+.dk-count { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.dk-count__b { position: relative; width: 132px; height: 132px; border-radius: 50%; border: 0; background: var(--iv, #fff); color: var(--ink); display: grid; place-items: center; cursor: pointer; box-shadow: 0 6px 18px rgba(38, 61, 55, .08); }
+.dk-count__b:disabled { cursor: default; }
+.dk-count__b > svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.dk-count__track { stroke: var(--line); }
+.dk-count__v { stroke: var(--em); transition: stroke-dashoffset .3s ease; }
+.dk-count__n { position: relative; font-size: 40px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1; }
+.dk-count__of { position: absolute; bottom: 30px; font-size: 12.5px; color: var(--mut); }
+.dk-count__b.is-done { background: var(--em); color: #fff; }
+/* A small, soft pulse on each tap. None with reduced motion, and none before sleep. */
+.dk-count__b.is-pulse { animation: dk-pulse .32s ease-out; }
+@keyframes dk-pulse { 0% { transform: scale(1); } 40% { transform: scale(.95); } 100% { transform: scale(1); } }
+@media (prefers-reduced-motion: reduce) { .dk-count__b.is-pulse { animation: none; } .dk-bar span, .dk-count__v { transition: none; } }
+.rm .dk-count__b.is-pulse { animation: none; }
+
+/* Before sleep: dim and low contrast, nothing bright or moving. */
+.dk--night { padding: 14px; border-radius: 22px; background: #1E1E3A; color: #E6E2FF; }
+.dk--night .dk-card { background: rgba(167, 139, 250, .12); }
+.dk--night .dk-words, .dk--night .dk-count__n { color: #E6E2FF; }
+.dk--night .dk-ref, .dk--night .dk-ayah, .dk--night .note, .dk--night .dk-quran__basmala, .dk--night .dk-count__of { color: #B9B2E6; }
+.dk--night .dk-bar { background: rgba(255, 255, 255, .1); }
+.dk--night .dk-bar span, .dk--night .dk-count__v { background: #A78BFA; stroke: #A78BFA; }
+.dk--night .dk-count__b { background: rgba(167, 139, 250, .16); box-shadow: none; }
+.dk--night .dk-count__b.is-done, .dk--night .dk-count__b.is-done .dk-count__n { background: #A78BFA; color: #141433; }
+.dk--night .btn { background: #A78BFA; color: #141433; }
+.dk--night .btn-link { color: #CFC6FF; }

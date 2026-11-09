@@ -15,6 +15,10 @@ import { StartGame } from './StartGame';
 import { StudySprintGame } from './StudySprintGame';
 import { TimeGame } from './TimeGame';
 import { VideoGame } from './VideoGame';
+import { DhikrGame } from '../../dhikr/DhikrGame';
+import type { DhikrId } from '../../dhikr/content';
+
+const dhikr = (id: DhikrId) => function Dhikr(p: GameProps) { return <DhikrGame id={id} {...p} />; };
 
 export const GAMES: Record<ChallengeId, ComponentType<GameProps>> = {
   video: VideoGame,
@@ -31,6 +35,11 @@ export const GAMES: Record<ChallengeId, ComponentType<GameProps>> = {
   calm_landscape: CalmLandscapeGame,
   micro_start: MicroStartGame,
   thought_sort: ThoughtSortGame,
+  dhikr_morning: dhikr('dhikr_morning'),
+  dhikr_evening: dhikr('dhikr_evening'),
+  dhikr_calm_heart: dhikr('dhikr_calm_heart'),
+  dhikr_moment: dhikr('dhikr_moment'),
+  dhikr_sleep: dhikr('dhikr_sleep'),
 };
 
 export { MemoryGame };

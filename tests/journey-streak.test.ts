@@ -91,7 +91,7 @@ describe('Test 3: sleep routine', () => {
 describe('Test 4: different people, different starts', () => {
   it('gives each need a different first step and only real challenges', () => {
     const plans = [
-      prof({ life: ['uni'], goals: ['focus'] }), prof({ life: ['work'], goals: ['organize'] }), prof({ goals: ['stress'], style: 'calm' }),
+      prof({ life: ['uni'], goals: ['focus'] }), prof({ life: ['work'], goals: ['organize'] }), prof({ goals: ['stress'], style: ['calm'] }),
       prof({ goals: ['start'] }), prof({ goals: ['focus'], life: ['flex'] }),
     ].map((p) => buildPlan(p));
     expect(new Set(plans.map((x) => ids(x).join())).size).toBe(plans.length);
@@ -110,8 +110,8 @@ describe('Test 4: different people, different starts', () => {
     expect(questionsFor(prof({ goals: ['focus', 'sleep'] }))).toContain('primary');
   });
   it('respects how someone likes to be helped', () => {
-    expect(buildPlan(prof({ goals: ['organize'], style: 'talk' })).nodes[0].kind).toBe('talk');
-    expect(firstPlay(buildPlan(prof({ goals: ['organize'], style: 'calm' })))).toBe('calm_landscape');
+    expect(buildPlan(prof({ goals: ['organize'], style: ['talk'] })).nodes[0].kind).toBe('talk');
+    expect(firstPlay(buildPlan(prof({ goals: ['organize'], style: ['calm'] })))).toBe('calm_landscape');
   });
   it('starts someone worn out gently', () => {
     expect(firstPlay(buildPlan(prof({ goals: ['focus'], hard: ['tired'] })))).toBe('time');
@@ -172,7 +172,7 @@ describe('Test 5: journey progression', () => {
     expect(s.xp).toBe(xp);
   });
   it('finishes a talk step only when a message is really sent', () => {
-    const s = state({ path: buildPlan(prof({ goals: ['organize'], style: 'talk' })) });
+    const s = state({ path: buildPlan(prof({ goals: ['organize'], style: ['talk'] })) });
     expect(s.path!.nodes[0].done).toBeUndefined();
     completeTalk(s);
     expect(s.path!.nodes[0].done).toBeDefined();
@@ -296,7 +296,7 @@ describe('Test 9: both languages', () => {
   it('has every choice and question in both, with the brief\'s wording', () => {
     const [en, ar] = [load('en'), load('ar-SA')];
     expect(ar.q.life.title).toBe('وش يشغل أغلب يومك؟');
-    expect(en.q.goals.title).toBe('What would you like Khowayk to help you with?');
+    expect(en.q.goals.title).toBe('What would you like Zaho to help you with?');
     expect(ar.opt.style.talk).toBe('نسولف ونفكر بحل');
     for (const q of ['life', 'goals', 'when', 'style']) {
       const p = prof({ life: ['uni', 'work'] });
@@ -339,35 +339,29 @@ describe('Privacy and the AI', () => {
       seen.push(JSON.parse(init.body));
       return Response.json({ status: 'completed', output: [{ type: 'message', content: [{ type: 'output_text', text: JSON.stringify({ reply: 'Hi', tone: 'friendly', distress: false, context: {} }) }] }] });
     }) as unknown as typeof fetch;
-    const s = state({ prof: prof({ life: ['uni'], goals: ['organize'], style: 'talk' }) });
+    const s = state({ prof: prof({ life: ['uni'], goals: ['organize'], style: ['talk'] }) });
     const req = buildChatRequest('hello', s) as { context: Record<string, unknown> };
     await handleChat({ ...req, context: { ...req.context, about: { ...(req.context.about as object), life: ['uni', 'diagnosed_adhd'] } } }, { apiKey: 'test-key-not-real', fetch: f });
     const ctx = seen[0].input[0].content;
     expect(ctx).toContain('"daily_life":["uni"]');
-    expect(ctx).toContain('"help_style":"talk"');
+    expect(ctx).toContain('"help_style":["talk"]');
     expect(ctx).not.toMatch(/diagnosed_adhd/);
   });
 });
 
-describe('smart replies consent', () => {
+describe('smart replies', () => {
   const chat = readFileSync('src/pages/Companion/index.tsx', 'utf8');
-  const load = (l: string) => JSON.parse(readFileSync(`src/i18n/locales/${l}/companion.json`, 'utf8')).consent;
+  const load = (l: string) => JSON.parse(readFileSync(`src/i18n/locales/${l}/companion.json`, 'utf8'));
 
-  it('stays off until the user answers', () => {
-    expect(defaultState().aiConsent).toBeNull();
-  });
-
-  it('is asked in the chat, with a real way to say no, and not in onboarding', () => {
-    expect(chat).toContain('d.aiConsent = 1');
-    expect(chat).toContain('d.aiConsent = 0');
+  it('run whenever the AI service is available, with no consent question in the chat or onboarding', () => {
+    expect(chat).toContain('const useAi = aiReady;');
+    expect(chat).not.toContain('aiConsent');
     expect(readFileSync('src/pages/Onboarding/index.tsx', 'utf8')).not.toContain('aiConsent');
+    for (const l of ['en', 'ar-SA']) expect(load(l).consent).toBeUndefined();
   });
 
-  it('is short, and still says the data goes to OpenAI', () => {
-    for (const c of [load('en'), load('ar-SA')]) {
-      expect(c.note).toBeUndefined();
-      expect(c.text).toContain('OpenAI');
-      expect(c.text.split('.').filter((x: string) => x.trim()).length).toBeLessThanOrEqual(2);
-    }
+  it('still say under the chat title that replies come from OpenAI', () => {
+    expect(chat).toContain("'companion.statusAi'");
+    for (const l of ['en', 'ar-SA']) expect(load(l).statusAi).toContain('OpenAI');
   });
 });

@@ -22,7 +22,7 @@ export const defaultState = (): AppState => ({
   pref: null, drive: 0, driving: 0, last: Date.now(), theme: '', comeback: 0, lastDaily: null, aiConsent: null, prayerDay: '', city: '', largeText: 0, lang: 'ar-SA', fb: [],
   prayerOn: 1, prayerAsk: 1, prayerMethod: 'umm_al_qura', prayerAsr: 0, loc: null, prayerAck: null, prayerBreak: null,
   prog: null, progDone: [], goals: null, nrg: 0, nrgD: '', fullDays: [], missed: 0,
-  prof: null, path: null, rest: [], streakOn: 1, streakGrace: 1, streakSeen: 0,
+  prof: null, path: null, rest: [], streakDays: [], streakOn: 1, streakGrace: 1, streakSeen: 0,
 });
 
 export const localRepository: StateRepository = {
@@ -64,6 +64,8 @@ export function hydrate(saved: Partial<AppState> | null, now = Date.now()): AppS
   if (!Array.isArray(s.fb)) s.fb = [];
   s.prayerOn = s.prayerOn === 0 ? 0 : 1;
   s.prayerAsk = s.prayerAsk === 0 ? 0 : 1;
+  // The driving settings are no longer shown, so a saved "driving now" could never be switched off. It is cleared here.
+  s.driving = 0;
   if (!isMethod(s.prayerMethod)) s.prayerMethod = 'umm_al_qura';
   s.prayerAsr = s.prayerAsr === 1 ? 1 : 0;
   const l = s.loc as PrayerPlace | null;
@@ -78,6 +80,7 @@ export function hydrate(saved: Partial<AppState> | null, now = Date.now()): AppS
   s.prof = validProfile(s.prof);
   s.path = validPlan(s.path);
   s.rest = Array.isArray(s.rest) ? s.rest.filter((d) => /^\d{4}-\d{2}-\d{2}$/.test(d)).slice(-60) : [];
+  s.streakDays = Array.isArray(s.streakDays) ? s.streakDays.filter((d) => /^\d{4}-\d{2}-\d{2}$/.test(d)).slice(-400) : [];
   s.streakOn = s.streakOn === 0 ? 0 : 1;
   s.streakGrace = s.streakGrace === 0 ? 0 : 1;
   s.streakSeen = Number.isFinite(s.streakSeen) ? s.streakSeen : 0;

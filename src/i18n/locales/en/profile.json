@@ -1,20 +1,20 @@
 {
   "q": {
     "life": { "title": "What does your typical day look like?", "sub": "Pick what fits. It helps me suggest things that make sense for you." },
-    "goals": { "title": "What would you like Khowayk to help you with?", "sub": "Choose as many as you like." },
+    "goals": { "title": "What would you like Zaho to help you with?", "sub": "Choose as many as you like." },
     "primary": { "title": "Which one matters most right now?", "sub": "We'll start there. You can change it any time." },
     "tasks": { "title": "Is there something you'd like to start or organize?", "sub": "Optional. Write it in your own words, like a course or a project.", "ph": "For example, the course you're taking" },
-    "when": { "title": "When would you like Khowayk to help you?", "sub": "I can suggest a good time based on your day and goal, and you can change it any time." },
-    "style": { "title": "How would you prefer Khowayk to help?", "sub": "I'll start with this, and you can always ask for something else." }
+    "when": { "title": "When would you like Zaho to help you?", "sub": "I can suggest a good time based on your day and goal, and you can change it any time." },
+    "style": { "title": "How would you prefer Zaho to help?", "sub": "I'll start with this, and you can always ask for something else." }
   },
   "opt": {
     "life": { "school": "School student", "uni": "University student", "work": "Working professional", "both": "Working and studying", "flex": "Flexible schedule", "other": "Something else", "skip": "Prefer not to say" },
     "goals": { "organize": "Organize my time and tasks", "focus": "Improve focus habits", "start": "Get started on delayed tasks", "stress": "Manage everyday stress", "sleep": "Build better sleep routines", "social": "Build social confidence", "habits": "Develop healthier habits", "other": "Something else" },
-    "when": { "after_class": "After school or university", "after_work": "After work", "bedtime": "Before bedtime", "stress": "When feeling stressed", "free": "Whenever I have free time", "suggest": "Let Khowayk suggest a time" },
+    "when": { "after_class": "After school or university", "after_work": "After work", "bedtime": "Before bedtime", "stress": "When feeling stressed", "free": "Whenever I have free time", "suggest": "Let Zaho suggest a time" },
     "style": { "games": "Short interactive challenges", "steps": "Step-by-step planning", "talk": "Talk things through", "calm": "Calm and relaxation activities", "auto": "Recommend based on my day", "unsure": "Not sure yet" }
   },
   "keepTasks": "Keep these for my journey. You can delete them any time in My Profile.",
-  "schoolNote": "If you're under 18, please use Khowayk with a parent or guardian's knowledge.",
+  "schoolNote": "If you're under 18, please use Zaho with a parent or guardian's knowledge.",
   "notDiagnosis": "These are just goals. Choosing one doesn't say anything about your health.",
   "settingsHint": "Sound, motion, prayer times and notifications are all in My Profile whenever you want them.",
   "suggest": {

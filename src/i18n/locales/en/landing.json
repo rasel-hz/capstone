@@ -1,11 +1,11 @@
 {
   "eyebrow": "A Saudi companion for your day",
-  "heroTitle": "Every day has its own mood, and KHOWAYK keeps pace with you",
+  "heroTitle": "Every day has its own mood, and ZAHO keeps pace with you",
   "heroText": "It chats with you, sets up a short mission to match your energy, and offers playable challenges to help you organize your day. It doesn't diagnose or treat.",
   "cta": "Let's start our journey",
   "ctaShort": "Get started",
-  "discover": "Discover KHOWAYK",
-  "mascotLabel": "KHOWAYK. Tap and it reacts",
+  "discover": "Discover ZAHO",
+  "mascotLabel": "ZAHO. Tap and it reacts",
   "tapHint": "Try tapping it",
   "howTitle": "How does it work?",
   "steps": {
@@ -30,7 +30,7 @@
       "text": "In-app points and achievements, with no streaks."
     }
   },
-  "meetTitle": "Meet KHOWAYK",
+  "meetTitle": "Meet ZAHO",
   "meetText": "A small companion that responds to the moment: it listens, thinks with you, and is happy when you get things done. It isn't a therapist, or a replacement for family, friends or professionals.",
   "meet": {
     "listening": "Listens",
@@ -76,6 +76,6 @@
     }
   },
   "honestTitle": "To be honest",
-  "honestText": "KHOWAYK is a wellbeing platform, not a diagnosis or treatment service. Your data is saved in your private account, and smart replies only run with your consent. Rewards are a preview with no actual vouchers. If you’re going through a hard time, talk to someone you trust or a professional.",
-  "closing": "Ready to start? KHOWAYK is waiting."
+  "honestText": "ZAHO is a wellbeing platform, not a diagnosis or treatment service. Your data is saved in your private account. Rewards are a preview with no actual vouchers. If you’re going through a hard time, talk to someone you trust or a professional.",
+  "closing": "Ready to start? ZAHO is waiting."
 }

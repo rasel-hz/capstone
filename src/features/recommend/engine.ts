@@ -1,6 +1,7 @@
 import type { AppState, ChallengeId, Difficulty, WhyPart } from '../../types/index.ts';
 import { CHALLENGES, JOURNEYS } from '../challenges/catalog.ts';
 import { CHALLENGE_META, type Goal } from './goals.ts';
+import { dhikrFitsNow } from '../dhikr/content.ts';
 
 export interface RecOptions {
   /** What the user is trying to do, from their words. Most important first. */
@@ -58,6 +59,7 @@ export function recommend(s: AppState, o: RecOptions = {}): Recommendation[] {
 
     // Eligibility.
     if (o.exclude?.includes(id)) continue;
+    if (m.dhikr && (!asked || !dhikrFitsNow(id, new Date(now)))) continue;
     if (o.minutes != null && c.min > o.minutes) continue;
     if (m.onRequest && !asked && !(goals[0] && m.goals[0] === goals[0])) continue;
     if (!asked && notForMe(s, id)) continue;

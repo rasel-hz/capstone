@@ -60,8 +60,8 @@ function chooseActs(p: LifeProfile, goal: GoalId | null): ChallengeId[] {
   // The personal board needs real tasks. Without them it would show an example.
   if (p.tasks.length >= 2 && (goal === 'organize' || goal === 'start')) a = toFront(a.filter((x) => x !== 'priority_board'), 'seq');
   if (p.hard.includes('thoughts') && !a.includes('thought_sort') && goal !== 'focus') a.splice(2, 0, 'thought_sort');
-  if (p.style === 'calm') a = toFront(a.includes('calm_landscape') ? a : [...a, 'calm_landscape'], 'calm_landscape');
-  if (p.style === 'steps') {
+  if (p.style.includes('calm')) a = toFront(a.includes('calm_landscape') ? a : [...a, 'calm_landscape'], 'calm_landscape');
+  if (p.style.includes('steps')) {
     const plan = a.find((x) => x === 'seq' || x === 'priority_board' || x === 'breakdown');
     if (plan) a = toFront(a, plan);
   }
@@ -85,9 +85,9 @@ export function buildPlan(p: LifeProfile, now = Date.now()): PathPlan {
   const goal = mainGoal(p);
   const first = chooseActs(p, goal);
   const cfg = p.tasks.length ? buildPlanConfig(p.tasks) : undefined;
-  const nodes = chapterNodes(first, 0, p.style === 'talk', cfg);
+  const nodes = chapterNodes(first, 0, p.style.includes('talk'), cfg);
   const next = p.goals.find((g) => g !== goal) ?? (goal === 'stress' || goal === 'sleep' ? 'habits' : goal ? 'stress' : 'habits');
-  const second = chooseActs({ ...p, style: null }, next).filter((id) => !first.includes(id));
+  const second = chooseActs({ ...p, style: [] }, next).filter((id) => !first.includes(id));
   const fill = (second.length >= 2 ? second : [...second, ...GENTLE.filter((x) => !first.includes(x))]).slice(0, 3);
   if (fill.length) nodes.push(...chapterNodes([...new Set(fill)], 1, false, cfg));
   return { v: 1, themes: [themeFor(p, goal), themeFor(p, next)], nodes, created: now };

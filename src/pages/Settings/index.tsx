@@ -1,6 +1,5 @@
-import { CalendarOff, CarFront, Flame, Download, Palette, ShieldCheck, Trash2, Type, UserRound, Accessibility, MapPin, Languages } from 'lucide-react';
+import { Flame, Palette, ShieldCheck, Trash2, UserRound, Accessibility, MapPin, Languages } from 'lucide-react';
 import { LogoutButton } from '../../features/auth/AuthViews';
-import { clearTypedRemote } from '../../services/progressSync';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Dialog, IconBadge, PageHeader, Segmented, SettingRow, Toggle } from '../../components/ui/kit';
@@ -10,7 +9,6 @@ import { TodayPrayers } from '../../features/prayer/PrayerCity';
 import { placeOf, settingsOf, turnOff } from '../../features/prayer/gate';
 import { PrayerSetup } from '../../features/prayer/PrayerSetup';
 import { METHODS, type MethodId } from '../../features/prayer/times';
-import { clearTypedText, typedCount } from '../../features/plan/privacy';
 import { formatList, type Lang, type Msg, msg } from '../../i18n';
 import { useLanguage } from '../../i18n/useLanguage';
 import { level, today } from '../../utils';
@@ -32,32 +30,14 @@ export function Settings({ onNavigate }: { onNavigate(v: ViewId): void }) {
   const language = useLanguage();
   const [name, setName] = useState(s.name);
   const [prayer, setPrayer] = useState(s.prayer);
-  const [ask, setAsk] = useState<'wipe' | 'typed' | null>(null);
+  const [ask, setAsk] = useState<'wipe' | null>(null);
   const [saved, setSaved] = useState<Msg>('');
-  const typedN = typedCount(s);
   const place = placeOf(s);
   const set = (fn: Parameters<typeof store.update>[0]) => store.update(fn);
 
   function flash(key: string) {
     setSaved(key);
     setTimeout(() => setSaved(''), 2500);
-  }
-
-  function exportData() {
-    const blob = new Blob([JSON.stringify(store.getState(), null, 2)], { type: 'application/json' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'khowayk-data.json';
-    a.click();
-    URL.revokeObjectURL(a.href);
-    flash('settings.flashExport');
-  }
-
-  async function clearTyped() {
-    set(clearTypedText);
-    setAsk(null);
-    // Typed text is also saved with the account, so it is cleared there too.
-    flash((await clearTypedRemote()) ? 'settings.flashTyped' : 'settings.flashTypedFailed');
   }
 
   function wipe() {
@@ -137,44 +117,12 @@ export function Settings({ onNavigate }: { onNavigate(v: ViewId): void }) {
               </SettingRow>
             )}
             <SettingRow title={t('settings.protect')} note={t('prayer.settings.protectNote')}><Segmented<number> label={t('settings.protectLabel')} value={s.pp} options={[0, 20, 30, 45].map((v) => ({ value: v, label: v ? t('common.minShort', { n: v }) : t('settings.none') }))} onChange={(v) => set((d) => { d.pp = v; })} /></SettingRow>
-            <SettingRow title={t('prayer.settings.ask')} note={t('prayer.settings.askNote')}>
-              <Toggle label={t('prayer.settings.ask')} on={!!s.prayerAsk} onChange={(v) => set((d) => { d.prayerAsk = v ? 1 : 0; })} />
-            </SettingRow>
           </>
         )}
-        <div className="set-note"><CarFront size={18} aria-hidden="true" /><div>
-          <b>{t('settings.driving')}</b>
-          <p className="note flush">{t('settings.drivingNote')}</p>
-        </div></div>
-        <SettingRow title={t('settings.drivingNow')} note={t('settings.drivingNowNote')}><Toggle label={t('settings.drivingNow')} on={!!s.driving} onChange={(v) => set((d) => { d.driving = v ? 1 : 0; })} /></SettingRow>
-        <SettingRow title={t('settings.driveHours')} note={t('settings.driveHoursNote')}>
-          <input type="number" min={0} max={12} className="num-input" aria-label={t('settings.driveHours')} value={s.drive} onChange={(e) => { const v = Math.max(0, Math.min(12, +e.target.value)); set((d) => { d.drive = v; }); }} />
-        </SettingRow>
-        {s.drive >= 2 && <p className="insight">{t('settings.driveBreak', { n: s.drive })}</p>}
-        <div className="set-note"><CalendarOff size={18} aria-hidden="true" /><p className="note flush">{t('settings.notConnected')}</p></div>
       </Group>
 
       <Group id="privacy" title={t('settings.privacy')} icon={ShieldCheck}>
-        <SettingRow title={t('settings.ai')} note={t('settings.aiNote')}>
-          <Toggle label={t('settings.ai')} on={s.aiConsent === 1} onChange={(v) => set((d) => { d.aiConsent = v ? 1 : 0; })} />
-        </SettingRow>
-        <div className="set-sub">
-          <b>{t('settings.stored')}</b>
-          <ul className="plain">
-            <li>{t('settings.storedAttempts', { n: s.hist.length, xp: s.xp, level: level(s) })}</li>
-            <li>{t('settings.storedEnergy', { n: s.en.length, m: s.chat.filter((m) => !m.b).length })}</li>
-            <li>{t('settings.storedTyped', { n: typedN })}</li>
-          </ul>
-        </div>
-        <div className="set-sub">
-          <b>{t('settings.approved')}</b>
-          {s.ctx.length ? (
-            <div className="tags">{s.ctx.map((c) => <button key={c} type="button" className="tag tag--btn" aria-label={t('settings.removeFact', { fact: t(`common.context.${c}`) })} onClick={() => set((d) => { d.ctx = d.ctx.filter((x) => x !== c); })}>{t(`common.context.${c}`)} <Trash2 size={13} aria-hidden="true" /></button>)}</div>
-          ) : <p className="note flush">{t('settings.approvedEmpty')}</p>}
-        </div>
         <div className="row">
-          <button type="button" className="btn sm alt" onClick={exportData}><Download size={15} aria-hidden="true" /> {t('settings.export')}</button>
-          <button type="button" className="btn sm alt" disabled={!typedN} onClick={() => setAsk('typed')}><Type size={15} aria-hidden="true" /> {t('settings.clearTyped')}</button>
           <button type="button" className="btn sm btn--danger" onClick={() => setAsk('wipe')}><Trash2 size={15} aria-hidden="true" /> {t('settings.wipe')}</button>
         </div>
       </Group>
@@ -198,16 +146,6 @@ export function Settings({ onNavigate }: { onNavigate(v: ViewId): void }) {
           <div className="row row--c">
             <button type="button" className="btn alt" onClick={() => setAsk(null)}>{t('common.back')}</button>
             <button type="button" className="btn btn--danger" onClick={wipe}>{t('settings.confirmDelete')}</button>
-          </div>
-        </Dialog>
-      )}
-      {ask === 'typed' && (
-        <Dialog label={t('settings.typedLabel')}>
-          <h2>{t('settings.typedQ')}</h2>
-          <p>{t('settings.typedText')}</p>
-          <div className="row row--c">
-            <button type="button" className="btn alt" onClick={() => setAsk(null)}>{t('common.back')}</button>
-            <button type="button" className="btn btn--danger" onClick={() => void clearTyped()}>{t('settings.confirmDelete')}</button>
           </div>
         </Dialog>
       )}

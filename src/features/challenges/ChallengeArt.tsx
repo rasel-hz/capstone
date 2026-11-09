@@ -164,6 +164,49 @@ const ART: Record<ChallengeId, ReactNode> = {
       <circle cx="56" cy="22" r="9" fill={C.sun} /><circle cx="80" cy="16" r="6" fill={C.sky} /><circle cx="100" cy="24" r="7" fill={C.cor} opacity=".85" />
     </Frame>
   ),
+  // Dhikr: quiet scenes for the time of day, no figures and no script.
+  // Sunrise over the dunes.
+  dhikr_morning: (
+    <Frame bg="#FFF0D2">
+      <circle cx="80" cy="64" r="22" fill={C.sun} />
+      {[-60, -30, 0, 30, 60].map((a) => <path key={a} d="M80 32v-10" stroke={C.sun} strokeWidth="3" strokeLinecap="round" transform={`rotate(${a} 80 64)`} />)}
+      <path d="M0 70q40-14 80-4t80-6v40H0z" fill={C.sand} />
+      <path d="M0 84q60-10 160 0v16H0z" fill={C.pe} />
+    </Frame>
+  ),
+  // Dusk: the sun low, the first star.
+  dhikr_evening: (
+    <Frame bg="#C9B8F2">
+      <circle cx="104" cy="70" r="18" fill={C.cor} opacity=".9" />
+      <path d="M0 72q40-12 80-4t80-8v40H0z" fill={C.dusk} opacity=".55" />
+      <path d="M0 86q70-10 160 0v14H0z" fill={C.dusk} />
+      <circle cx="40" cy="24" r="2.4" fill={C.iv} /><circle cx="128" cy="18" r="1.8" fill={C.iv} />
+    </Frame>
+  ),
+  // A heart held in two cupped hands of light.
+  dhikr_calm_heart: (
+    <Frame bg="#E9F5EE">
+      <circle cx="80" cy="50" r="34" fill={C.iv} />
+      <path d="M80 70c-16-11-24-19-24-28a12 12 0 0 1 24-4 12 12 0 0 1 24 4c0 9-8 17-24 28z" fill={C.sage} />
+      <path d="M40 74q40 22 80 0" stroke={C.em} strokeWidth="3" fill="none" strokeLinecap="round" opacity=".5" />
+    </Frame>
+  ),
+  // A single leaf on still water.
+  dhikr_moment: (
+    <Frame bg="#E7F4FB">
+      <ellipse cx="80" cy="72" rx="56" ry="10" fill={C.sky} opacity=".6" />
+      <path d="M58 64C58 40 80 28 108 26c0 26-16 40-50 38z" fill={C.sage} />
+      <path d="M60 62q20-14 44-32" stroke={C.em} strokeWidth="2" fill="none" strokeLinecap="round" />
+    </Frame>
+  ),
+  // A crescent and a few stars over a calm night.
+  dhikr_sleep: (
+    <Frame bg="#26264A">
+      <path d="M96 22a24 24 0 1 0 22 34 19 19 0 1 1-22-34z" fill={C.sun} opacity=".9" />
+      {[[30, 24], [52, 40], [130, 74], [24, 70], [140, 30]].map(([x, y]) => <circle key={`${x}${y}`} cx={x} cy={y} r="1.8" fill={C.iv} opacity=".8" />)}
+      <path d="M0 86q80-10 160 0v14H0z" fill={C.dusk} opacity=".6" />
+    </Frame>
+  ),
 };
 
 export const ChallengeArt = ({ id }: { id: ChallengeId }) => <>{ART[id]}</>;

@@ -1,4 +1,4 @@
-import { ArrowRight, Check, Lock } from 'lucide-react';
+import { ArrowRight, Check } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { fireConfetti } from '../../animations/effects';
@@ -101,7 +101,6 @@ export function Onboarding({ initialStep = 0 }: { initialStep?: number }) {
                 <input id="ob-name" dir="auto" value={name} maxLength={40} placeholder={t('onboarding.namePh')} className="name-input" onChange={(e) => setName(e.target.value)} />
                 <p>{t('onboarding.address')}</p>
                 <Segmented<Gender> className="seg--c" label={t('settings.address')} value={g} options={[{ value: 'm', label: t('common.masculine') }, { value: 'f', label: t('common.feminine') }]} onChange={setG} />
-                <p className="note ob-priv"><Lock size={13} aria-hidden="true" /> {t('onboarding.privacy')}</p>
               </div>
               <div className="ob-act">
                 {canLeave && <button type="button" className="btn alt" onClick={toLanding}><ArrowRight size={16} className="flip" aria-hidden="true" /> {t('common.back')}</button>}

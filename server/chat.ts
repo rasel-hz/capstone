@@ -1,5 +1,6 @@
 import { crisisMessage, detectCrisis, isCrisisText } from '../src/features/companion/crisis.ts';
 import { CHALLENGES } from '../src/features/challenges/catalog.ts';
+import { isDhikr } from '../src/features/dhikr/content.ts';
 import ar from '../src/i18n/locales/ar-SA/challenges.json' with { type: 'json' };
 import en from '../src/i18n/locales/en/challenges.json' with { type: 'json' };
 import { messageLang } from '../src/features/companion/lang.ts';
@@ -44,6 +45,8 @@ export interface ChatRequest {
     /** Calculated on the device from the user's chosen city or location. Null when not set up. */
     prayer: { next: string; minutesUntil: number; inWindow: boolean } | null;
     about: ReturnType<typeof validProfile>;
+    /** Dhikr challenges that fit the user's local time now, worked out on the device. */
+    dhikrNow: string[];
   };
 }
 
@@ -137,6 +140,7 @@ export function parseRequest(raw: unknown): ChatRequest {
       lastPlan: parseLastPlan(c.lastPlan),
       prayer: parsePrayer(c.prayer),
       about: validProfile(c.about),
+      dhikrNow: (Array.isArray(c.dhikrNow) ? c.dhikrNow : []).filter((id): id is string => typeof id === 'string' && isDhikr(id)),
       confirmed: (Array.isArray(c.confirmed) ? c.confirmed : []).filter((t): t is string => CONTEXT_TAGS.includes(t as string)),
       completed: num(c.completed),
       attempts: num(c.attempts),
@@ -195,15 +199,19 @@ export function acceptOutput(rawText: string, lang: 'ar-SA' | 'en' = 'ar-SA', sa
 }
 
 // Catalog data only: what each activity is, so the model can only point at real ones.
-function activities(lang: 'ar-SA' | 'en') {
+// Dhikr appears only when it fits the user's time now, and the model never writes religious text itself:
+// the app shows the verified words. It is offered sometimes, not whenever someone is stressed.
+const DHIKR_NOTE = 'Islamic remembrance (dhikr). The app shows the verified texts with their sources: never quote, write or paraphrase any dhikr, dua or verse yourself, only suggest the activity. Offer it gently and only when the user seems open to it, asks for it, or the time fits; not every time the user is stressed, and keep suggesting the other activities too. Never present it as treatment or promise that it removes anxiety.';
+function activities(lang: 'ar-SA' | 'en', dhikrNow: string[] = []) {
   const L = lang === 'en' ? en : ar;
-  return (Object.keys(CHALLENGES) as (keyof typeof CHALLENGES)[]).map((id) => ({
+  return (Object.keys(CHALLENGES) as (keyof typeof CHALLENGES)[]).filter((id) => !isDhikr(id) || dhikrNow.includes(id)).map((id) => ({
     id,
     name: L.items[id].name,
     minutes: CHALLENGES[id].min,
     purpose: L.items[id].purpose,
     supports: CHALLENGE_META[id].goals,
     ...(CHALLENGE_META[id].onRequest ? { note: 'only if the user wants to reflect on their feelings' } : {}),
+    ...(isDhikr(id) ? { note: DHIKR_NOTE } : {}),
     ...(id === 'seq' ? { note: "with the user's own tasks it becomes a personal planning board: now, later or not today, then time blocks if they know their time. Without tasks it shows a general example." } : {}),
   }));
 }
@@ -217,7 +225,7 @@ function contextBlock(c: ChatRequest['context'], replyLang: 'ar-SA' | 'en') {
     reported_low_energy_today: c.lowEnergyToday,
     confirmed_today: c.confirmed,
     feedback: c.feedback.map((f) => ({ id: f.id, user_found_it: f.net > 0 ? 'helpful' : f.net < 0 ? 'not helpful' : 'mixed' })),
-    activities: activities(replyLang),
+    activities: activities(replyLang, c.dhikrNow),
     about: c.about ? { daily_life: c.about.life, main_goal: c.about.primary ?? c.about.goals[0] ?? null, goals: c.about.goals, help_when: c.about.when, help_style: c.about.style, hard_days: c.about.hard, sleep_self_report: c.about.sleep, tasks_they_kept: c.about.tasks } : null,
     prayer: c.prayer ? { next_prayer: c.prayer.next, minutes_until_next: c.prayer.minutesUntil, in_prayer_window: c.prayer.inWindow } : null,
     last_plan: c.lastPlan

@@ -388,8 +388,6 @@ input[type='time'] { width: auto; }
 .ccard { align-self: flex-end; max-width: 92%; background: #fff; box-shadow: inset 0 0 0 2px var(--lil); border-radius: var(--r-md); padding: 12px 14px; animation: rise .28s var(--ease); display: flex; flex-direction: column; gap: 7px; }
 .ccard__facts li { display: flex; justify-content: space-between; align-items: center; gap: 8px; background: var(--lil); border-radius: 9px; padding: 4px 10px; margin-bottom: 4px; font-size: 14px; min-height: 34px; }
 .ccard__facts button { border: 0; background: none; cursor: pointer; display: inline-flex; padding: 5px; color: var(--ink); }
-.consent { box-shadow: inset 0 0 0 2px var(--lav); }
-.consent h3 { margin-top: 0; }
 .alert { display: flex; gap: 8px; align-items: flex-start; background: var(--sun-l); padding: 9px 16px; margin: 0; font-size: 13.5px; }
 .alert svg { flex: none; margin-top: 3px; }
 .chat-sug { padding: 0 16px 10px; }
@@ -466,7 +464,6 @@ input[type='time'] { width: auto; }
 .ob-card { background: #fff; border-radius: var(--r-lg); padding: 22px; box-shadow: var(--shadow-card); }
 .ob-card .scene > p { margin: 12px 0 7px; }
 .ob-card .name-input { margin-inline: auto; display: block; }
-.ob-priv { margin-top: 14px !important; }
 .ob-act { display: flex; gap: 8px; justify-content: center; align-items: center; margin-top: 18px; flex-wrap: wrap; }
 .ob-j { display: grid; grid-template-columns: repeat(auto-fill, minmax(135px, 1fr)); gap: 9px; margin-top: 10px; text-align: start; }
 .ob-j__b { position: relative; border: 0; background: var(--cr); border-radius: 13px; overflow: hidden; padding: 0; cursor: pointer; font: inherit; font-size: 13px; color: var(--ink); display: flex; flex-direction: column; box-shadow: inset 0 0 0 1px var(--line); transition: box-shadow var(--t-micro) var(--ease), transform var(--t-micro) var(--ease); }

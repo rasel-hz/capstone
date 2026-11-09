@@ -40,7 +40,8 @@ const dayNum = (d: string) => Math.round(Date.parse(`${d}T00:00:00Z`) / 864e5);
 const numDay = (n: number) => new Date(n * 864e5).toISOString().slice(0, 10);
 
 export function qualifyingDays(s: AppState, tz = streakTz(s)): Set<string> {
-  const out = new Set<string>();
+  // Days Supabase already counted, from any device, plus anything played here that isn't synced yet.
+  const out = new Set<string>(s.streakDays ?? []);
   for (const h of s.hist) {
     if (h.status === 'COMPLETED' && CHALLENGES[h.id] && !CHALLENGES[h.id].selfReport && Number.isFinite(h.ts)) out.add(localDate(new Date(h.ts), tz));
   }

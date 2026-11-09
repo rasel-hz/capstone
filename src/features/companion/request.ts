@@ -1,5 +1,6 @@
 import type { AppState } from '../../types';
 import { CHALLENGES } from '../challenges/catalog';
+import { dhikrNow } from '../dhikr/content';
 import { isLowEnergy } from '../mission/planner';
 import { isCrisisText } from './crisis';
 import { progressStats } from '../progress/stats';
@@ -35,8 +36,10 @@ export function buildChatRequest(message: string, s: AppState) {
       lastPlan: lastPlan(s),
       // Only for scheduling: the next prayer and how far away it is. Never the location or any check-in answer.
       prayer: prayerContext(s),
-      // What the user chose to tell us in onboarding, for advice that fits. Sent only with chat consent.
+      // What the user chose to tell us in onboarding, for advice that fits.
       about: s.prof,
+      // Only which dhikr challenges fit the time now, from the device clock. Nothing about the user.
+      dhikrNow: dhikrNow(),
       attempts: st.attempts.length,
       completed: st.completed.length,
       avgAccuracy: st.avgAccuracy,

@@ -100,7 +100,8 @@ export function MissionPlayer({ start, onClose, onNavigate }: { start: PlayerSta
     if (r.all && !r.solo && !r.quiet) void claimDailyBonusAfterSync(store.getState().mission!.id);
     setSummary(r);
     setPhase('finish');
-    if (r.quiet) {
+    // Self-report check-ins, and quiet challenges such as dhikr before sleep, end without sound or confetti.
+    if (r.quiet || store.getState().mission!.items.every((i) => CHALLENGES[i.id].quiet)) {
       setMood('calm');
       return;
     }
@@ -172,9 +173,10 @@ export function MissionPlayer({ start, onClose, onNavigate }: { start: PlayerSta
     const m = st.mission!;
     const done = m.items[m.idx];
     const nextItem = m.items[m.idx + 1];
-    if (!CHALLENGES[done.id].selfReport) playSound(!!st.snd, 'fin');
+    const hushed = !!CHALLENGES[done.id].selfReport || !!CHALLENGES[done.id].quiet;
+    if (!hushed) playSound(!!st.snd, 'fin');
     say(r.mood || 'celebrating', r.say ?? (r.acc == null ? 'player.sayDone' : r.retries ? 'player.sayRetried' : 'player.sayGood'));
-    if (o.leveledUp) fireConfetti(!!st.rm);
+    if (o.leveledUp && !CHALLENGES[done.id].quiet) fireConfetti(!!st.rm);
     setRound(null);
     setResult({ xp: o.xp, base: CHALLENGES[done.id].xp, acc: r.acc, retries: r.retries, note: r.note, leveledUp: o.leveledUp, newLevel: o.newLevel, last: !nextItem });
     setPhase('result');

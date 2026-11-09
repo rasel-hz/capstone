@@ -5,6 +5,7 @@ import type { Profile, RegisterInput } from '../../services/auth';
 import type { Gender } from '../../types';
 import { claimForUser, loadForUser, stashAndReset } from './localAccount';
 import { startProgressSync } from '../../services/progressSync';
+import { startDailySync } from '../../services/dailySync';
 
 type Status = 'loading' | 'signedOut' | 'signedIn';
 
@@ -89,6 +90,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // While signed in, progress is sent to Supabase as it happens, including history saved before.
   useEffect(() => (status === 'signedIn' ? startProgressSync(store) : undefined), [status, store]);
+  // The streak, today's goals and the onboarding answers are kept with the account the same way.
+  useEffect(() => (status === 'signedIn' ? startDailySync(store) : undefined), [status, store]);
 
   const register = useCallback(async (v: RegisterInput) => {
     const r = await auth.register(v);

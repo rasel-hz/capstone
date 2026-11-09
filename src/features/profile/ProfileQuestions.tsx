@@ -44,7 +44,7 @@ export function ProfileQuestions({ initial, busy, onBack, onDone, onGroup }: {
       case 'goals': return p.goals;
       case 'primary': return p.primary ? [p.primary] : [];
       case 'when': return p.when;
-      case 'style': return p.style ? [p.style] : [];
+      case 'style': return p.style;
       default: return [];
     }
   };
@@ -66,7 +66,7 @@ export function ProfileQuestions({ initial, busy, onBack, onDone, onGroup }: {
         }
         case 'primary': return { ...a, primary: (next[0] as GoalId) ?? null };
         case 'when': return { ...a, when: next as LifeProfile['when'] };
-        case 'style': return { ...a, style: (next[0] as LifeProfile['style']) ?? null };
+        case 'style': return { ...a, style: next as LifeProfile['style'] };
         default: return a;
       }
     });

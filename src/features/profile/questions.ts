@@ -30,11 +30,12 @@ export interface LifeProfile {
   sleep: SleepId | null;
   /** No longer asked. Kept for the same reason. */
   hard: HardId[];
-  style: StyleId | null;
+  /** Every kind of help the user picked. Answers saved before this was multiple choice are read as a list of one. */
+  style: StyleId[];
   at: number;
 }
 
-export const emptyProfile = (): LifeProfile => ({ v: 1, life: [], goals: [], primary: null, tasks: [], when: [], sleep: null, hard: [], style: null, at: 0 });
+export const emptyProfile = (): LifeProfile => ({ v: 1, life: [], goals: [], primary: null, tasks: [], when: [], sleep: null, hard: [], style: [], at: 0 });
 
 export type QuestionId = 'life' | 'goals' | 'primary' | 'tasks' | 'when' | 'style';
 
@@ -71,7 +72,7 @@ export function optionsFor(q: QuestionId, p: LifeProfile): readonly string[] {
   }
 }
 
-export const isMulti = (q: QuestionId) => q === 'life' || q === 'goals' || q === 'when';
+export const isMulti = (q: QuestionId) => q === 'life' || q === 'goals' || q === 'when' || q === 'style';
 /** Options that mean "none of this", so picking one clears the rest. */
 export const EXCLUSIVE = ['skip'];
 
@@ -99,7 +100,7 @@ export function validProfile(raw: unknown): LifeProfile | null {
   return {
     v: 1, life: only(r.life, LIFE), goals, primary: primary && goals.includes(primary) ? primary : null,
     tasks: [...new Set((Array.isArray(r.tasks) ? r.tasks : []).map(cleanTask).filter(Boolean))].slice(0, MAX_TASKS),
-    when: only(r.when, WHEN), sleep: one(r.sleep, SLEEP), hard: only(r.hard, HARD), style: one(r.style, STYLE),
+    when: only(r.when, WHEN), sleep: one(r.sleep, SLEEP), hard: only(r.hard, HARD), style: Array.isArray(r.style) ? only(r.style, STYLE) : only([r.style], STYLE),
     at: typeof r.at === 'number' ? r.at : 0,
   };
 }
