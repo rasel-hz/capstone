@@ -12,7 +12,6 @@ import { buildPlan } from '../../features/path/planner';
 import { ProfileQuestions } from '../../features/profile/ProfileQuestions';
 import { toLegacy, type LifeProfile } from '../../features/profile/questions';
 import { iso, tr } from '../../i18n';
-import { isAiAvailable } from '../../services/companion';
 import { useBackHandler } from '../../services/native';
 import type { Gender } from '../../types';
 import { useAuth } from '../../features/auth/AuthProvider';
@@ -34,23 +33,14 @@ export function Onboarding({ initialStep = 0 }: { initialStep?: number }) {
   const [g, setG] = useState<Gender>(store.getState().g);
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState(false);
-  const [aiReady, setAiReady] = useState(false);
-  // Answers wait here while the AI question is on screen, so nothing is saved until it's answered.
-  const [answers, setAnswers] = useState<LifeProfile | null>(null);
   const signedIn = auth.status === 'signedIn';
-  // The AI question is only a step when the AI can actually be used.
-  const names = aiReady ? [...STEP_NAMES, 'ai'] : STEP_NAMES;
-  const shown = answers ? names.length - 1 : step < QUESTIONS ? step : QUESTIONS + group;
+  const shown = step < QUESTIONS ? step : QUESTIONS + group;
   const mascot = useMascot(MOODS[shown] ?? 'idle');
   // From the first step, back returns to the landing page.
   const canLeave = step === 0 && !signedIn;
   const toLanding = () => store.update((d) => { d.started = 0; });
   // Android back goes to the previous step, or the landing page, instead of closing the app.
-  useBackHandler(() => (answers ? setAnswers(null) : canLeave ? toLanding() : setStep((s) => s - 1)), !!answers || step > 0 || canLeave);
-
-  useEffect(() => {
-    void isAiAvailable().then(setAiReady);
-  }, []);
+  useBackHandler(() => (canLeave ? toLanding() : setStep((s) => s - 1)), step > 0 || canLeave);
 
   useEffect(() => {
     mascot.play('greeting');
@@ -69,12 +59,7 @@ export function Onboarding({ initialStep = 0 }: { initialStep?: number }) {
     mascot.play('encouraging');
   }
 
-  function questionsDone(p: LifeProfile) {
-    if (aiReady && store.getState().aiConsent == null) setAnswers(p);
-    else void finish(p);
-  }
-
-  async function finish(p: LifeProfile, aiConsent?: 0 | 1) {
+  async function finish(p: LifeProfile) {
     // Onboarding counts as finished only once the account says so, so another device skips it too.
     if (saving) return;
     setSaving(true);
@@ -90,7 +75,6 @@ export function Onboarding({ initialStep = 0 }: { initialStep?: number }) {
     fireConfetti(!!store.getState().rm);
     store.update((d) => {
       Object.assign(d, toLegacy(p), { name: firstName, g, prof: p, path: buildPlan(p), done: 1, view: 'path' });
-      if (aiConsent !== undefined) d.aiConsent = aiConsent;
       d.chat = [{ b: 1, t: tr('onboarding.firstMessage', { name: iso(firstName) }) }];
     });
   }
@@ -99,8 +83,8 @@ export function Onboarding({ initialStep = 0 }: { initialStep?: number }) {
     <div id="app" className="ob-wrap">
       <main className="onboard">
         <div className="ob-top"><LanguageSwitcher /></div>
-        <ol className="stepper" aria-label={t('onboarding.stepOf', { n: shown + 1, total: names.length })}>
-          {names.map((n, i) => (
+        <ol className="stepper" aria-label={t('onboarding.stepOf', { n: shown + 1, total: STEP_NAMES.length })}>
+          {STEP_NAMES.map((n, i) => (
             <li key={n} className={i < shown ? 'is-done' : i === shown ? 'is-cur' : ''} aria-current={i === shown ? 'step' : undefined}>
               <span aria-hidden="true">{i < shown ? <Check size={13} /> : i + 1}</span><em>{t(`onboarding.steps.${n}`)}</em>
             </li>
@@ -142,23 +126,7 @@ export function Onboarding({ initialStep = 0 }: { initialStep?: number }) {
               </div>
             </>
           )}
-          {/* Kept mounted behind the AI question, so going back returns to the answers. */}
-          {step >= QUESTIONS && <div hidden={!!answers}><ProfileQuestions busy={saving} onBack={() => setStep(ACCOUNT_STEP)} onGroup={setGroup} onDone={questionsDone} /></div>}
-          {answers && (
-            <>
-              <div className="scene">
-                <h1>{t('companion.consent.title')}</h1>
-                <p>{t('companion.consent.text')}</p>
-                <p className="note">{t('companion.consent.note')}</p>
-                <p className="note">{t('onboarding.aiNoNote')}</p>
-              </div>
-              <div className="ob-act">
-                <button type="button" className="btn alt" disabled={saving} onClick={() => setAnswers(null)}><ArrowRight size={16} className="flip" aria-hidden="true" /> {t('common.back')}</button>
-                <button type="button" className="btn alt" disabled={saving} onClick={() => void finish(answers, 0)}>{t('onboarding.aiNo')}</button>
-                <button type="button" className="btn" disabled={saving} onClick={() => void finish(answers, 1)}>{t('companion.consent.yes')}</button>
-              </div>
-            </>
-          )}
+          {step >= QUESTIONS && <ProfileQuestions busy={saving} onBack={() => setStep(ACCOUNT_STEP)} onGroup={setGroup} onDone={(p) => void finish(p)} />}
           {saveError && <p className="hint auth-err" role="alert">{t('auth.errors.saveFailed')}</p>}
         </div>
       </main>

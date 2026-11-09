@@ -145,7 +145,6 @@ export function Companion() {
         <div className="panel consent">
           <h3>{t('companion.consent.title')}</h3>
           <p>{t('companion.consent.text')}</p>
-          <p className="note">{t('companion.consent.note')}</p>
           <div className="row">
             <button type="button" className="btn sm" onClick={() => store.update((d) => { d.aiConsent = 1; })}>{t('companion.consent.yes')}</button>
             <button type="button" className="btn sm alt" onClick={() => store.update((d) => { d.aiConsent = 0; })}>{t('companion.consent.no')}</button>

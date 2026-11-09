@@ -45,7 +45,7 @@
   "notConnected": "Calendar, traffic and weather aren't connected. What you approve in chat appears below.",
   "privacy": "Privacy and your data",
   "ai": "Smart replies (OpenAI)",
-  "aiNote": "When on, your message, recent chat messages and a results summary go to OpenAI to produce a reply. We don't send your name, your journeys, what you type in challenges or your \"How Are You Feeling?\" answers.",
+  "aiNote": "When on, your message, recent chat messages and a results summary go to OpenAI to produce a reply. We don't send your name, your journeys, what you type in challenges or your \"How Are You Feeling?\" answers. Under OpenAI's policy, API data isn't used for training and may be kept for up to 30 days to monitor abuse.",
   "stored": "What's saved",
   "storedAttempts": "{{n}} attempts and {{xp}} points (level {{level}})",
   "storedEnergy": "{{n}} energy check-ins and {{m}} messages you wrote in chat",

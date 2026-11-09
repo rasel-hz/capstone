@@ -35,7 +35,6 @@ After the name and account steps, questions depend on earlier answers, and every
 - Answers are stable IDs in `AppState.prof`, marked as self-reported. A category never implies a timetable, an age or a condition, and goals are never mapped to a diagnosis.
 - Typed tasks are saved only if the "keep these" box is ticked. Settings → delete typed text removes them.
 - Sound, motion, prayer times and the protected minutes moved to My Profile.
-- The last step asks for consent to smart replies, only if the AI is available and the user has not answered. Nothing goes to OpenAI without "I agree". "Not now" keeps the simple replies and the limited-mode notice.
 - **Age policy is still open.** The reference requires separate safeguarding, consent and regulatory review for minors before launch. "School student" is only recorded as said, with a note about a parent or guardian. The product owner needs to decide the policy.
 
 ## The journey

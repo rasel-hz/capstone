@@ -34,8 +34,7 @@
   "disclaimer": "I'm not a therapist and I don't diagnose. I don't replace your family, friends or professionals.",
   "consent": {
     "title": "Turn on smart replies?",
-    "text": "If you agree, your message, recent chat messages and a summary of your challenge results go to OpenAI to produce a reply. We don't send your name or chosen journeys.",
-    "note": "According to OpenAI's policy, API data isn't used for training and may be kept for up to 30 days to monitor abuse. Don't write sensitive information you don't want to share. You can turn this off any time in My Profile.",
+    "text": "If you agree, your messages and a summary of your results go to OpenAI to write replies. You can turn this off any time in My Profile.",
     "yes": "I agree",
     "no": "No, keep using the rules"
   },

@@ -36,11 +36,8 @@
     "comfort": "Comfort",
     "goals": "Your goals",
     "time": "Your time",
-    "help": "Your help",
-    "ai": "Smart replies"
+    "help": "Your help"
   },
   "finish": "All done",
-  "cityQ": "Which city are you in? We'll calculate prayer times for you (optional)",
-  "aiNo": "Not now",
-  "aiNoNote": "Everything still works without this, but chat replies will be simple. You can turn it on later in My Profile."
+  "cityQ": "Which city are you in? We'll calculate prayer times for you (optional)"
 }

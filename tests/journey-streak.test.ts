@@ -350,18 +350,24 @@ describe('Privacy and the AI', () => {
 });
 
 describe('smart replies consent', () => {
-  const page = readFileSync('src/pages/Onboarding/index.tsx', 'utf8');
+  const chat = readFileSync('src/pages/Companion/index.tsx', 'utf8');
+  const load = (l: string) => JSON.parse(readFileSync(`src/i18n/locales/${l}/companion.json`, 'utf8')).consent;
 
   it('stays off until the user answers', () => {
     expect(defaultState().aiConsent).toBeNull();
   });
 
-  it('is asked in onboarding, with a real way to say no', () => {
-    expect(page).toContain('finish(answers, 1)');
-    expect(page).toContain('finish(answers, 0)');
+  it('is asked in the chat, with a real way to say no, and not in onboarding', () => {
+    expect(chat).toContain('d.aiConsent = 1');
+    expect(chat).toContain('d.aiConsent = 0');
+    expect(readFileSync('src/pages/Onboarding/index.tsx', 'utf8')).not.toContain('aiConsent');
   });
 
-  it('is only asked when it has not been answered and the AI can be used', () => {
-    expect(page).toMatch(/aiReady && store\.getState\(\)\.aiConsent == null/);
+  it('is short, and still says the data goes to OpenAI', () => {
+    for (const c of [load('en'), load('ar-SA')]) {
+      expect(c.note).toBeUndefined();
+      expect(c.text).toContain('OpenAI');
+      expect(c.text.split('.').filter((x: string) => x.trim()).length).toBeLessThanOrEqual(2);
+    }
   });
 });
