@@ -4,6 +4,7 @@ import ar from '../src/i18n/locales/ar-SA/challenges.json' with { type: 'json' }
 import en from '../src/i18n/locales/en/challenges.json' with { type: 'json' };
 import { messageLang } from '../src/features/companion/lang.ts';
 import { groundedTasks } from './grounding.ts';
+import { validProfile } from '../src/features/profile/questions.ts';
 import { CHALLENGE_META, isGoal, type Goal } from '../src/features/recommend/goals.ts';
 import { INTENTS, REPLY_SCHEMA, SYSTEM_PROMPT } from './prompt.ts';
 
@@ -42,6 +43,7 @@ export interface ChatRequest {
     lastPlan: LastPlan | null;
     /** Calculated on the device from the user's chosen city or location. Null when not set up. */
     prayer: { next: string; minutesUntil: number; inWindow: boolean } | null;
+    about: ReturnType<typeof validProfile>;
   };
 }
 
@@ -134,6 +136,7 @@ export function parseRequest(raw: unknown): ChatRequest {
       }),
       lastPlan: parseLastPlan(c.lastPlan),
       prayer: parsePrayer(c.prayer),
+      about: validProfile(c.about),
       confirmed: (Array.isArray(c.confirmed) ? c.confirmed : []).filter((t): t is string => CONTEXT_TAGS.includes(t as string)),
       completed: num(c.completed),
       attempts: num(c.attempts),
@@ -215,6 +218,7 @@ function contextBlock(c: ChatRequest['context'], replyLang: 'ar-SA' | 'en') {
     confirmed_today: c.confirmed,
     feedback: c.feedback.map((f) => ({ id: f.id, user_found_it: f.net > 0 ? 'helpful' : f.net < 0 ? 'not helpful' : 'mixed' })),
     activities: activities(replyLang),
+    about: c.about ? { daily_life: c.about.life, main_goal: c.about.primary ?? c.about.goals[0] ?? null, goals: c.about.goals, help_when: c.about.when, help_style: c.about.style, hard_days: c.about.hard, sleep_self_report: c.about.sleep, tasks_they_kept: c.about.tasks } : null,
     prayer: c.prayer ? { next_prayer: c.prayer.next, minutes_until_next: c.prayer.minutesUntil, in_prayer_window: c.prayer.inWindow } : null,
     last_plan: c.lastPlan
       ? { day: c.lastPlan.day, now: c.lastPlan.now, later: c.lastPlan.later, not_today: c.lastPlan.notToday, time_blocks: c.lastPlan.blocks, minutes_available: c.lastPlan.minutes }

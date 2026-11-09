@@ -19,6 +19,8 @@ interface MissionApi {
   resume(c: ResumeChoice): void;
   /** Opens the optional prayer break, for this window if there is one. */
   openBreak(w: PrayerWindow | null): void;
+  /** A challenge is on screen, so anything behind it should wait. */
+  playing: boolean;
 }
 
 const Ctx = createContext<MissionApi | null>(null);
@@ -98,7 +100,8 @@ export function MissionProvider({ children, onNavigate }: { children: ReactNode;
 
   useBackHandler(() => { setBlocker(null); setBreakFor(null); }, !!blocker || !!breakFor);
 
-  const api = useMemo(() => ({ start, resume, openBreak }), [start, resume, openBreak]);
+  const playing = !!player;
+  const api = useMemo(() => ({ start, resume, openBreak, playing }), [start, resume, openBreak, playing]);
 
   return (
     <Ctx.Provider value={api}>

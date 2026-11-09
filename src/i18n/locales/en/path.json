@@ -1,0 +1,78 @@
+{
+  "title": "Your Journey",
+  "sub": "One small step at a time.",
+  "earned": "XP earned",
+  "gotXp": "+{{n}} XP",
+  "canEarn": "Earn {{n}} XP",
+  "chapter": "Chapter {{n}}",
+  "listLabel": "Steps of your journey",
+  "stripLabel": "{{done}} of {{total}} steps done in this chapter",
+  "see": "See your journey",
+  "change": "Change activity",
+  "themes": {
+    "organize": "Sorting out your time",
+    "focus": "Focus habits",
+    "start": "Getting started",
+    "stress": "Easing the day",
+    "sleep": "A calmer evening routine",
+    "social": "Confidence with people",
+    "habits": "Small better habits",
+    "other": "A gentle start",
+    "study": "Organizing your studies",
+    "work": "Work and your own projects",
+    "gentle": "A gentle start"
+  },
+  "node": {
+    "talk": "Tell me what's going on",
+    "reflect": "What worked?",
+    "milestone": "Milestone"
+  },
+  "nodeText": {
+    "talk": "You said you like talking things through, so let's start there.",
+    "reflect": "A quick look back at what helped.",
+    "milestone": "Finish the steps before it to reach this checkpoint."
+  },
+  "state": {
+    "done": "done",
+    "current": "your next step",
+    "locked": "coming up"
+  },
+  "lockedNote": "Finish the step before this one to open it. Everything is still open in the challenge library.",
+  "youEarned": "You earned {{n}} XP here.",
+  "replay": "Play again",
+  "talkNow": "Talk to your buddy",
+  "reflectQ": "How did these steps feel?",
+  "reflect": {
+    "good": "They helped",
+    "okay": "They were okay",
+    "not": "Not really"
+  },
+  "reflectNote": "Any answer is fine. It earns no XP and isn't a score.",
+  "allDone": "You finished this journey",
+  "allDoneText": "Want a few more small steps? Resting is fine too.",
+  "more": "Add another chapter",
+  "edit": "Update my answers",
+  "library": "All challenges",
+  "editTitle": "Update your answers",
+  "editText": "Your finished steps stay. Only the steps ahead change.",
+  "setupTitle": "Let's build your journey",
+  "setupText": "A few quick questions, all optional. Your XP and history stay as they are.",
+  "homeSetup": "Build your personal journey",
+  "homeSetupSub": "A few quick questions, and steps that fit your day",
+  "settings": {
+    "title": "Journey and streak",
+    "answers": "My answers",
+    "answersNote": "Change your day, goals and how you like to be helped.",
+    "open": "Update",
+    "streak": "Show my daily streak",
+    "streakNote": "Off hides it everywhere. It never affects your XP.",
+    "grace": "Protect a missed day",
+    "graceNote": "One missed day in any 7 won't end your streak."
+  },
+  "xpLabel": "{{n}} XP in total",
+  "overall": "{{done}} of {{total}} steps done",
+  "sheet": {
+    "step": "Step {{n}} of {{total}}",
+    "hasEasy": "Has an easier version"
+  }
+}

@@ -11,6 +11,7 @@ import { achievements } from '../src/features/rewards/achievements';
 import { defaultState, hydrate } from '../src/services/storage';
 import type { AppState, Attempt, ChallengeId } from '../src/types';
 import { today } from '../src/utils';
+import { withoutEmoji } from '../src/services/points';
 
 const fresh = (o: Partial<AppState> = {}) => ({ ...defaultState(), ...o });
 const attempt = (id: ChallengeId, o: Partial<Attempt> = {}): Attempt => ({ mid: 'm', id, status: 'COMPLETED', acc: null, retries: 0, xp: 0, dur: 30, d: today(), ts: Date.now(), ...o });
@@ -149,7 +150,13 @@ describe('interface text', () => {
 
   it('contains no emoji or pictographic symbols', () => {
     const emoji = /[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{FE0F}]/u;
-    const hits = walk('src').filter((f) => /\.(tsx?|css)$/.test(f)).filter((f) => emoji.test(readFileSync(f, 'utf8')));
+    const hits = walk('src').filter((f) => /\.(tsx?|css|json)$/.test(f)).filter((f) => emoji.test(readFileSync(f, 'utf8')));
     expect(hits).toEqual([]);
+  });
+
+  it('removes emoji from reward text that comes from the database', () => {
+    expect(withoutEmoji('A coffee from Dunkin \u2615')).toBe('A coffee from Dunkin');
+    expect(withoutEmoji('Get your reward \u{1F39F}\uFE0F')).toBe('Get your reward');
+    expect(withoutEmoji('No emoji here')).toBe('No emoji here');
   });
 });

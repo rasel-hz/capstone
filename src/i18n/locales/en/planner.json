@@ -27,7 +27,8 @@
     "helped": "you said it suited you last time",
     "gentle": "it's gentle, to suit your energy today",
     "fits": "it fits the {{n}} minutes you have",
-    "chat": "Suggested in your chat"
+    "chat": "Suggested in your chat",
+    "path": "The next step on your journey"
   },
   "reason": {
     "low": "at your energy today",

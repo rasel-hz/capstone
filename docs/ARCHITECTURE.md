@@ -40,7 +40,7 @@ The planner is rule-based. Driving and prayer checks happen in `MissionProvider`
 
 - **Tokens:** `styles/tokens.css` holds the brand palette from reference 3.3, derived shades, the type scale, radii and motion timing. Use these instead of new values.
 - **UI kit:** `components/ui/kit.tsx` has the page header, section title, icon badge, progress bar, empty state, segmented control, switch, setting row and dialog.
-- **Icons:** Lucide only, through `lucide-react`. No emoji; `tests/redesign.test.ts` fails if one appears in `src/`.
+- **Icons:** Lucide only, through `lucide-react`. No emoji; `tests/redesign.test.ts` fails if one appears in `src/`, including the locale files.
 - **Art:** `features/challenges/ChallengeArt.tsx` has the challenge art, journey art and oasis backdrop, all flat vector drawn from the palette.
 
 ## Language

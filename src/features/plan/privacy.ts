@@ -8,7 +8,7 @@ const strip = (d: unknown) => {
   if (d && typeof d === 'object') TYPED.forEach((k) => delete (d as Record<string, unknown>)[k]);
 };
 
-export const typedCount = (s: AppState) => s.hist.filter((h) => hasTyped(h.data)).length;
+export const typedCount = (s: AppState) => s.hist.filter((h) => hasTyped(h.data)).length + (s.prof?.tasks.length ? 1 : 0);
 
 /** Removes typed text everywhere it is kept. Scores, XP, statuses and dates stay. */
 export function clearTypedText(d: AppState) {
@@ -19,4 +19,7 @@ export function clearTypedText(d: AppState) {
     strip(i.data);
   });
   d.chat.forEach((m) => { if (m.sug) delete m.sug.cfg; });
+  // Tasks from onboarding, and the journey steps built from them.
+  if (d.prof) d.prof.tasks = [];
+  d.path?.nodes.forEach((n) => { delete n.cfg; });
 }

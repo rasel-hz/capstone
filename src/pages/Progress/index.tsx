@@ -9,6 +9,7 @@ import { ChallengeArt } from '../../features/challenges/ChallengeArt';
 import { CHALLENGES } from '../../features/challenges/catalog';
 import { fullDaysIn } from '../../features/buddy/buddy';
 import { progressStats } from '../../features/progress/stats';
+import { StreakCard } from '../../features/streak/StreakBits';
 import { fetchProgress, onProgressChanged, type RemoteProgress } from '../../services/progressSync';
 import { useCountUp } from '../../hooks/useCountUp';
 import { formatDate, formatList, isRtl } from '../../i18n';
@@ -156,6 +157,7 @@ function ProgressView({ onNavigate, s }: { onNavigate(v: ViewId): void; s: AppSt
       <PageHeader title={t('progress.title')} sub={t('progress.sub')}>
         <Mascot state={mascot.state} size={72} />
       </PageHeader>
+      <StreakCard />
 
       <div className="tiles">
         <Stat title={t('progress.tileCompleted')} value={st.completed.length} note={t('progress.ofAttempts', { count: st.attempts.length })} />

@@ -1,4 +1,4 @@
-import { BatteryFull, BatteryLow, BatteryMedium, ChevronDown, Clock, MessageCircle, Play, Shuffle, Timer, type LucideIcon } from 'lucide-react';
+import { BatteryFull, BatteryLow, BatteryMedium, Check, ChevronDown, Clock, Compass, Flag, MessageCircle, Play, Shuffle, Sparkles, Timer, type LucideIcon } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ProgressBar, Segmented } from '../../components/ui/kit';
@@ -17,6 +17,8 @@ import { acknowledge, breakLeft, needsCheckIn, nextOf, placeOf } from '../../fea
 import { PrayerCheckIn } from '../../features/prayer/PrayerBreak';
 import { useMinute } from '../../features/prayer/PrayerCity';
 import { formatPrayerTime } from '../../features/prayer/times';
+import { currentNode, earnedXp, nodeState, pathItem, type PathNode } from '../../features/path/planner';
+import { StreakChip } from '../../features/streak/StreakBits';
 import { progressStats } from '../../features/progress/stats';
 import { recommend } from '../../features/recommend/engine';
 import { currentLang, formatDate, iso } from '../../i18n';
@@ -56,6 +58,7 @@ export function Home({ onNavigate }: { onNavigate(v: ViewId): void }) {
   const askWindow = needsCheckIn(s, now);
   const blocked = !!s.driving;
   const st = progressStats(s);
+  const node = currentNode(s.path);
 
   useEffect(() => {
     if (greeted || s.driving) return;
@@ -115,6 +118,8 @@ export function Home({ onNavigate }: { onNavigate(v: ViewId): void }) {
         </section>
       ) : open ? (
         OpenMission({ onOptions: () => setOptions(!options), options, blocked })
+      ) : node ? (
+        PathNext({ n: node })
       ) : doneToday ? (
         SingleStep({ onNavigate })
       ) : (
@@ -131,17 +136,70 @@ export function Home({ onNavigate }: { onNavigate(v: ViewId): void }) {
         </span>
       </button>
 
-      <button type="button" className="mini" onClick={() => onNavigate('prog')} aria-label={t('dashboard.progressLabel', { n: level(s), done: st.days[6].count })}>
-        <span className="lvl" aria-hidden="true">{level(s)}</span>
-        <span className="grow">
-          <span className="mini__top"><b>{t('common.levelN', { n: level(s) })}</b><span className="note">{t('dashboard.doneToday', { count: st.days[6].count })}</span></span>
-          <ProgressBar value={s.xp % 100} label={t('common.toNextLevel')} />
-        </span>
-      </button>
+      {s.path ? PathStrip() : (
+        <>
+          <button type="button" className="talk" onClick={() => onNavigate('path')}>
+            <span className="talk__icon"><Compass size={20} aria-hidden="true" /></span>
+            <span className="grow">
+              <b>{t('path.homeSetup')}</b>
+              <span className="note">{t('path.homeSetupSub')}</span>
+            </span>
+          </button>
+          <button type="button" className="mini" onClick={() => onNavigate('prog')} aria-label={t('dashboard.progressLabel', { n: level(s), done: st.days[6].count })}>
+            <span className="lvl" aria-hidden="true">{level(s)}</span>
+            <span className="grow">
+              <span className="mini__top"><b>{t('common.levelN', { n: level(s) })}</b><span className="note">{t('dashboard.doneToday', { count: st.days[6].count })}</span></span>
+              <ProgressBar value={s.xp % 100} label={t('common.toNextLevel')} />
+            </span>
+          </button>
+        </>
+      )}
 
       {DayContext({ onNavigate })}
     </div>
   );
+
+  // The next step on the personal journey is the one main action on this screen.
+  function PathNext({ n }: { n: PathNode }) {
+    const name = n.kind === 'play' && n.id ? (n.id === 'seq' && n.cfg ? t('games.plan.title') : t(`challenges.items.${n.id}.name`)) : t(`path.node.${n.kind}`);
+    const act = () => (n.kind === 'play' ? missions.start([pathItem(store.getState(), n)]) : onNavigate(n.kind === 'talk' ? 'chat' : 'path'));
+    return (
+      <section className="next" aria-labelledby="next-t">
+        <p className="eyebrow">{t('dashboard.nextStep')}</p>
+        <div className="next__row">
+          {n.id && <div className="next__art"><ChallengeArt id={n.id} /></div>}
+          <div className="grow">
+            <h2 id="next-t" dir="auto">{name}</h2>
+            {n.id && <p className="next__meta"><Clock size={14} aria-hidden="true" /> {t('common.minutes', { count: CHALLENGES[n.id].min })} · {t('path.canEarn', { n: CHALLENGES[n.id].xp })}</p>}
+          </div>
+        </div>
+        <p className="note">{n.id ? t(`challenges.items.${n.id}.purpose`) : t(`path.nodeText.${n.kind}`)}</p>
+        <div className="next__act">
+          <button type="button" className="btn btn--lg" disabled={blocked} onClick={act}><Play size={17} aria-hidden="true" /> {t(n.kind === 'talk' ? 'path.talkNow' : 'common.start')}</button>
+          <button type="button" className="btn-link" onClick={() => onNavigate('chal')}><Shuffle size={15} aria-hidden="true" /> {t('path.change')}</button>
+        </div>
+      </section>
+    );
+  }
+
+  // Finished, current and upcoming steps at a glance. Only recorded progress is shown.
+  function PathStrip() {
+    const plan = s.path!;
+    const chapter = node?.ch ?? plan.nodes[plan.nodes.length - 1].ch;
+    const nodes = plan.nodes.filter((x) => x.ch === chapter);
+    return (
+      <section className="pstrip" aria-label={t('path.title')}>
+        <div className="pstrip__top">
+          <b>{t(`path.themes.${plan.themes[chapter] ?? 'gentle'}`)}</b>
+          <span className="pm__chips"><StreakChip /><span className="sk-chip"><Sparkles size={14} aria-hidden="true" /> <b>{earnedXp(plan)}</b></span></span>
+        </div>
+        <ol className="pstrip__dots" aria-label={t('path.stripLabel', { done: nodes.filter((x) => x.done).length, total: nodes.length })}>
+          {nodes.map((x) => <li key={x.key} className={`is-${nodeState(plan, x)} ${x.kind === 'milestone' ? 'is-mile' : ''}`}>{x.done && <Check size={12} aria-hidden="true" />}{!x.done && x.kind === 'milestone' && <Flag size={12} aria-hidden="true" />}</li>)}
+        </ol>
+        <button type="button" className="btn-link" onClick={() => onNavigate('path')}>{t('path.see')}</button>
+      </section>
+    );
+  }
 
   // Plain render helpers, called as functions, so nothing remounts on each render.
   function BreakRow({ onOpen }: { onOpen(): void }) {

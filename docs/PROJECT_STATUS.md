@@ -12,13 +12,14 @@ This file lists what has been done and what still needs doing. For how to run th
 | Languages | Saudi Arabic and English, switchable at any time, including mid-game |
 | Challenges | 14 playable, including Just the First Step and Let's Think It Through |
 | Chat | OpenAI, helpful-first, follows the language you write in, and suggests activities through an explainable engine. Offline fallback is labelled limited mode |
-| Home | One next step, a chat entry and a small progress line |
+| Home | The next journey step, today's goals, a chat entry and a compact journey preview |
 | Mascot | A clip for all 11 states |
 | Prayer times | Calculated on the device for a city or your rounded location, with a selectable method. A once-per-window check-in and an optional break replace the old lock. See [PRAYER.md](PRAYER.md) |
 | Navigation | 5 tabs, with خويّك raised in the middle on phones |
 | Android app | Built with Capacitor and running on the Android emulator. Games and chat not yet tried there. See [ANDROID.md](ANDROID.md) |
 | Data | Saved in the browser only, with no accounts or database |
-| Tests | 205 unit tests, type check and build all pass. `npm run eval:ai` has 23 real-model cases; every reply was right on 2026-11-07 |
+| Onboarding and journey | Adaptive questions, an illustrated oasis journey map with Numo on the current step, and a humane daily streak. See [JOURNEY.md](JOURNEY.md) |
+| Tests | 300 unit tests, type check and build all pass. `npm run eval:ai` passed 23 of 23 real-model cases on 2026-11-08 |
 | Chat to game | Your own tasks go from the chat into the planning board, and your choices come back to the chat |
 | Public launch | **Not ready.** See "Before any public launch" below |
 
@@ -85,6 +86,16 @@ All work so far is on `main`. Start new work on a new branch from `main`.
 - Home simplified to one next step.
 
 ## What we need to do
+
+### Journey and streak
+- [ ] Check the journey map on a real iPhone and Android phone, and watch Numo's walk between steps while the screen is visible.
+- [ ] Ask Masko for a walking clip. Numo travels in the standing pose for now.
+- [ ] Product owner: set the age policy for minors. The reference requires safeguarding, consent and regulatory review before launch.
+- [ ] Build `sleep_winddown` and `routine_builder`. Sleep journeys use calm activities for now.
+- [ ] Save the profile, journey and rest days to Supabase, so they follow an account to a new device.
+- [ ] Add free-text "something else" answers in onboarding, and adapt the journey as feedback comes in.
+- [ ] Commission distinct Numo clips for streak milestones. They use existing clips and particles today.
+- [ ] Test the whole flow signed in with a real account, and on a phone.
 
 ### Companion and recommendations
 - [x] Pass the user's own tasks from chat to the planning game, save their choices, and follow up from them.

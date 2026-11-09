@@ -7,10 +7,11 @@ import { Progress } from '../../pages/Progress';
 import { Rewards } from '../../pages/Rewards';
 import { Settings } from '../../pages/Settings';
 import type { ViewId } from '../../types';
+import { PathPage } from '../../pages/Path';
 import { NavBar, SubTabs } from '../navigation/NavBar';
 
 const PAGES: Record<ViewId, (p: { onNavigate(v: ViewId): void }) => React.JSX.Element> = {
-  home: Home, journeys: Journeys, chal: Challenges, chat: Companion, prog: Progress, rew: Rewards, set: Settings,
+  home: Home, journeys: Journeys, chal: Challenges, chat: Companion, prog: Progress, rew: Rewards, set: Settings, path: PathPage,
 };
 
 export function AppShell({ onNavigate }: { onNavigate(v: ViewId): void }) {

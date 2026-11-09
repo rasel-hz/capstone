@@ -29,11 +29,14 @@
   "stepOf": "Step {{n}} of {{total}}",
   "steps": {
     "about": "About you",
-    "account": "Let's meet 🤍",
+    "account": "Let's meet",
     "journeys": "Journeys",
     "day": "Your day",
     "prayer": "Prayer",
-    "comfort": "Comfort"
+    "comfort": "Comfort",
+    "goals": "Your goals",
+    "time": "Your time",
+    "help": "Your help"
   },
   "finish": "All done",
   "cityQ": "Which city are you in? We'll calculate prayer times for you (optional)"

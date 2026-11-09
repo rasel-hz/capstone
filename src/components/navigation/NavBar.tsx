@@ -13,7 +13,7 @@ const TABS: [ViewId, LucideIcon][] = [
 ];
 
 // The tab that stays lit for a view reached through a sub-tab.
-export const TAB_OF: Partial<Record<ViewId, ViewId>> = { journeys: 'chal' };
+export const TAB_OF: Partial<Record<ViewId, ViewId>> = { journeys: 'chal', path: 'home' };
 
 export function NavBar({ view, onNavigate }: { view: ViewId; onNavigate(v: ViewId): void }) {
   const { t } = useTranslation();

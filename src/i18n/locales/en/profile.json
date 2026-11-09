@@ -1,0 +1,37 @@
+{
+  "q": {
+    "life": { "title": "What does your typical day look like?", "sub": "Pick what fits. It helps me suggest things that make sense for you." },
+    "goals": { "title": "What would you like Khowayk to help you with?", "sub": "Choose as many as you like." },
+    "primary": { "title": "Which one matters most right now?", "sub": "We'll start there. You can change it any time." },
+    "tasks": { "title": "Is there something you'd like to start or organize?", "sub": "Optional. Write it in your own words, like a course or a project.", "ph": "For example, the course you're taking" },
+    "when": { "title": "When would you like Khowayk to help you?", "sub": "I can suggest a good time based on your day and goal, and you can change it any time." },
+    "sleep": { "title": "How has your sleep schedule been lately?", "sub": "Optional, and it's only what you tell me." },
+    "hard": { "title": "What usually makes a difficult day harder?", "sub": "Pick any that feel familiar." },
+    "style": { "title": "How would you prefer Khowayk to help?", "sub": "I'll start with this, and you can always ask for something else." }
+  },
+  "follow": {
+    "free_study": { "title": "When do you usually have time after studying?", "sub": "Optional. A rough idea is enough." },
+    "free_work": { "title": "When do you usually get free after work?", "sub": "Optional. A rough idea is enough." },
+    "busy_both": { "title": "What takes most of your time these days?", "sub": "Optional." },
+    "me_time": { "title": "When do you like to set time aside for yourself?", "sub": "Optional." }
+  },
+  "opt": {
+    "life": { "school": "School student", "uni": "University student", "work": "Working professional", "both": "Working and studying", "flex": "Flexible schedule", "other": "Something else", "skip": "Prefer not to say" },
+    "goals": { "organize": "Organize my time and tasks", "focus": "Improve focus habits", "start": "Get started on delayed tasks", "stress": "Manage everyday stress", "sleep": "Build better sleep routines", "social": "Build social confidence", "habits": "Develop healthier habits", "other": "Something else" },
+    "when": { "after_class": "After school or university", "after_work": "After work", "bedtime": "Before bedtime", "stress": "When feeling stressed", "free": "Whenever I have free time", "suggest": "Let Khowayk suggest a time" },
+    "sleep": { "regular": "Fairly consistent", "late": "I often go to bed late", "varies": "My sleep schedule varies", "skip": "Prefer not to answer" },
+    "hard": { "tasks": "Too many tasks", "focus": "Difficulty focusing", "delay": "Putting things off", "thoughts": "Too many thoughts", "tired": "Feeling exhausted", "other": "Something else", "skip": "Prefer to skip" },
+    "style": { "games": "Short interactive challenges", "steps": "Step-by-step planning", "talk": "Talk things through", "calm": "Calm and relaxation activities", "auto": "Recommend based on my day", "unsure": "Not sure yet" },
+    "follow": { "afternoon": "In the afternoon", "evening": "In the evening", "weekend": "Mostly weekends", "varies": "It changes", "right_after": "Right after work", "late_evening": "Later in the evening", "study": "Studying", "work": "Work", "both_equal": "Both about the same", "other": "Something else", "morning": "In the morning" }
+  },
+  "keepTasks": "Keep these for my journey. You can delete them any time in My Profile.",
+  "schoolNote": "If you're under 18, please use Khowayk with a parent or guardian's knowledge.",
+  "notDiagnosis": "These are just goals. Choosing one doesn't say anything about your health.",
+  "settingsHint": "Sound, motion, prayer times and notifications are all in My Profile whenever you want them.",
+  "suggest": {
+    "after_work": "A short activity after your workday could be a convenient time. You can change it any time.",
+    "after_class": "A short activity after your classes could be a convenient time. You can change it any time.",
+    "bedtime": "A calm few minutes before bed could fit your goal. You can change it any time.",
+    "none": "I don't know enough about your day yet, so we'll keep it flexible."
+  }
+}

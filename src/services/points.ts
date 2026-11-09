@@ -33,12 +33,21 @@ function db() {
   return supabase;
 }
 
+/** The catalog text comes from the shared database, so emoji are removed here as well as in the seed data. */
+export const withoutEmoji = (s: string) => s.replace(/\s*[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{FE0F}\u{200D}\u{20E3}]+/gu, '').trim();
+
 export async function fetchRewards(): Promise<Reward[]> {
   const { data, error } = await db().from('rewards')
     .select('id, brand_ar, brand_en, title_ar, title_en, cta_ar, cta_en, required_points, category, website_url, logo_url, accent_color, logo_background, sort_order')
     .order('sort_order');
   if (error) throw new PointsError(error.message);
-  return (data ?? []) as Reward[];
+  return ((data ?? []) as Reward[]).map((r) => ({
+    ...r,
+    title_ar: withoutEmoji(r.title_ar),
+    title_en: withoutEmoji(r.title_en),
+    cta_ar: withoutEmoji(r.cta_ar),
+    cta_en: withoutEmoji(r.cta_en),
+  }));
 }
 
 export async function fetchSummary(): Promise<PointsSummary> {

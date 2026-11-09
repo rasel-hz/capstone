@@ -70,13 +70,13 @@ create table if not exists public.user_reward_unlocks (
 -- Seed the four demonstration rewards. Re-running refreshes their details and keeps everyone's unlocks.
 insert into public.rewards (id, brand_ar, brand_en, title_ar, title_en, cta_ar, cta_en, required_points, category, website_url, logo_url, accent_color, logo_background, sort_order)
 values
-  ('dunkin', 'دانكن', 'Dunkin', 'قهوة من دانكن ☕', 'A coffee from Dunkin ☕', 'خذ قهوتك ☕', 'Get your coffee ☕', 40, 'coffee',
+  ('dunkin', 'دانكن', 'Dunkin', 'قهوة من دانكن', 'A coffee from Dunkin', 'خذ قهوتك', 'Get your coffee', 40, 'coffee',
    'https://www.dunkinksa.com/', 'https://www.dunkinksa.com/assets/images/logo-main.svg?v=4', '#E8590C', null, 1),
-  ('jarir', 'مكتبة جرير', 'Jarir Bookstore', 'قسيمة كتب من جرير 📚', 'A Jarir book voucher 📚', 'شوف مكافأتك 🎁', 'See your reward 🎁', 80, 'shopping',
+  ('jarir', 'مكتبة جرير', 'Jarir Bookstore', 'قسيمة كتب من جرير', 'A Jarir book voucher', 'شوف مكافأتك', 'See your reward', 80, 'shopping',
    'https://www.jarir.com/', 'https://www.jarir.com/assets/images/logo/jarir.svg', '#D71920', null, 2),
-  ('vox', 'ڤوكس سينما', 'VOX Cinemas', 'تذكرة سينما 🎬', 'A cinema ticket 🎬', 'خذ مكافأتك 🎟️', 'Get your reward 🎟️', 120, 'entertainment',
+  ('vox', 'ڤوكس سينما', 'VOX Cinemas', 'تذكرة سينما', 'A cinema ticket', 'خذ مكافأتك', 'Get your reward', 120, 'entertainment',
    'https://ksa.voxcinemas.com/', null, '#5B2C83', null, 3),
-  ('extra', 'إكسترا', 'eXtra', 'قسيمة تسوق من إكسترا 🎧', 'An eXtra shopping voucher 🎧', 'شوف مكافأتك 🎁', 'See your reward 🎁', 150, 'shopping',
+  ('extra', 'إكسترا', 'eXtra', 'قسيمة تسوق من إكسترا', 'An eXtra shopping voucher', 'شوف مكافأتك', 'See your reward', 150, 'shopping',
    'https://www.extra.com/', 'https://www.extra.com/_ui/responsive/theme-extra/images/logo-extra.png', '#F26522', '#1F2A44', 4)
 on conflict (id) do update set
   brand_ar = excluded.brand_ar, brand_en = excluded.brand_en, title_ar = excluded.title_ar, title_en = excluded.title_en,

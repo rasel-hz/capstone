@@ -35,10 +35,11 @@ This file is intended for product managers, UI/UX designers, frontend engineers,
 | RTL Arabic visual system | CURRENT | IBM Plex Sans Arabic, CSS variables, sidebar/mobile bottom navigation. Improve accessibility, componentization, and polish. |
 | English interface | CURRENT | Every screen and challenge in Saudi Arabic and English, with RTL and LTR, switchable mid-game. See `docs/I18N.md`. |
 | Animated mascot | CURRENT | Approved 2D character with a clip for each of its 11 states, tied to real app events. Safari and reduced motion use the still image. See `docs/MASCOT.md`. |
-| Onboarding | CURRENT | 5 steps for name/pronouns, chosen journeys, routine/sleep, prayer buffer, sound/motion. |
-| Home | CURRENT | Greeting, energy check-in, mission timeline with reasons, progress, quick actions, «ترتيب يومك» (next calculated prayer or manual prayer time, confirmed context, schedule). The driving card moved to settings; if the user set driving, the mission is replaced by a safety notice. |
+| Onboarding | CURRENT | Name, account, then adaptive optional questions: daily life, follow-up, goals and main goal, optional tasks, when to help, sleep, hard days, help style. Technical settings live in My Profile. See `docs/JOURNEY.md`. |
+| Home | CURRENT | Greeting, energy check-in, one next step, today's goals, chat entry, journey preview and only relevant day details. If the user set driving, the step is replaced by a safety notice. |
+| Personal journey and streak | CURRENT (on device) | Journey generated from onboarding answers, on a map with verified progress and real XP. Daily streak calculated from recorded attempts, with rest days and grace. Stored on the device per account. See `docs/JOURNEY.md`. |
 | Journey selection | CURRENT | 8 journey definitions with a detail map of shared challenges; not 8 distinct clinical programs. |
-| Challenges | CURRENT | 12 playable types: the 6 in §8 plus `attention_scene`, `priority_board`, `breakdown`, `study_sprint`, `emotion_map` and `calm_landscape` from §9. Library has categories, real status and original art. |
+| Challenges | CURRENT | 14 playable types: the 6 in §8 plus `attention_scene`, `priority_board`, `breakdown`, `study_sprint`, `emotion_map`, `calm_landscape`, `micro_start` and `thought_sort` from §9. Library has categories, real status and original art. |
 | Connected mission player | CURRENT | Focused full-screen player: intro, automatic progression, round indicator, feedback, skip/end/pause/exit, result, final summary. Mid-game state isn't restored: a resumed challenge restarts, and says so. |
 | Companion chat | CURRENT | OpenAI through a small server when a key is set and the user consents. Helpful-first replies in the language the user writes in, structured output (intent, goals, the user's tasks, stated minutes, up to 3 catalog activities), all validated on the server. Keyword rules otherwise, labelled as limited mode. No tools, server-side memory or accounts yet. See `docs/AI.md`. |
 | AI conversation and reasoning | CURRENT (partial) / TARGET | Structured extraction, grounded task lists, safety layers and a 21-case real-model check (`npm run eval:ai`) are in. Tool calling, server memory with provenance and a scored evaluation dataset are TARGET. |
@@ -155,7 +156,7 @@ Use meaningful color contrast, soft layered gradients, shadows, animated scene d
 
 ## 6. Landing page detailed specification
 
-**[CURRENT]** sticky top bar, mascot hero with slogan «كل يوم له جوّه.. وخويّك يعرف كيف يمشي معك 🤍», CTAs «يلا نبدأ رحلتنا» / «اكتشف خويّك», animated floating decorative elements and mouse parallax; “تعرّف على خويّك” with 6 expressions; “كيف يشتغل؟” six steps; 8 illustrated journey cards; playable memory preview; Saudi lifestyle cards (prayer, driving, family, Ramadan, study, weather); illustrative level preview explicitly labeled example; closing CTA.
+**[CURRENT]** sticky top bar, mascot hero with slogan «كل يوم له جوّه.. وخويّك يعرف كيف يمشي معك», CTAs «يلا نبدأ رحلتنا» / «اكتشف خويّك», animated floating decorative elements and mouse parallax; “تعرّف على خويّك” with 6 expressions; “كيف يشتغل؟” six steps; 8 illustrated journey cards; playable memory preview; Saudi lifestyle cards (prayer, driving, family, Ramadan, study, weather); illustrative level preview explicitly labeled example; closing CTA.
 
 **[TARGET]** upgrade to premium editorial storytelling, richer original vector/illustration scenes, microinteractions, smooth but restrained scroll reveals, crisp mobile layout, fast load, accessible semantic HTML, SEO metadata, privacy links, transparent “wellbeing not therapy” messaging, clear account entry. Landing demo must be genuinely playable, not a fake animation.
 

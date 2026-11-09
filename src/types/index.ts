@@ -9,7 +9,7 @@ export type ChallengeCategory = 'focus' | 'memory' | 'planning' | 'time' | 'rela
 export type Difficulty = 'easy' | 'normal';
 export type ContextTag = 'event' | 'work' | 'sleep';
 export type EnergyLevel = 'high' | 'mid' | 'low';
-export type ViewId = 'home' | 'journeys' | 'chal' | 'chat' | 'prog' | 'rew' | 'set';
+export type ViewId = 'home' | 'journeys' | 'chal' | 'chat' | 'prog' | 'rew' | 'set' | 'path';
 
 export type ItemStatus = 'NOT_STARTED' | 'IN_PROGRESS' | 'PAUSED' | 'COMPLETED' | 'SKIPPED' | 'ABANDONED';
 export type MissionStatus = 'IN_PROGRESS' | 'PAUSED' | 'DONE';
@@ -46,6 +46,8 @@ export interface PlannedItem {
   id: ChallengeId;
   why: Why;
   diff: Difficulty;
+  /** The journey step this attempt belongs to, so only a real completion can mark it done. */
+  jn?: string;
   /** Personal content for the game, validated before use. Without it a game shows its general example. */
   cfg?: import('../features/plan/config').PlanConfig;
 }
@@ -203,6 +205,18 @@ export interface AppState {
   fullDays: string[];
   /** Show a warm welcome back once after a long gap. */
   missed: number;
+  /** What the user told us during onboarding. Self-reported, optional, and never a diagnosis. */
+  prof: import('../features/profile/questions').LifeProfile | null;
+  /** The personal journey. Only real completions mark its steps done. */
+  path: import('../features/path/planner').PathPlan | null;
+  /** Days the user chose to rest, as YYYY-MM-DD. */
+  rest: string[];
+  /** Show the streak. Off hides it everywhere. */
+  streakOn: number;
+  /** Protect one unplanned missed day in any 7. */
+  streakGrace: number;
+  /** The highest streak milestone already celebrated. */
+  streakSeen: number;
   /** The Supabase account this saved data belongs to. Missing before an account is created. */
   uid?: string;
 }

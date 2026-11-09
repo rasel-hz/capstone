@@ -1,4 +1,4 @@
-import { CalendarOff, CarFront, Download, Palette, ShieldCheck, Trash2, Type, UserRound, Accessibility, MapPin, Languages } from 'lucide-react';
+import { CalendarOff, CarFront, Flame, Download, Palette, ShieldCheck, Trash2, Type, UserRound, Accessibility, MapPin, Languages } from 'lucide-react';
 import { LogoutButton } from '../../features/auth/AuthViews';
 import { clearTypedRemote } from '../../services/progressSync';
 import { useState } from 'react';
@@ -99,6 +99,12 @@ export function Settings({ onNavigate }: { onNavigate(v: ViewId): void }) {
         <SettingRow title={t('settings.motion')} note={t('settings.motionNote')}><Toggle label={t('settings.motion')} on={!!s.rm} onChange={(v) => set((d) => { d.rm = v ? 1 : 0; })} /></SettingRow>
         <SettingRow title={t('settings.sound')} note={t('settings.soundNote')}><Toggle label={t('settings.sound')} on={!!s.snd} onChange={(v) => set((d) => { d.snd = v ? 1 : 0; })} /></SettingRow>
         <SettingRow title={t('settings.largeText')}><Toggle label={t('settings.largeText')} on={!!s.largeText} onChange={(v) => set((d) => { d.largeText = v ? 1 : 0; })} /></SettingRow>
+      </Group>
+
+      <Group id="journey" title={t('path.settings.title')} icon={Flame}>
+        <SettingRow title={t('path.settings.answers')} note={t('path.settings.answersNote')}><button type="button" className="btn sm alt" onClick={() => onNavigate('path')}>{t('path.settings.open')}</button></SettingRow>
+        <SettingRow title={t('path.settings.streak')} note={t('path.settings.streakNote')}><Toggle label={t('path.settings.streak')} on={!!s.streakOn} onChange={(v) => set((d) => { d.streakOn = v ? 1 : 0; })} /></SettingRow>
+        <SettingRow title={t('path.settings.grace')} note={t('path.settings.graceNote')}><Toggle label={t('path.settings.grace')} on={!!s.streakGrace} onChange={(v) => set((d) => { d.streakGrace = v ? 1 : 0; })} /></SettingRow>
       </Group>
 
       <Group id="day" title={t('settings.day')} icon={MapPin}>

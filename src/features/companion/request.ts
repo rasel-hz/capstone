@@ -35,6 +35,8 @@ export function buildChatRequest(message: string, s: AppState) {
       lastPlan: lastPlan(s),
       // Only for scheduling: the next prayer and how far away it is. Never the location or any check-in answer.
       prayer: prayerContext(s),
+      // What the user chose to tell us in onboarding, for advice that fits. Sent only with chat consent.
+      about: s.prof,
       attempts: st.attempts.length,
       completed: st.completed.length,
       avgAccuracy: st.avgAccuracy,

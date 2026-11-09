@@ -1,5 +1,31 @@
 # Changelog
 
+## Unreleased: illustrated journey map
+
+### Added
+- The journey is now an illustrated oasis world: a winding route over islands and bridges, chapters with their own look, stepping-stone steps, gate milestones, and scenery placed so it never covers a step.
+- Numo stands on the step saved progress says is current, celebrates a verified finish once, then moves along the route to the next step. It opens near the current step.
+- A level sheet with the step's details, XP, and Start, Resume or Play again.
+- A sticky header with total XP, streak and journey progress.
+
+### Changed
+- The finish screen links back to the journey after a journey step.
+- Removed every emoji from the app text, the reward data and the docs. Streak milestones now use icons.
+
+## Unreleased: personal onboarding, journey map and daily streak
+
+### Added
+- Adaptive onboarding: questions follow from earlier answers, about daily life, goals and a main goal, optional tasks, when to help, sleep, hard days and how to help. All optional, stored as self-report.
+- A personal journey built from those answers, on an original oasis map with chapters, checkmarks, real XP, milestones and Numo at the current step. See docs/JOURNEY.md.
+- A humane daily streak worked out from recorded attempts: one per day, chosen rest days, one protected missed day in any 7, milestones at 1, 3, 7, 14 and 30 days, and an off switch.
+- Existing users keep everything and can build a journey when they choose.
+- The companion knows what the user chose to share in onboarding.
+
+### Changed
+- Prayer protection, location, sound and motion are no longer onboarding questions. They are in My Profile.
+- Home shows the next journey step and a compact journey preview.
+- A back button on the first onboarding step returns to the landing page.
+
 ## Unreleased: journeys as 7-day programs and today's goals
 
 ### Added

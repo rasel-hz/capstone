@@ -3,6 +3,8 @@ import { today } from '../utils';
 import { CITIES, isMethod, roundCoord, validTz, type PrayerPlace } from '../features/prayer/times';
 import { validBuddy } from '../features/buddy/buddy';
 import { validProgram } from '../features/program/program';
+import { validPlan } from '../features/path/planner';
+import { validProfile } from '../features/profile/questions';
 
 // Storage sits behind this interface so a real backend can replace it later.
 export interface StateRepository {
@@ -20,6 +22,7 @@ export const defaultState = (): AppState => ({
   pref: null, drive: 0, driving: 0, last: Date.now(), theme: '', comeback: 0, lastDaily: null, aiConsent: null, prayerDay: '', city: '', largeText: 0, lang: 'ar-SA', fb: [],
   prayerOn: 1, prayerAsk: 1, prayerMethod: 'umm_al_qura', prayerAsr: 0, loc: null, prayerAck: null, prayerBreak: null,
   prog: null, progDone: [], goals: null, nrg: 0, nrgD: '', fullDays: [], missed: 0,
+  prof: null, path: null, rest: [], streakOn: 1, streakGrace: 1, streakSeen: 0,
 });
 
 export const localRepository: StateRepository = {
@@ -72,5 +75,11 @@ export function hydrate(saved: Partial<AppState> | null, now = Date.now()): AppS
   s.progDone = Array.isArray(s.progDone) ? s.progDone.filter((r) => r && typeof r.before === 'number' && typeof r.after === 'number') : [];
   validBuddy(s);
   s.missed = s.missed ? 1 : 0;
+  s.prof = validProfile(s.prof);
+  s.path = validPlan(s.path);
+  s.rest = Array.isArray(s.rest) ? s.rest.filter((d) => /^\d{4}-\d{2}-\d{2}$/.test(d)).slice(-60) : [];
+  s.streakOn = s.streakOn === 0 ? 0 : 1;
+  s.streakGrace = s.streakGrace === 0 ? 0 : 1;
+  s.streakSeen = Number.isFinite(s.streakSeen) ? s.streakSeen : 0;
   return s;
 }

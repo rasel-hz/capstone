@@ -1,0 +1,22 @@
+{
+  "title": "Daily streak",
+  "chip": "Daily streak: {{n}}",
+  "days_one": "day",
+  "days_other": "days",
+  "current": "Current",
+  "longest": "Longest",
+  "next": "Next milestone",
+  "recent": "Your last 14 days",
+  "mark": { "done": "Challenge done", "rest": "Rest day", "protected": "Protected day", "none": "Nothing recorded" },
+  "rest": "Take today as a rest day",
+  "undoRest": "I don't need a rest today",
+  "restOn": "Resting today. Your streak is safe, and there's nothing you need to do.",
+  "kind": "A day counts when you finish one challenge. Missing days is okay, and this says nothing about your health.",
+  "m": {
+    "seed": { "title": "Your first day", "text": "A small start is still a start." },
+    "spark": { "title": "3 days", "text": "You're getting going." },
+    "flame": { "title": "One week", "text": "Seven days of showing up for yourself." },
+    "star": { "title": "Two weeks", "text": "This is starting to look like a habit." },
+    "trophy": { "title": "One month", "text": "Thirty days. Take a moment to enjoy that." }
+  }
+}

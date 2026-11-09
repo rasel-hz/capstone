@@ -52,11 +52,11 @@ Why this shape:
 
 ## 4. Database design (PostgreSQL)
 
-Conventions: `uuid` PKs (`gen_random_uuid()`), `timestamptz` in UTC, `local_day date` computed in the user's time zone, `created_at`/`updated_at` everywhere, `ON DELETE CASCADE` from `users` (so deletion propagates), and row ownership checked in the API. **Encrypt** free-text and self-report columns marked 🔒 at the application level (or with pgsodium).
+Conventions: `uuid` PKs (`gen_random_uuid()`), `timestamptz` in UTC, `local_day date` computed in the user's time zone, `created_at`/`updated_at` everywhere, `ON DELETE CASCADE` from `users` (so deletion propagates), and row ownership checked in the API. **Encrypt** free-text and self-report columns marked [encrypted] at the application level (or with pgsodium).
 
 ```
 users                (id, auth_id UNIQUE, locale, timezone DEFAULT 'Asia/Riyadh', created_at, deleted_at)
-user_profiles        (user_id PK→users, display_name 🔒, address_form CHECK IN ('m','f'), city_id, schedule CHECK IN ('work','study','flex'),
+user_profiles        (user_id PK→users, display_name [encrypted], address_form CHECK IN ('m','f'), city_id, schedule CHECK IN ('work','study','flex'),
                       active_pattern, sleep_pattern, onboarding_completed_at)
 user_preferences     (user_id PK, sound bool, reduced_motion bool, large_text bool, theme, mission_length CHECK IN ('normal','short'),
                       prayer_protect_min CHECK IN (0,20,30,45), language)
@@ -67,7 +67,7 @@ user_journeys        (user_id, journey_id, priority, PRIMARY KEY (user_id, journ
 checkins             (id, user_id, local_day, energy CHECK IN ('high','mid','low'), source CHECK IN ('home','chat'), created_at,
                       UNIQUE (user_id, local_day))              -- one per day, upsert
 conversations        (id, user_id, started_at, last_message_at, retention_until)
-messages             (id, conversation_id, user_id, role CHECK IN ('user','assistant','system_notice'), content 🔒,
+messages             (id, conversation_id, user_id, role CHECK IN ('user','assistant','system_notice'), content [encrypted],
                       lang, intent, safety_level SMALLINT DEFAULT 0, model, created_at, expires_at)
 context_observations (id, user_id, kind CHECK IN ('event','work','sleep','low_energy',…), value jsonb,
                       source CHECK IN ('user_said','user_set','system_inferred'), evidence_message_id NULL→messages,
@@ -91,7 +91,7 @@ challenge_attempts   (id, user_id, mission_item_id→mission_items, challenge_id
                       status CHECK IN ('in_progress','completed','skipped','abandoned'),
                       client_attempt_key UNIQUE (user_id, client_attempt_key))   -- idempotent create
 challenge_results    (attempt_id PK→challenge_attempts, first_try_accuracy SMALLINT NULL CHECK (0..100), retries int,
-                      payload jsonb 🔒 (typed text / self-report), payload_schema_version, created_at)
+                      payload jsonb [encrypted] (typed text / self-report), payload_schema_version, created_at)
 xp_transactions      (id, user_id, delta int, reason CHECK IN ('attempt_completed','achievement','redemption','refund','adjustment'),
                       source_type, source_id uuid, idempotency_key text NOT NULL, created_at,
                       UNIQUE (user_id, idempotency_key))         -- e.g. 'attempt:<attempt_id>' → XP can't be paid twice
@@ -103,7 +103,7 @@ partners             (id, legal_name, category, status CHECK IN ('prospective','
 rewards              (id, kind CHECK IN ('in_app','user_defined','partner'), partner_id NULL, cost_xp, inventory int NULL,
                       starts_at, ends_at, status, terms)
 reward_redemptions   (id, user_id, reward_id, status CHECK IN ('reserved','issued','redeemed','expired','refunded','failed'),
-                      xp_transaction_id→xp_transactions, voucher_ref 🔒, idempotency_key, UNIQUE (user_id, idempotency_key), timestamps)
+                      xp_transaction_id→xp_transactions, voucher_ref [encrypted], idempotency_key, UNIQUE (user_id, idempotency_key), timestamps)
 agent_runs           (id, user_id, conversation_id, trigger CHECK IN ('chat','mission_plan','adapt'), model, prompt_version,
                       input_tokens, output_tokens, latency_ms, outcome CHECK IN ('ok','safety','fallback','error'), error_code, created_at)
 agent_tool_calls     (id, run_id→agent_runs, tool, args jsonb (redacted), result_summary jsonb, status CHECK IN ('ok','denied','error','needs_approval'),
@@ -162,7 +162,7 @@ Shared request/response types live in `packages/shared` (or `src/shared/contract
 ## 6. Privacy and security requirements before any deployment
 
 - Authenticated chat with per-user quotas and a spending cap on the OpenAI key (fixes H-2).
-- Encryption for 🔒 columns. Retention: messages expire by default (for example after 30 days) unless the user keeps them.
+- Encryption for columns marked [encrypted]. Retention: messages expire by default (for example after 30 days) unless the user keeps them.
 - Export and delete per user. Deletion cascades and removes data from logs within a set window.
 - Audit events for every agent write and consent change. Logs never contain message text or keys (today's rule in `server/chat.ts` stays).
 - Security headers, CORS restricted to the app's origins, and TLS everywhere.

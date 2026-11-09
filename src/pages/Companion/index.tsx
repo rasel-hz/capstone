@@ -7,6 +7,7 @@ import { useMascot } from '../../components/mascot/useMascot';
 import { useAppState, useStore } from '../../context/AppStateContext';
 import { tr } from '../../i18n';
 import { SuggestionCard } from '../../features/companion/SuggestionCard';
+import { completeTalk } from '../../features/path/planner';
 import { buildSuggestion } from '../../features/recommend/suggest';
 import { aiCompanion, isAiAvailable, ruleCompanion } from '../../services/companion';
 import type { ContextTag } from '../../types';
@@ -69,7 +70,7 @@ export function Companion() {
     mascot.clear();
     // The history sent to the AI shouldn't repeat this message, so it is read before saving it.
     const before = store.getState();
-    store.update((d) => { d.chat.push({ t: v }); });
+    store.update((d) => { d.chat.push({ t: v }); completeTalk(d); });
     setWaiting(true);
     let reply;
     try {
