@@ -20,7 +20,7 @@ if (resolve(out).startsWith(resolve('.'))) {
 }
 
 // Restore order respects foreign keys. Identity columns need OVERRIDING SYSTEM VALUE.
-export const TABLES = ['rewards', 'profiles', 'challenge_attempts', 'point_transactions', 'user_reward_unlocks'];
+export const TABLES = ['rewards', 'profiles', 'challenge_attempts', 'point_transactions', 'user_reward_unlocks', 'reward_redemptions'];
 const IDENTITY = new Set(['point_transactions']);
 
 const sql = postgres(url, { ssl: 'require', max: 1, onnotice: () => {} });

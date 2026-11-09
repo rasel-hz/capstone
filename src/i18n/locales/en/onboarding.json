@@ -7,7 +7,7 @@
   "namePh": "Your name or nickname",
   "address": "In Arabic, address me as",
   "journeysQ": "What would you like to work on?",
-  "journeysNote": "Choose more than one, or skip this and change it later. These are for support and practice, not a diagnosis.",
+  "journeysNote": "Choose more than one, or skip this and change it later.",
   "dayQ": "What does your day usually look like?",
   "sleep": "Your sleep (optional)",
   "sleepOptions": {

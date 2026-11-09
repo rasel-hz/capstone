@@ -31,7 +31,6 @@
   },
   "statusAi": "Replies come from an AI model (OpenAI) and can be wrong",
   "statusRules": "Limited mode: simple rules in the app, not AI. I may miss what you mean.",
-  "disclaimer": "I'm not a therapist and I don't diagnose. I don't replace your family, friends or professionals.",
   "logLabel": "Conversation",
   "empty": "Tell me about your day: your sleep, your work, or anything on your mind.",
   "card": {

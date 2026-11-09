@@ -1,4 +1,4 @@
-import { Lock, Plus, X } from 'lucide-react';
+import { Plus, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { tr } from '../../../i18n';
@@ -78,7 +78,6 @@ export function ThoughtSortGame({ diff, env, onDone }: GameProps) {
       <div className="scene pp">
         <div className="pp__head">
           <h2 className="q__t">{t('games.thought.addQ')}</h2>
-          <p className="note flush">{t('games.thought.addNote', { count: max })}</p>
         </div>
         <ul className="pp__list">
           {items.map((x, i) => (
@@ -100,7 +99,6 @@ export function ThoughtSortGame({ diff, env, onDone }: GameProps) {
             {EXAMPLES.map((k) => <button key={k} type="button" className="tag tag--btn" onClick={() => setDraft(t(`games.thought.examples.${k}`))}>{t(`games.thought.examples.${k}`)}</button>)}
           </div>
         )}
-        <p className="note"><Lock size={13} aria-hidden="true" /> {t('games.thought.private')}</p>
         <div className="row row--c"><button type="button" className="btn" disabled={!items.length} onClick={() => setPhase('sort')}>{t('common.next')}</button></div>
       </div>
     );
@@ -111,7 +109,6 @@ export function ThoughtSortGame({ diff, env, onDone }: GameProps) {
       <div className="scene pp">
         <div className="pp__head">
           <h2 className="q__t">{t('games.thought.sortQ')}</h2>
-          <p className="note flush">{t('games.thought.sortNote')}</p>
         </div>
         <div className="pb__deck" data-drop="deck">
           <div className="pb__cards">
@@ -154,7 +151,6 @@ export function ThoughtSortGame({ diff, env, onDone }: GameProps) {
         <>
           <div className="pp__head">
             <h2 className="q__t">{t('games.thought.stepQ')}</h2>
-            <p className="note flush">{t('games.thought.stepNote')}</p>
           </div>
           {act.length > 1 && (
             <div className="tags tags--c" role="group" aria-label={t('games.thought.pickOne')}>
@@ -173,7 +169,6 @@ export function ThoughtSortGame({ diff, env, onDone }: GameProps) {
         <>
           <div className="pp__head">
             <h2 className="q__t">{t('games.thought.noActQ')}</h2>
-            <p className="note flush">{t('games.thought.noActNote')}</p>
           </div>
           <div className="row row--c">
             <button type="button" className="btn alt" onClick={() => setPhase('sort')}>{t('common.back')}</button>
@@ -181,7 +176,6 @@ export function ThoughtSortGame({ diff, env, onDone }: GameProps) {
           </div>
         </>
       )}
-      {inB('unsure').length > 0 && <p className="note center">{t('games.thought.unsureNote')}</p>}
     </div>
   );
 }

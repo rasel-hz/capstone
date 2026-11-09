@@ -1,6 +1,6 @@
 {
   "title": "Challenges",
-  "sub": "Short games to try at your own pace. They're for your own tracking, not a measure of your health.",
+  "sub": "Short games to try at your own pace.",
   "categories": {
     "all": "All",
     "focus": "Focus",
@@ -119,7 +119,7 @@
     "dhikr_calm_heart": {
       "name": "Ease your heart",
       "desc": "Established supplications for worry and distress, at your own pace.",
-      "purpose": "Established supplications and dhikr for worry, distress and fear. Remembrance and prayer, not treatment and not a substitute for a professional.",
+      "purpose": "Established supplications and dhikr for worry, distress and fear.",
       "instructions": "Read each supplication slowly and tap the counter when you say it. There is no timer, and you can skip any of them."
     },
     "dhikr_moment": {

@@ -21,10 +21,16 @@ export interface Reward {
 }
 
 export interface PointsSummary {
+  /** Points ever earned. Spending doesn't lower it. */
   lifetime: number;
+  /** Points that can be spent now: earned minus spent. Older databases don't send it, so it falls back to lifetime. */
+  balance?: number;
   today: number;
   unlocks: { reward_id: string; unlocked_at: string; celebrated: boolean }[];
+  redemptions?: { reward_id: string; points: number; at: string }[];
 }
+
+export const balanceOf = (s: PointsSummary) => s.balance ?? s.lifetime;
 
 export class PointsError extends Error {}
 
@@ -53,6 +59,14 @@ export async function fetchRewards(): Promise<Reward[]> {
 export async function fetchSummary(): Promise<PointsSummary> {
   const { data, error } = await db().rpc('my_points_summary');
   if (error) throw new PointsError(error.message);
+  return data as PointsSummary;
+}
+
+/** Spends a reward's points. The database checks the balance and refuses if it isn't enough. */
+export async function redeemReward(id: string): Promise<PointsSummary> {
+  const { data, error } = await db().rpc('redeem_reward', { p_reward: id });
+  if (error) throw new PointsError(/not_enough_points/.test(error.message) ? 'notEnough' : 'failed');
+  notifyPointsChanged();
   return data as PointsSummary;
 }
 

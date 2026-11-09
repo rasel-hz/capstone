@@ -58,7 +58,6 @@ export function PrayerSetup({ value, onChange, onSkip }: { value: PlaceChoice; o
       ) : (
         <div className="psu__intro">
           <b>{t('prayer.setup.title')}</b>
-          <p className="note flush">{t('prayer.setup.text')}</p>
         </div>
       )}
 

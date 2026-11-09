@@ -1,19 +1,21 @@
 import { motion } from 'motion/react';
-import { BarChart3, Gamepad2, Gift, House, MessageCircle, UserRound, type LucideIcon } from 'lucide-react';
+import { Gamepad2, House, MessageCircle, Trophy, UserRound, type LucideIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { ViewId } from '../../types';
 import { Mascot } from '../mascot/Mascot';
 import { LanguageSwitcher } from '../ui/LanguageSwitcher';
 import { LogoutButton } from '../../features/auth/AuthViews';
 
-// Six tabs, with the buddy raised. Journeys open from the Challenges page. Rewards has its own tab and is
-// still a sub-tab of Progress (see SubTabs).
+// Five tabs, with the buddy raised. Journeys open from the Challenges page. Progress and Rewards share one
+// "Achievements" tab and switch with the sub-tabs at the top of the page (see SubTabs).
 const TABS: [ViewId, LucideIcon][] = [
-  ['home', House], ['chal', Gamepad2], ['chat', MessageCircle], ['prog', BarChart3], ['rew', Gift], ['set', UserRound],
+  ['home', House], ['chal', Gamepad2], ['chat', MessageCircle], ['prog', Trophy], ['set', UserRound],
 ];
+// A tab whose label differs from its first page's name.
+const TAB_LABEL: Partial<Record<ViewId, string>> = { prog: 'nav.achievements' };
 
 // The tab that stays lit for a view reached through a sub-tab.
-export const TAB_OF: Partial<Record<ViewId, ViewId>> = { journeys: 'chal', path: 'home' };
+export const TAB_OF: Partial<Record<ViewId, ViewId>> = { journeys: 'chal', path: 'home', rew: 'prog' };
 
 export function NavBar({ view, onNavigate }: { view: ViewId; onNavigate(v: ViewId): void }) {
   const { t } = useTranslation();
@@ -26,7 +28,7 @@ export function NavBar({ view, onNavigate }: { view: ViewId; onNavigate(v: ViewI
           {active === id && <motion.span layoutId="nav-active" className="nav-pill" transition={{ type: 'spring', stiffness: 420, damping: 36 }} />}
           <Icon className="nav-icon" size={19} aria-hidden="true" />
           {id === 'chat' && <span className="nav-buddy__face" aria-hidden="true"><Mascot state="idle" size={46} still /></span>}
-          <span className="nav-label">{t(`nav.${id}`)}</span>
+          <span className="nav-label">{t(TAB_LABEL[id] ?? `nav.${id}`)}</span>
         </button>
       ))}
       <LanguageSwitcher />

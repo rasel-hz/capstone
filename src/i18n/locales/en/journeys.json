@@ -1,8 +1,7 @@
 {
   "title": "My Journeys",
-  "sub": "Short journeys, 7 days each. They are support and practice, not treatment, and no diagnosis is needed.",
+  "sub": "Short journeys, 7 days each.",
   "all": "All journeys",
-  "disclaimerDetail": "This is a journey for support and practice, not a treatment program or a diagnosis. It shares challenges with other journeys.",
   "tagDone": "Completed",
   "tagNext": "Next",
   "exploreName": "Explore {{name}}",
@@ -22,7 +21,7 @@
     },
     "ocd": {
       "name": "Navigating Uncertainty",
-      "desc": "Educational content only. Any treatment program belongs with a professional",
+      "desc": "Handling things that are uncertain",
       "ask": "How would you rate how you handle uncertain things?"
     },
     "mood": {
@@ -86,7 +85,6 @@
     "up": "Your rating went up from {{before}} to {{after}}. Nice work!",
     "same": "Your rating stayed the same ({{before}}). What matters is you finished it.",
     "down": "Your rating is {{after}}, from {{before}}. That's okay, days differ, and you can do it again any time.",
-    "selfNote": "This is your own rating, not a medical measure.",
     "again": "Start another journey"
   },
   "backToChal": "Back to Challenges",

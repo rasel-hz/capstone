@@ -12,7 +12,7 @@ const milestoneFor = (n: number) => [...MILESTONES].reverse().find((m) => n >= m
 
 const MILESTONE_ICON: Record<string, LucideIcon> = { seed: Sprout, spark: Sparkles, flame: Flame, star: Star, trophy: Trophy };
 
-function MilestoneIcon({ id, size = 14 }: { id: string; size?: number }) {
+export function MilestoneIcon({ id, size = 14 }: { id: string; size?: number }) {
   const Ic = MILESTONE_ICON[id];
   return <Ic className="sk-ic" size={size} aria-hidden="true" />;
 }
@@ -44,16 +44,23 @@ export function StreakCard() {
   const days = recentDays(v);
   const next = nextMilestone(v.current);
   return (
-    <section className="panel sk-card" aria-labelledby="sk-t">
-      <div className="sk-card__top">
-        <h2 id="sk-t">{t('streak.title')}</h2>
-        <StreakChip />
+    <section className="pv-sec pv-streak" aria-labelledby="sk-t">
+      <h2 className="pv-h" id="sk-t">{t('streak.title')}</h2>
+      <div className="pv-streak__top">
+        <div className="pv-big">
+          <b>{v.current}</b>
+          <span>{t('streak.current')}</span>
+        </div>
+        <dl className="pv-side">
+          <div><dt>{t('streak.longest')}</dt><dd>{v.longest}</dd></div>
+          {next && <div><dt>{t('streak.next')}</dt><dd><MilestoneIcon id={next.id} /> {next.n} {t('streak.days', { count: next.n })}</dd></div>}
+        </dl>
       </div>
-      <dl className="sk-stats">
-        <div><dt>{t('streak.current')}</dt><dd>{v.current}</dd></div>
-        <div><dt>{t('streak.longest')}</dt><dd>{v.longest}</dd></div>
-        {next && <div><dt>{t('streak.next')}</dt><dd><MilestoneIcon id={next.id} /> {next.n} {t('streak.days', { count: next.n })}</dd></div>}
-      </dl>
+      {next && (
+        <div className="pv-meter" role="progressbar" aria-valuemin={0} aria-valuemax={next.n} aria-valuenow={v.current} aria-label={t('streak.next')}>
+          <i style={{ width: `${Math.min(100, (v.current / next.n) * 100)}%` }} />
+        </div>
+      )}
       <ol className="sk-days" aria-label={t('streak.recent')}>
         {days.map(({ d, mark, today }) => {
           const Ic = mark === 'none' ? null : MARK_ICON[mark];
@@ -71,14 +78,14 @@ export function StreakCard() {
         <span><Moon size={12} aria-hidden="true" /> {t('streak.mark.rest')}</span>
         <span><ShieldCheck size={12} aria-hidden="true" /> {t('streak.mark.protected')}</span>
       </p>
-      <div className="row">
+      <div className="pv-rest">
         {v.todayRest ? (
           <button type="button" className="btn sm alt" onClick={() => store.update((d) => undoRest(d))}>{t('streak.undoRest')}</button>
         ) : canRest(s) && (
           <button type="button" className="btn sm alt" onClick={() => store.update((d) => { takeRest(d); })}><Coffee size={14} aria-hidden="true" /> {t('streak.rest')}</button>
         )}
+        <p className="note flush">{t(v.todayRest ? 'streak.restOn' : 'streak.kind')}</p>
       </div>
-      <p className="note flush">{t(v.todayRest ? 'streak.restOn' : 'streak.kind')}</p>
     </section>
   );
 }

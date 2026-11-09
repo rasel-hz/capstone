@@ -46,11 +46,11 @@ describe('removed screens', () => {
     for (const gone of ['prayer.settings.ask', 'settings.driving', 'settings.drivingNow', 'settings.driveHours', 'settings.notConnected']) expect(page).not.toContain(gone);
   });
 
-  it('progress no longer shows the tiles, the activity chart or the self-report section', () => {
+  it('progress shows only the streak and journey results', () => {
     const page = read('src/pages/Progress/index.tsx');
-    for (const gone of ['progress.tileCompleted', 'common.level', 'progress.tileRate', 'progress.tileAccuracy', 'progress.activity', 'progress.asTable', 'progress.selfTitle']) expect(page).not.toContain(gone);
-    // Unrelated parts of the page stay.
-    for (const kept of ['<StreakCard />', 'progress.fullDays.title', 'progress.programs.title', 'progress.scoredTitle', 'progress.notesTitle']) expect(page).toContain(kept);
+    for (const gone of ['progress.tileCompleted', 'common.level', 'progress.tileRate', 'progress.tileAccuracy', 'progress.activity', 'progress.asTable', 'progress.selfTitle',
+      'progress.fullDays.title', 'progress.scoredTitle', 'progress.unscoredTitle', 'progress.notesTitle']) expect(page).not.toContain(gone);
+    for (const kept of ['<WeekStreak', 'progress.programs.title', 'progress.brief.refresh']) expect(page).toContain(kept);
   });
 });
 

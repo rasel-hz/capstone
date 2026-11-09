@@ -3,12 +3,12 @@ import { useEffect, useRef, type ReactNode } from 'react';
 
 // Small shared pieces, so every screen has the same controls and spacing.
 
-export function PageHeader({ title, sub, children }: { title: string; sub?: string; children?: ReactNode }) {
+// Pages show their title only; explanatory subtitles were removed across the app. `sub` stays accepted so callers don't break.
+export function PageHeader({ title, children }: { title: string; sub?: string; children?: ReactNode }) {
   return (
     <header className="page-head">
       <div className="grow">
         <h1>{title}</h1>
-        {sub && <p className="page-sub">{sub}</p>}
       </div>
       {children}
     </header>

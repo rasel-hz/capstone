@@ -156,7 +156,7 @@ const DIAGNOSIS = /(عندك|فيك|مصاب|تعاني من|you have|you may ha
 
 // A sentence that refuses or only asks isn't a diagnosis, such as "I can't tell you if you have ADHD".
 const REFUSAL = /(can't|cannot|can not|can’t|won't|won’t|not able|unable|don't know|don’t know|\bif you\b|\bwhether\b|\bdo you\b|ما أقدر|ما اقدر|ما أعرف|ما اعرف|ما أشخص|ما أشخّص|إذا|لو\s|هل\s)/i;
-const isDiagnosis = (reply: string) => reply.split(/[.،!؟?\n]+/).some((part) => DIAGNOSIS.test(part + '.') && !REFUSAL.test(part));
+export const isDiagnosis = (reply: string) => reply.split(/[.،!؟?\n]+/).some((part) => DIAGNOSIS.test(part + '.') && !REFUSAL.test(part));
 
 // Final checks on what the model proposed. Anything unexpected is rejected rather than shown.
 // `said` is what the user wrote in this conversation, used to keep only tasks they really mentioned.
@@ -167,7 +167,8 @@ export function acceptOutput(rawText: string, lang: 'ar-SA' | 'en' = 'ar-SA', sa
   } catch {
     throw new ChatError(502, 'bad_model_output');
   }
-  const reply = typeof o.reply === 'string' ? o.reply.trim() : '';
+  // «يا بعدي» is replaced by the {name} token, which the app fills with the user's name.
+  const reply = typeof o.reply === 'string' ? o.reply.trim().replace(/يا بعدي/g, 'يا {name}') : '';
   if (!reply || reply.length > MAX_REPLY || typeof o.distress !== 'boolean') throw new ChatError(502, 'bad_model_output');
   if (o.distress) return crisisReply(2, lang);
   if (isDiagnosis(reply)) throw new ChatError(502, 'unsafe_model_output');

@@ -110,7 +110,6 @@ export function CalmGame({ env, onDone }: GameProps) {
           <button type="button" className="btn" onClick={beginBreath}>{t('games.calm.startBreathing')}</button>
           <button type="button" className="btn alt" onClick={beginQuiet}>{t('games.calm.noBreathing')}</button>
         </div>
-        <p className="note center">{t('games.calm.disclaimer')}</p>
       </div>
     );
   }
@@ -123,7 +122,6 @@ export function CalmGame({ env, onDone }: GameProps) {
           {['y', 's', 'n'].map((k) => <button key={k} type="button" className="opt" onClick={() => answer(k)}>{t(`games.common.help.${k}`)}</button>)}
         </div>
         <div className="row row--c"><button type="button" className="btn-link" onClick={() => answer(null)}>{t('games.common.preferNot')}</button></div>
-        <p className="note center">{t('games.common.trackingOnly')}</p>
       </div>
     );
   }

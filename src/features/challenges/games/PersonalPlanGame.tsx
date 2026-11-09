@@ -99,7 +99,6 @@ export function PersonalPlanGame({ env, onDone, cfg }: GameProps & { cfg: PlanCo
       <div className="scene pp">
         <div className="pp__head">
           <h2 className="q__t">{t('games.plan.tasksQ')}</h2>
-          <p className="note flush">{t('games.plan.tasksNote')}</p>
         </div>
         <ul className="pp__list">
           {tasks.filter((x) => x.src === 'user').map((x) => (
@@ -128,7 +127,6 @@ export function PersonalPlanGame({ env, onDone, cfg }: GameProps & { cfg: PlanCo
       <div className="scene pp">
         <div className="pp__head">
           <h2 className="q__t">{t('games.plan.sortQ')}</h2>
-          <p className="note flush">{t('games.plan.sortNote')}</p>
         </div>
         <div className="pb__deck" data-drop="deck">
           <div className="pb__cards">
@@ -178,7 +176,6 @@ export function PersonalPlanGame({ env, onDone, cfg }: GameProps & { cfg: PlanCo
       <div className="scene pp">
         <div className="pp__head">
           <h2 className="q__t">{t('games.plan.timeQ')}</h2>
-          <p className="note flush">{t('games.plan.timeNote')}</p>
         </div>
         <div className="tags tags--c" role="group" aria-label={t('games.plan.timeQ')}>
           {TIME_CHOICES.map((m) => <button key={m} type="button" className="tag tag--btn" onClick={() => setMinutes(m)}>{t('common.minutes', { count: m })}</button>)}
@@ -200,7 +197,6 @@ export function PersonalPlanGame({ env, onDone, cfg }: GameProps & { cfg: PlanCo
     <div className="scene pp">
       <div className="pp__head">
         <h2 className="q__t">{t('games.plan.blocksQ', { n: minutes })}</h2>
-        <p className="note flush">{t('games.plan.blocksNote')}</p>
       </div>
       <div className={`pp__meter ${over ? 'is-over' : ''}`} role="status">
         <Clock size={15} aria-hidden="true" />

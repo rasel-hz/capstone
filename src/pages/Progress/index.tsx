@@ -1,35 +1,21 @@
-import { Zap } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { EmptyState, PageHeader } from '../../components/ui/kit';
 import { Mascot } from '../../components/mascot/Mascot';
 import { useMascot } from '../../components/mascot/useMascot';
 import { useAppState } from '../../context/AppStateContext';
-import { ChallengeArt } from '../../features/challenges/ChallengeArt';
-import { CHALLENGES } from '../../features/challenges/catalog';
-import { fullDaysIn } from '../../features/buddy/buddy';
 import { progressStats } from '../../features/progress/stats';
-import { StreakCard } from '../../features/streak/StreakBits';
-import { fetchProgress, onProgressChanged, type RemoteProgress } from '../../services/progressSync';
+import { MilestoneIcon } from '../../features/streak/StreakBits';
+import { canRest, MILESTONES, nextMilestone, recentDays, streakOf, takeRest, undoRest } from '../../features/streak/streak';
+import { useCountUp } from '../../hooks/useCountUp';
 import { formatDate, isRtl } from '../../i18n';
-import type { AppState, Attempt, ViewId } from '../../types';
-
-const avg = (a: number[]) => Math.round(a.reduce((n, v) => n + v, 0) / a.length);
-const median = (a: number[]) => {
-  const s = [...a].sort((x, y) => x - y);
-  return s[Math.floor(s.length / 2)];
-};
-
-function Spark({ values }: { values: number[] }) {
-  const { t } = useTranslation();
-  if (values.length < 2) return null;
-  const rtl = isRtl();
-  const pts = values.map((v, i) => {
-    const p = (i / (values.length - 1)) * 100;
-    return `${rtl ? 100 - p : p},${28 - (v / 100) * 24}`;
-  }).join(' ');
-  return <svg className="spark" viewBox="0 0 100 30" preserveAspectRatio="none" role="img" aria-label={t('progress.sparkLabel', { values: values.join(t('common.listSep')) })}><polyline points={pts} fill="none" stroke="#28785B" strokeWidth="2" vectorEffect="non-scaling-stroke" /></svg>;
-}
+import { fillName } from '../../features/companion/name';
+import { briefInput, fallbackBrief, requestBrief, type BriefText } from '../../features/progress/brief';
+import { useStore } from '../../context/AppStateContext';
+import { Check, Coffee, Moon, RefreshCw, ShieldCheck } from 'lucide-react';
+import { today } from '../../utils';
+import { fetchProgress, onProgressChanged, type RemoteProgress } from '../../services/progressSync';
+import type { AppState, ViewId } from '../../types';
 
 // Everything on this page comes from Supabase. The device's copy is used only for settings such as the
 // language and reduced motion, never for the numbers.
@@ -94,94 +80,147 @@ function ProgressView({ onNavigate, s }: { onNavigate(v: ViewId): void; s: AppSt
     );
   }
 
-  const scored = st.byChallenge.filter(([id]) => CHALLENGES[id].scored);
-  const unscored = st.byChallenge.filter(([id]) => !CHALLENGES[id].scored && !CHALLENGES[id].selfReport);
-  const row = (a: Attempt[]) => median(a.map((h) => h.dur));
+  return (
+    <div className="pv">
+      <PageHeader title={t('progress.title')} />
+      <BriefHero s={s} />
+      <WeekStreak s={s} />
+      {s.progDone.length > 0 && <JourneyResults s={s} />}
+    </div>
+  );
+}
+
+// Zaho presents the week: the AI's headline and nudge come out of Zaho as a speech bubble.
+// Written once a day and kept on the device; refreshed from the bubble. Without the AI, plain words stand in.
+function BriefHero({ s }: { s: AppState }) {
+  const { t } = useTranslation();
+  const store = useStore();
+  const v = streakOf(s);
+  const hit = MILESTONES.some((m) => m.n === v.current) && v.todayDone;
+  const mascot = useMascot(v.todayDone ? 'happy' : 'idle');
+  // A brief saved before the headline format (no nudge field) is written again.
+  const saved = s.brief && s.brief.d === today() && s.brief.lang === s.lang && s.brief.nudge !== undefined ? { headline: s.brief.text, nudge: s.brief.nudge } : null;
+  const [brief, setBrief] = useState<BriefText | null>(saved);
+  const [busy, setBusy] = useState(false);
+
+  const write = useCallback(async () => {
+    setBusy(true);
+    const fresh = briefInput(s);
+    try {
+      const b = await requestBrief(fresh);
+      setBrief(b);
+      store.update((d) => { d.brief = { d: today(), lang: fresh.lang, text: b.headline, nudge: b.nudge }; });
+      mascot.play('happy');
+    } catch {
+      // Not saved, so tomorrow (or a refresh) tries the AI again.
+      setBrief(fallbackBrief(fresh));
+    } finally {
+      setBusy(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [s.lang]);
+
+  useEffect(() => {
+    if (!saved) void write();
+    // Reaching a milestone today gets Zaho's celebration.
+    else if (hit) mascot.play('celebrating');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
-    <>
-      <PageHeader title={t('progress.title')} sub={t('progress.sub')}>
-        <Mascot state={mascot.state} size={72} />
-      </PageHeader>
-      <StreakCard />
+    <section className="pv-hero" aria-labelledby="brief-t" aria-busy={busy}>
+      <div className="pv-hero__buddy"><Mascot state={busy ? 'thinking' : mascot.state} size={128} /></div>
+      <div className="pv-bubble">
+        <p className="sr-only" id="brief-t">{t('progress.brief.title')}</p>
+        <p className="pv-headline" dir="auto">{busy && !brief ? t('progress.brief.writing') : fillName(brief?.headline ?? '', s.name)}</p>
+        {brief?.nudge && <p className="pv-nudge" dir="auto">{fillName(brief.nudge, s.name)}</p>}
+        <button type="button" className="pv-refresh" disabled={busy} aria-label={t('progress.brief.refresh')} title={t('progress.brief.refresh')} onClick={() => void write()}><RefreshCw size={15} aria-hidden="true" /></button>
+      </div>
+    </section>
+  );
+}
 
-      {s.fullDays.length > 0 && (() => {
-        const week = fullDaysIn(s);
-        return (
-          <section className="panel">
-            <h2>{t('progress.fullDays.title')}</h2>
-            <p className="flush">{t('progress.fullDays.week', { n: week.filter((d) => d.full).length })}</p>
-            <ol className="fdays">
-              {week.map(({ date, full }) => {
-                const day = formatDate(date, { weekday: 'short' });
-                return <li key={date.toDateString()} className={full ? 'is-full' : ''} aria-label={t(full ? 'progress.fullDays.dayFull' : 'progress.fullDays.dayNot', { day })}><i aria-hidden="true">{full ? <Zap size={14} /> : null}</i><span aria-hidden="true">{day}</span></li>;
-              })}
-            </ol>
-            <p className="note flush">{t('progress.fullDays.note')}</p>
-          </section>
-        );
-      })()}
+const MARK_ICON = { done: Check, rest: Moon, protected: ShieldCheck } as const;
 
-      {s.progDone.length > 0 && (
-        <section className="panel">
-          <h2>{t('progress.programs.title')}</h2>
-          <p className="note">{t('progress.programs.note')}</p>
-          <ul className="pres-list">
-            {[...s.progDone].reverse().map((r) => (
-              <li key={`${r.id}${r.end}`}>
-                <b>{t(`journeys.items.${r.id}.name`)}</b>
-                <span className={r.after > r.before ? 'pres-list__up' : ''}>{t('progress.programs.row', { before: r.before, after: r.after })}</span>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+// The week is the page's centre: one large streak number, a quiet line with the other figures, and this
+// week's seven days with their marks. The week before is one tap away, so all 14 days stay reachable.
+function WeekStreak({ s }: { s: AppState }) {
+  const { t } = useTranslation();
+  const store = useStore();
+  const [earlier, setEarlier] = useState(false);
+  const v = streakOf(s);
+  const all = recentDays(v, 14);
+  const days = earlier ? all.slice(0, 7) : all.slice(7);
+  const next = nextMilestone(v.current);
+  const current = useCountUp(v.current, 700);
+  const week = briefInput(s).stats.week;
+  if (!s.streakOn) return null;
+  return (
+    <section className="pv-week" aria-labelledby="sk-t">
+      <h2 className="sr-only" id="sk-t">{t('streak.title')}</h2>
+      <div className="pv-week__head">
+        <div className="pv-big"><b>{current}</b><span>{t('streak.current')}</span></div>
+        {next && (
+          <div className="pv-next" role="progressbar" aria-valuemin={0} aria-valuemax={next.n} aria-valuenow={v.current} aria-label={t('streak.next')}>
+            <span className="pv-next__l"><MilestoneIcon id={next.id} /> {t('streak.next')} · {next.n} {t('streak.days', { count: next.n })}</span>
+            <span className="pv-next__bar"><i style={{ width: `${Math.min(100, (v.current / next.n) * 100)}%` }} /></span>
+          </div>
+        )}
+      </div>
+      <p className="pv-facts">
+        <span>{t('streak.longest')} <b>{v.longest}</b></span>
+        <span><b>{week}</b> {t('progress.brief.week')}</span>
+      </p>
 
-      {scored.length > 0 && (
-        <section className="panel">
-          <h2>{t('progress.scoredTitle')}</h2>
-          <p className="note">{t('progress.scoredNote')}</p>
-          <ul className="perf">
-            {scored.map(([id, a]) => {
-              const vals = a.filter((h) => h.acc != null).map((h) => h.acc as number);
-              return (
-                <li key={id}>
-                  <div className="perf__art"><ChallengeArt id={id} /></div>
-                  <div className="grow"><b>{t(`challenges.items.${id}.name`)}</b><p className="note flush">{t('progress.scoredRow', { times: t('challenges.times', { count: a.length }), avg: avg(vals), last: vals[vals.length - 1] })}</p></div>
-                  <Spark values={vals.slice(-8)} />
-                </li>
-              );
-            })}
-          </ul>
-        </section>
-      )}
+      <ol className="pv-days" aria-label={t('streak.recent')}>
+        {days.map(({ d, mark, today: isToday }) => {
+          const Ic = mark === 'none' ? null : MARK_ICON[mark];
+          const date = new Date(`${d}T12:00:00Z`);
+          return (
+            <li key={d} className={`pv-day pv-day--${mark} ${isToday ? 'is-today' : ''}`} aria-label={`${formatDate(date, { weekday: 'long', day: 'numeric', month: 'long' })}: ${t(`streak.mark.${mark}`)}`}>
+              <span className="pv-day__w" aria-hidden="true">{formatDate(date, { weekday: 'narrow' })}</span>
+              <span className="pv-day__o" aria-hidden="true">{Ic ? <Ic size={16} /> : date.getUTCDate()}</span>
+            </li>
+          );
+        })}
+      </ol>
+      <div className="pv-week__foot">
+        <button type="button" className="pv-link" aria-pressed={earlier} onClick={() => setEarlier(!earlier)}>{t(earlier ? 'progress.week.this' : 'progress.week.before')}</button>
+        <span className="pv-legend" aria-hidden="true">
+          <span><Check size={12} /> {t('streak.mark.done')}</span>
+          <span><Moon size={12} /> {t('streak.mark.rest')}</span>
+          <span><ShieldCheck size={12} /> {t('streak.mark.protected')}</span>
+        </span>
+      </div>
 
-      {unscored.length > 0 && (
-        <section className="panel">
-          <h2>{t('progress.unscoredTitle')}</h2>
-          <p className="note">{t('progress.unscoredNote')}</p>
-          <ul className="perf">
-            {unscored.map(([id, a]) => (
-              <li key={id}>
-                <div className="perf__art"><ChallengeArt id={id} /></div>
-                <div className="grow"><b>{t(`challenges.items.${id}.name`)}</b><p className="note flush">{t('progress.unscoredRow', { times: t('challenges.times', { count: a.length }), time: t('common.seconds', { count: row(a) }) })}</p></div>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
+      <div className="pv-rest">
+        {v.todayRest ? (
+          <button type="button" className="pv-chip" onClick={() => store.update((d) => undoRest(d))}><Moon size={14} aria-hidden="true" /> {t('streak.undoRest')}</button>
+        ) : canRest(s) && (
+          <button type="button" className="pv-chip" onClick={() => store.update((d) => { takeRest(d); })}><Coffee size={14} aria-hidden="true" /> {t('streak.rest')}</button>
+        )}
+        <span className="pv-rest__t">{t(v.todayRest ? 'streak.restOn' : 'streak.kind')}</span>
+      </div>
+    </section>
+  );
+}
 
-      <section className="panel insight-box">
-        <h2>{t('progress.notesTitle')}</h2>
-        <p><b>{t('progress.known')}</b> {t('progress.knownText', { done: st.completed.length, total: st.attempts.length })}</p>
-        {st.attempts.length >= 4 ? (
-          <>
-            <p><b>{t('progress.noticed')}</b> {t('progress.noticedText', { short: st.shortCount, total: st.completed.length })}</p>
-            <p><b>{t('progress.maybe')}</b> {t('progress.maybeText')}</p>
-          </>
-        ) : <p className="note">{t('progress.needMore')}</p>}
-        <p className="note">{t('progress.disclaimer')}</p>
-      </section>
-    </>
+// Each finished journey as its two ratings: where the user started and where they ended.
+function JourneyResults({ s }: { s: AppState }) {
+  const { t } = useTranslation();
+  const arrow = isRtl() ? '\u2190' : '\u2192';
+  return (
+    <section className="pv-journeys" aria-labelledby="pj-t">
+      <h2 className="pv-h" id="pj-t">{t('progress.programs.title')}</h2>
+      <ul>
+        {[...s.progDone].reverse().map((r) => (
+          <li key={`${r.id}${r.end}`} className={r.after > r.before ? 'is-up' : ''} aria-label={`${t(`journeys.items.${r.id}.name`)}: ${t('progress.programs.row', { before: r.before, after: r.after })}`}>
+            <b className="pv-j__name">{t(`journeys.items.${r.id}.name`)}</b>
+            <span className="pv-j__nums" aria-hidden="true"><span>{r.before}</span><i>{arrow}</i><b>{r.after}</b></span>
+            {r.after > r.before && <span className="pv-j__tag">{t('progress.programs.up')}</span>}
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }

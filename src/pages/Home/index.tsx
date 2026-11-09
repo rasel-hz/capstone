@@ -204,7 +204,6 @@ export function Home({ onNavigate }: { onNavigate(v: ViewId): void }) {
           <span className="talk__icon"><MessageCircle size={20} aria-hidden="true" /></span>
           <span className="grow">
             <b>{t('dashboard.talkTitle')}</b>
-            <span className="note">{t('dashboard.talkSub')}</span>
           </span>
         </button>
         {!s.path && (
@@ -212,8 +211,7 @@ export function Home({ onNavigate }: { onNavigate(v: ViewId): void }) {
             <span className="talk__icon"><Compass size={20} aria-hidden="true" /></span>
             <span className="grow">
               <b>{t('path.homeSetup')}</b>
-              <span className="note">{t('path.homeSetupSub')}</span>
-            </span>
+              </span>
           </button>
         )}
       </div>
@@ -308,7 +306,6 @@ export function Home({ onNavigate }: { onNavigate(v: ViewId): void }) {
             {M.items.length > 1 && <p className="note flush">{t('dashboard.missionProgress', { n: done, total: M.items.length })}</p>}
           </div>
         </div>
-        <p className="note">{t('dashboard.resumeShort')}</p>
         <div className="next__act">
           <button type="button" className="btn btn--lg" disabled={blocked} onClick={() => missions.start()}><Play size={17} aria-hidden="true" /> {t('dashboard.continueMission')}</button>
           <button type="button" className="btn-link" aria-expanded={options} onClick={onOptions}>{t('dashboard.otherOptions')} <ChevronDown size={15} aria-hidden="true" /></button>
@@ -371,7 +368,6 @@ export function Home({ onNavigate }: { onNavigate(v: ViewId): void }) {
           <button type="button" className="btn btn--lg" onClick={() => missions.start([item])}><Play size={17} aria-hidden="true" /> {t('common.start')}</button>
           <button type="button" className="btn-link" onClick={() => onNavigate('chal')}><Shuffle size={15} aria-hidden="true" /> {t('dashboard.chooseAnother')}</button>
         </div>
-        <p className="note flush">{t('dashboard.restIsFine')}</p>
       </section>
     );
   }

@@ -137,10 +137,7 @@ export function ProfileQuestions({ initial, busy, onBack, onDone, onGroup }: {
           </div>
         )}
 
-        {q === 'life' && p.life.includes('school') && <p className="note pq__sub">{t('profile.schoolNote')}</p>}
-        {q === 'goals' && <p className="note pq__sub">{t('profile.notDiagnosis')}</p>}
         {suggestion !== undefined && <p className="insight">{suggestion ? t(`profile.suggest.${suggestion}`) : t('profile.suggest.none')}</p>}
-        {last && <p className="note pq__sub">{t('profile.settingsHint')}</p>}
       </div>
 
       <div className="ob-act">

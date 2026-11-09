@@ -1,4 +1,4 @@
-import { Bell, Clock, Pause, Play, Timer } from 'lucide-react';
+import { Clock, Pause, Play, Timer } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Mascot } from '../../components/mascot/Mascot';
@@ -108,7 +108,6 @@ export function PrayerBreakView({ window: w, onClose, onContinue }: { window: Pr
         <span className="timer-big" role="timer" aria-label={t('prayer.break.leftLabel', { time: clock(Math.ceil(left / 1000)) })}>{clock(Math.ceil(left / 1000))}</span>
       </Ring>
       <h2 id="pbk-t">{t(saved ? 'prayer.break.saved' : 'prayer.break.takeTime')}</h2>
-      <p className="note">{t('prayer.break.reminderOnly')}</p>
       {changing ? <Lengths onPick={(m) => { store.update((d) => setBreakLength(d, m)); setChanging(false); }} /> : (
         <>
           <div className="row row--c">
@@ -124,7 +123,6 @@ export function PrayerBreakView({ window: w, onClose, onContinue }: { window: Pr
           </div>
         </>
       )}
-      {!!s.notif && <p className="note"><Bell size={13} aria-hidden="true" /> {t('prayer.break.notifNote')}</p>}
     </div>
   );
 }

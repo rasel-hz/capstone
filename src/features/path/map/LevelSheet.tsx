@@ -57,7 +57,6 @@ export function LevelSheet({ node, state, name, position, total, resume, rm, onC
             <div className="lsheet__act">
               {(['good', 'okay', 'not'] as const).map((k) => <button key={k} type="button" className="btn sm alt" onClick={onReflect}>{t(`path.reflect.${k}`)}</button>)}
             </div>
-            <p className="note flush">{t('path.reflectNote')}</p>
           </>
         ) : (
           <>
@@ -70,7 +69,6 @@ export function LevelSheet({ node, state, name, position, total, resume, rm, onC
               {c?.hasEasy && <Fact icon={<Gauge size={15} aria-hidden="true" />}>{t('path.sheet.hasEasy')}</Fact>}
             </ul>
             {state === 'locked' && <p className="lsheet__locked"><Lock size={14} aria-hidden="true" /> {t('path.lockedNote')}</p>}
-            {resume && <p className="note flush">{t('dashboard.resumeShort')}</p>}
             <div className="lsheet__act">
               {state === 'current' && node.kind === 'play' && <button type="button" className="btn btn--lg" onClick={onStart}><Play size={17} aria-hidden="true" /> {t(resume ? 'common.continue' : 'common.start')}</button>}
               {state === 'current' && node.kind === 'talk' && <button type="button" className="btn btn--lg" onClick={onTalk}><MessageCircle size={17} aria-hidden="true" /> {t('path.talkNow')}</button>}

@@ -63,7 +63,7 @@
     "pts_other": "{{count}} points",
     "left_one": "{{count}} point to go!",
     "left_other": "{{count}} points to go!",
-    "unlocked": "Unlocked!",
+    "unlocked": "You can afford it",
     "locked": "Locked",
     "details": "See details",
     "progressLabel": "Your progress toward {{title}}",
@@ -71,7 +71,7 @@
     "openSite": "Open the {{brand}} website ↗",
     "openSiteLabel": "Opens the official {{brand}} website in a new tab",
     "demo": "Reward preview — no actual voucher",
-    "lockedText": "Unlocks by itself when you reach {{points}}, and stays yours for good.",
+    "lockedText": "You can use it once your balance reaches {{points}}. Using it spends those points.",
     "close": "Back",
     "loading": "One moment, getting your points...",
     "error": "We couldn’t load your points right now.",
@@ -79,6 +79,16 @@
     "howTitle": "How do I earn points?",
     "howChallenge": "+10 for each challenge you finish",
     "howMission": "+20 when you finish the whole daily mission",
-    "moreTitle": "Your achievements and collection"
+    "moreTitle": "Your achievements and collection",
+    "balance": "Your balance",
+    "use": "Use voucher",
+    "confirmQ": "Use it? {{points}} will come off your balance.",
+    "confirmYes": "Yes, use it",
+    "confirmNo": "Not now",
+    "usedTitle": "Used!",
+    "usedText": "{{points}} spent. Your balance is now {{balance}}.",
+    "notEnough": "Your balance isn't enough yet.",
+    "failed": "Couldn't use it right now. Try again.",
+    "historyTitle": "Used before"
   }
 }

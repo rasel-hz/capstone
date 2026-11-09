@@ -1,7 +1,7 @@
 {
   "brand": "ZAHO",
   "pageTitle": "ZAHO | زهو",
-  "pageDescription": "ZAHO is a Saudi wellbeing companion with playable challenges and flexible daily plans. It does not diagnose or treat.",
+  "pageDescription": "ZAHO is a Saudi wellbeing companion with playable challenges and flexible daily plans.",
   "switchLanguage": "Switch language to Arabic",
   "languageChanged": "Language changed to English",
   "save": "Save",
@@ -27,7 +27,6 @@
   "level": "Level",
   "levelN": "Level {{n}}",
   "toNextLevel": "Progress to the next level",
-  "xpDisclaimer": "Points reward taking part. They don't measure your health.",
   "listSep": ", ",
   "clauseSep": ", ",
   "sentenceEnd": ".",

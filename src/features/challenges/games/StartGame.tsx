@@ -1,4 +1,4 @@
-import { Lock, Play } from 'lucide-react';
+import { Play } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { clock } from '../../../utils';
@@ -75,7 +75,6 @@ export function StartGame({ env, onDone }: GameProps) {
           {STEPS.map((x) => <button key={x} type="button" className="tag tag--btn" onClick={() => setStep(t(`games.start.steps.${x}`))}>{t(`games.start.steps.${x}`)}</button>)}
         </div>
         {error && <p className="hint" role="alert">{t('games.start.error')}</p>}
-        <p className="note"><Lock size={13} aria-hidden="true" /> {t('games.start.privacy')}</p>
         <div className="row row--c"><button type="button" className="btn btn--lg" onClick={begin}><Play size={17} aria-hidden="true" /> {t('games.start.begin')}</button></div>
       </div>
     );
@@ -102,7 +101,6 @@ export function StartGame({ env, onDone }: GameProps) {
           <button key={k} type="button" className="opt" onClick={() => answer(k)}>{t(`games.start.outcomes.${k}`)}</button>
         ))}
       </div>
-      <p className="note center">{t('games.start.honest')}</p>
     </div>
   );
 }
