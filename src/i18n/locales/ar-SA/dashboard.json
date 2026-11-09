@@ -87,5 +87,7 @@
   "talkTitle": "وش شاغلك اليوم؟",
   "talkSub": "سولف مع خويّك، ويساعدك ترتب يومك",
   "progressLabel": "المستوى {{n}}، خلصت اليوم {{done}}. افتح تطورك",
-  "doneToday": "خلصت اليوم: {{count}}"
+  "doneToday": "خلصت اليوم: {{count}}",
+  "energyBubble": "وش طاقتك اليوم؟",
+  "energyChange": "غيّر طاقتك اليوم، الحين: {{level}}"
 }

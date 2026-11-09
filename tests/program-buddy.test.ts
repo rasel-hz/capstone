@@ -90,6 +90,13 @@ describe('goals and energy', () => {
     expect(energyToday(s)).toBe(1);
   });
 
+  it('never gives points for goals, since they are self-reported', () => {
+    const s = defaultState();
+    addGoals(s, ['a', 'b']);
+    todayGoals(s).forEach((g) => toggleGoal(s, g.id));
+    expect(s.xp).toBe(0);
+  });
+
   it('completing a challenge gives energy, but a self-report check-in does not', () => {
     const s = defaultState();
     createMission(s, [{ id: 'calm', why: [], diff: 'normal' }, { id: 'emotion_map', why: [], diff: 'normal' }], false);
@@ -123,12 +130,13 @@ describe('goals and energy', () => {
     expect(week.map((d) => d.full)).toEqual([false, false, false, true, false, false, true]);
   });
 
-  it('shows the buddy sleepy before anything is done, then awake', () => {
+  it('shows the buddy sleepy before anything is done, then awake, and sad with the user on a low day', () => {
     const s = defaultState();
     expect(buddyMood(s, false, D(1))).toBe('resting');
     addEnergy(s, D(1));
     expect(buddyMood(s, false, D(1))).toBe('idle');
-    expect(buddyMood(s, true, D(1))).toBe('calm');
+    expect(buddyMood(s, true, D(1))).toBe('concerned');
+    expect(buddyMood(s, true, D(2))).toBe('concerned');
     expect(buddyMood(s, false, D(2))).toBe('resting');
   });
 

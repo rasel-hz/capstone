@@ -3,6 +3,8 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ProgressBar, Segmented } from '../../components/ui/kit';
 import { Mascot } from '../../components/mascot/Mascot';
+import ClickSpark, { type ClickSparkHandle } from '../../components/reactbits/ClickSpark';
+import { Reveal, SettleText } from '../../components/ui/HomeMotion';
 import { useMascot } from '../../components/mascot/useMascot';
 import { useAppState, useStore } from '../../context/AppStateContext';
 import { CHALLENGES } from '../../features/challenges/catalog';
@@ -17,7 +19,7 @@ import { acknowledge, breakLeft, needsCheckIn, nextOf, placeOf } from '../../fea
 import { PrayerCheckIn } from '../../features/prayer/PrayerBreak';
 import { useMinute } from '../../features/prayer/PrayerCity';
 import { formatPrayerTime } from '../../features/prayer/times';
-import { currentNode, earnedXp, nodeState, pathItem, type PathNode } from '../../features/path/planner';
+import { currentNode, nodeState, pathItem, type PathNode } from '../../features/path/planner';
 import { StreakChip } from '../../features/streak/StreakBits';
 import { progressStats } from '../../features/progress/stats';
 import { recommend } from '../../features/recommend/engine';
@@ -41,11 +43,16 @@ export function Home({ onNavigate }: { onNavigate(v: ViewId): void }) {
   const missions = useMissions();
   const low = isLowEnergy(s);
   // The buddy wakes up as today's energy comes in, and reacts to each new point.
-  const mascot = useMascot(buddyMood(s, low));
+  // Sad only for today's own low-energy answer, not for a "short missions" preference.
+  const lastCheckIn = s.en[s.en.length - 1];
+  const mascot = useMascot(buddyMood(s, !!lastCheckIn && lastCheckIn.d === today() && lastCheckIn.e === 'low'));
   const nrg = buddyEnergy(s);
   const lastNrg = useRef(nrg);
+  const energySpark = useRef<ClickSparkHandle>(null);
   const [steps, setSteps] = useState(false);
   const [options, setOptions] = useState(false);
+  // The buddy asks about energy once a day. After an answer it becomes a small badge that reopens the question.
+  const [askEnergy, setAskEnergy] = useState(false);
   const h = new Date().getHours();
   const greeting = t(h < 12 ? 'dashboard.morning' : h < 17 ? 'dashboard.afternoon' : 'dashboard.evening');
   const open = hasOpenMission(s);
@@ -79,33 +86,87 @@ export function Home({ onNavigate }: { onNavigate(v: ViewId): void }) {
       d.en = d.en.filter((y) => y.d !== today());
       d.en.push({ d: today(), e, ts: Date.now() });
     });
-    mascot.play(e === 'high' ? 'happy' : 'encouraging');
+    // Low energy gets no cheerful reaction: the buddy's sad look comes from its mood instead.
+    if (e !== 'low') mascot.play(e === 'high' ? 'happy' : 'encouraging');
+    else mascot.clear();
+    // A small burst for high energy only, from that choice. Measured now, before the bubble closes.
+    if (e === 'high') {
+      const root = document.querySelector('.hero__scene')?.getBoundingClientRect();
+      const btn = document.querySelectorAll('.ebubble .seg__b')[ENERGY.findIndex((x) => x.value === 'high')]?.getBoundingClientRect();
+      if (root && btn) energySpark.current?.spark(btn.left - root.left + btn.width / 2, btn.top - root.top + btn.height / 2);
+    }
+    setAskEnergy(false);
   }
 
+  const dayContext = DayContext({ onNavigate });
+
+  const sky = h < 12 ? 'morning' : h < 17 ? 'day' : 'evening';
+
   return (
-    <div className="dash dash--calm">
-      <section className="hello" aria-label={t('dashboard.welcomeLabel')}>
-        <Mascot state={mascot.state} size={84} label={t('common.brand')} interactive />
-        <div className="grow">
-          <p className="eyebrow">{formatDate(new Date(), { weekday: 'long', day: 'numeric', month: 'long' })}</p>
-          <h1>{t('dashboard.hello', { name: iso(s.name), greeting })}</h1>
-          <p className="hello__line">{energyToday ? t(`dashboard.energyLine.${energyToday}`) : t('dashboard.howToday')}</p>
-          <Segmented<EnergyLevel> className="seg--energy seg--compact" label={t('dashboard.energyLabel')} value={energyToday} options={ENERGY.map((e) => ({ ...e, label: t(`dashboard.energy.${e.value}`) }))} onChange={checkIn} />
-        </div>
-      </section>
+    <div className="dash dash--world">
+      {/* Home is one small world, top to bottom: the sky and the buddy's hill, the meadow with today's step,
+          then a trail of stepping stones for the goals. Below it, a quieter garden with everything else. */}
+      <div className="world">
+        <section className={`hero hero--${sky} hero--e${nrg}`} aria-label={t('dashboard.welcomeLabel')}>
+          <span className="sky" aria-hidden="true"><i className="sky__orb" /><i className="sky__cloud" /><i className="sky__cloud sky__cloud--2" /><i className="sky__dots" /></span>
+          {/* Total points and the streak, small, at the top. Points open Rewards; the streak opens Progress, where its days are shown. */}
+          <div className="hero__top">
+            <p className="eyebrow">{formatDate(new Date(), { weekday: 'long', day: 'numeric', month: 'long' })}</p>
+            <span className="hero__chips">
+              <button type="button" className="sk-chip hero__pts" aria-label={t('path.xpLabel', { n: s.xp })} onClick={() => onNavigate('rew')}><Sparkles size={14} aria-hidden="true" /> <b>{s.xp}</b></button>
+              {s.streakOn ? <button type="button" className="hero__streak" onClick={() => onNavigate('prog')}><StreakChip /></button> : null}
+            </span>
+          </div>
+          <div className="hero__txt">
+            <h1><SettleText text={t('dashboard.hello', { name: iso(s.name), greeting })} /></h1>
+            {/* While the buddy's bubble asks about energy, the line would repeat it, so it waits for the answer. */}
+            {energyToday && !askEnergy && <p className="hero__line">{t(`dashboard.energyLine.${energyToday}`)}</p>}
+          </div>
+          <ClickSpark ref={energySpark} auto={false} className="hero__scene" disabled={!!s.rm} sparkColor={['#28785B', '#FFD36E', '#A78BFA']} sparkSize={9} sparkRadius={26} sparkCount={10} duration={500}>
+            <div className="hw-stage">
+              <span className="hw-glow" aria-hidden="true" />
+              <div className="hero__buddy">
+                <Mascot state={mascot.state} size={190} label={t('common.brand')} interactive />
+              </div>
+              {energyToday && !askEnergy && (() => {
+                const Icon = ENERGY.find((x) => x.value === energyToday)!.icon;
+                const name = t(`dashboard.energy.${energyToday}`);
+                return (
+                  <button type="button" className={`ebadge ebadge--${energyToday}`} aria-label={t('dashboard.energyChange', { level: name })} onClick={() => setAskEnergy(true)}>
+                    <Icon size={15} aria-hidden="true" /> {name}
+                  </button>
+                );
+              })()}
+              <svg className="hill" viewBox="0 0 400 120" preserveAspectRatio="none" aria-hidden="true">
+                <path className="hill__back" d="M0 70 C 70 30, 140 40, 210 62 S 340 20, 400 44 L 400 120 L 0 120 Z" />
+                <path className="hill__front" d="M0 92 C 90 54, 150 46, 200 46 S 320 60, 400 88 L 400 120 L 0 120 Z" />
+              </svg>
+            </div>
+            {(!energyToday || askEnergy) && (
+              <div className="hero__ask">
+                {/* The question comes from the buddy, as a speech bubble pointing up at it. */}
+                <div className="ebubble">
+                  <p className="ebubble__q">{t('dashboard.energyBubble')}</p>
+                  <Segmented<EnergyLevel> className="seg--bubble" label={t('dashboard.energyLabel')} value={energyToday} options={ENERGY.map((e) => ({ ...e, label: t(`dashboard.energy.${e.value}`) }))} onChange={checkIn} />
+                </div>
+              </div>
+            )}
+          </ClickSpark>
+        </section>
 
-      <MissedYou />
+        <div className="meadow">
+          <MissedYou />
 
-      {s.prayerBreak && !s.driving && <BreakRow onOpen={() => missions.openBreak(null)} />}
-      {askWindow && !s.prayerBreak && !s.driving && (
-        <PrayerCheckIn
-          compact
-          window={askWindow}
-          onPrayed={() => store.update((d) => acknowledge(d, askWindow, 'prayed'))}
-          onNotYet={() => missions.openBreak(askWindow)}
-          onNotNow={() => store.update((d) => acknowledge(d, askWindow, 'later'))}
-        />
-      )}
+          {s.prayerBreak && !s.driving && <BreakRow onOpen={() => missions.openBreak(null)} />}
+          {askWindow && !s.prayerBreak && !s.driving && (
+            <PrayerCheckIn
+              compact
+              window={askWindow}
+              onPrayed={() => store.update((d) => acknowledge(d, askWindow, 'prayed'))}
+              onNotYet={() => missions.openBreak(askWindow)}
+              onNotNow={() => store.update((d) => acknowledge(d, askWindow, 'later'))}
+            />
+          )}
 
       {s.driving ? (
         <section className="next next--stop" aria-labelledby="next-t">
@@ -125,37 +186,53 @@ export function Home({ onNavigate }: { onNavigate(v: ViewId): void }) {
       ) : (
         DailyMission({ steps, onSteps: () => setSteps(!steps), onNavigate })
       )}
+        </div>
 
-      {!s.driving && <GoalsCard />}
+        {!s.driving && (
+          <div className="trail">
+            <svg className="wave" viewBox="0 0 400 40" preserveAspectRatio="none" aria-hidden="true"><path d="M0 0 L400 0 L400 14 C 300 40, 220 2, 140 22 S 40 30, 0 16 Z" /></svg>
+            <Reveal><GoalsCard /></Reveal>
+          </div>
+        )}
+      </div>
 
-      <button type="button" className="talk" onClick={() => onNavigate('chat')}>
-        <span className="talk__icon"><MessageCircle size={20} aria-hidden="true" /></span>
-        <span className="grow">
-          <b>{t('dashboard.talkTitle')}</b>
-          <span className="note">{t('dashboard.talkSub')}</span>
-        </span>
-      </button>
+      <div className="garden">
 
-      {s.path ? PathStrip() : (
-        <>
-          <button type="button" className="talk" onClick={() => onNavigate('path')}>
+      <Reveal delay={0.05}>
+      <div className="tiles">
+        <button type="button" className="talk tile" onClick={() => onNavigate('chat')}>
+          <span className="talk__icon"><MessageCircle size={20} aria-hidden="true" /></span>
+          <span className="grow">
+            <b>{t('dashboard.talkTitle')}</b>
+            <span className="note">{t('dashboard.talkSub')}</span>
+          </span>
+        </button>
+        {!s.path && (
+          <button type="button" className="talk tile tile--path" onClick={() => onNavigate('path')}>
             <span className="talk__icon"><Compass size={20} aria-hidden="true" /></span>
             <span className="grow">
               <b>{t('path.homeSetup')}</b>
               <span className="note">{t('path.homeSetupSub')}</span>
             </span>
           </button>
-          <button type="button" className="mini" onClick={() => onNavigate('prog')} aria-label={t('dashboard.progressLabel', { n: level(s), done: st.days[6].count })}>
-            <span className="lvl" aria-hidden="true">{level(s)}</span>
-            <span className="grow">
-              <span className="mini__top"><b>{t('common.levelN', { n: level(s) })}</b><span className="note">{t('dashboard.doneToday', { count: st.days[6].count })}</span></span>
-              <ProgressBar value={s.xp % 100} label={t('common.toNextLevel')} />
-            </span>
-          </button>
-        </>
-      )}
+        )}
+      </div>
+      </Reveal>
 
-      {DayContext({ onNavigate })}
+      <Reveal delay={0.05}>
+      {s.path ? PathStrip() : (
+        <button type="button" className="mini" onClick={() => onNavigate('prog')} aria-label={t('dashboard.progressLabel', { n: level(s), done: st.days[6].count })}>
+          <span className="lvl" aria-hidden="true">{level(s)}</span>
+          <span className="grow">
+            <span className="mini__top"><b>{t('common.levelN', { n: level(s) })}</b><span className="note">{t('dashboard.doneToday', { count: st.days[6].count })}</span></span>
+            <ProgressBar value={s.xp % 100} label={t('common.toNextLevel')} />
+          </span>
+        </button>
+      )}
+      </Reveal>
+
+      {dayContext && <Reveal delay={0.05}>{dayContext}</Reveal>}
+      </div>
     </div>
   );
 
@@ -191,7 +268,6 @@ export function Home({ onNavigate }: { onNavigate(v: ViewId): void }) {
       <section className="pstrip" aria-label={t('path.title')}>
         <div className="pstrip__top">
           <b>{t(`path.themes.${plan.themes[chapter] ?? 'gentle'}`)}</b>
-          <span className="pm__chips"><StreakChip /><span className="sk-chip"><Sparkles size={14} aria-hidden="true" /> <b>{earnedXp(plan)}</b></span></span>
         </div>
         <ol className="pstrip__dots" aria-label={t('path.stripLabel', { done: nodes.filter((x) => x.done).length, total: nodes.length })}>
           {nodes.map((x) => <li key={x.key} className={`is-${nodeState(plan, x)} ${x.kind === 'milestone' ? 'is-mile' : ''}`}>{x.done && <Check size={12} aria-hidden="true" />}{!x.done && x.kind === 'milestone' && <Flag size={12} aria-hidden="true" />}</li>)}

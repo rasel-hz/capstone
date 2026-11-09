@@ -1,5 +1,20 @@
 # Changelog
 
+## Unreleased: Home as a small world
+
+### Changed
+- Home is one scene instead of stacked cards: a sky that follows the time of day, the buddy large on its hill, today's step on the meadow, goals as stepping stones on a trail, and a quieter garden for the rest.
+- The buddy asks about energy in a speech bubble, once a day. After an answer it becomes a small badge beside the buddy that reopens the question.
+- On a "low energy" day the buddy looks sad with the user instead of laughing. A "short missions" preference doesn't make it sad.
+- Total points and the streak sit small at the top. Points open Rewards; the streak opens Progress.
+- Goals are shorter to read ("My goals") and give no points, since they are self-reported. They still fill the buddy's energy, shown by its glow.
+
+### Added
+- Light motion from React Bits (MIT + Commons Clause): the greeting settles in word by word, sections rise into view, and a small spark marks high energy and finished goals. All of it stops with reduced motion. Adds `gsap`.
+
+### Removed
+- The energy leaves and the full-energy break note under the goals, and the points and streak chips on the journey strip.
+
 ## Unreleased: illustrated journey map
 
 ### Added

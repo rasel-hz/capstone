@@ -31,7 +31,10 @@ export function removeGoal(s: AppState, id: string, d = today()) {
   if (s.goals && s.goals.d === d) s.goals.items = s.goals.items.filter((g) => g.id !== id);
 }
 
-/** Ticks or unticks a goal. Energy comes only the first time it's ticked, so unticking costs nothing. */
+/**
+ * Ticks or unticks a goal. Energy comes only the first time it's ticked, so unticking costs nothing.
+ * Goals are self-reported, so they never earn points.
+ */
 export function toggleGoal(s: AppState, id: string, d = today()) {
   const g = todayGoals(s, d).find((x) => x.id === id);
   if (!g) return false;
@@ -62,17 +65,23 @@ export function fullDaysIn(s: AppState, n = 7, now = new Date()) {
   });
 }
 
-/** How the buddy looks on Home: sleepy before anything is done today, awake once energy comes in. */
-export function buddyMood(s: AppState, low: boolean, d = today()): 'resting' | 'calm' | 'idle' {
-  const n = energyToday(s, d);
-  return n === 0 ? 'resting' : low ? 'calm' : 'idle';
+/**
+ * How the buddy looks on Home. On a low-energy day it looks sad with the user rather than cheerful;
+ * otherwise it's sleepy before anything is done today and awake once energy comes in.
+ */
+export function buddyMood(s: AppState, low: boolean, d = today()): 'concerned' | 'resting' | 'idle' {
+  if (low) return 'concerned';
+  return energyToday(s, d) === 0 ? 'resting' : 'idle';
 }
 
 /** Checks saved goals and energy, so a bad value can't break Home. */
 export function validBuddy(s: AppState, d = today()) {
   const g = s.goals as DayGoals | null;
   s.goals = g && g.d === d && Array.isArray(g.items)
-    ? { d, items: g.items.filter((x) => x && typeof x.id === 'string' && typeof x.text === 'string' && clean(x.text)).slice(0, MAX_GOALS).map((x) => ({ id: x.id, text: clean(x.text), done: x.done ? 1 : 0, ...(x.e ? { e: 1 as const } : {}) })) }
+    ? {
+        d,
+        items: g.items.filter((x) => x && typeof x.id === 'string' && typeof x.text === 'string' && clean(x.text)).slice(0, MAX_GOALS).map((x) => ({ id: x.id, text: clean(x.text), done: x.done ? 1 : 0, ...(x.e ? { e: 1 as const } : {}) })),
+      }
     : null;
   s.nrg = Number.isFinite(s.nrg) ? Math.max(0, Math.min(ENERGY_FULL, Math.round(s.nrg))) : 0;
   if (typeof s.nrgD !== 'string') s.nrgD = '';

@@ -1,14 +1,12 @@
 {
   "goals": {
-    "title": "Today's goals",
-    "sub": "Small things you want to do today. Each one done gives the buddy energy.",
+    "title": "My goals",
     "add": "Add",
     "addLabel": "New goal",
     "placeholder": "For example: reply to my manager's email",
-    "empty": "No goals yet. One small goal is enough.",
     "remove": "Remove: {{text}}",
     "full": "That's {{n}} goals, enough for today.",
-    "fromChat": "You can also tell the buddy what you have on, and it puts them here."
+    "ringLabel": "{{done}} of {{total}} goals done"
   },
   "energy": {
     "label": "Buddy's energy",
