@@ -10,7 +10,7 @@ import {
 import { clearTypedText } from '../src/features/plan/privacy';
 import { acknowledge, needsCheckIn } from '../src/features/prayer/gate';
 import { prayerTimes } from '../src/features/prayer/times';
-import { emptyProfile, followFor, optionsFor, questionsFor, suggestWhen, toLegacy, validProfile, type LifeProfile } from '../src/features/profile/questions';
+import { emptyProfile, optionsFor, questionsFor, suggestWhen, toLegacy, validProfile, type LifeProfile } from '../src/features/profile/questions';
 import { canRest, pendingMilestone, streakOf, takeRest, undoRest } from '../src/features/streak/streak';
 import { defaultState, hydrate } from '../src/services/storage';
 import type { AppState, Attempt, ChallengeId } from '../src/types';
@@ -33,10 +33,7 @@ function playCurrent(s: AppState, acc: number | null = null) {
 
 describe('Test 1: university student', () => {
   const p = prof({ life: ['uni'], goals: ['organize', 'start'], primary: 'start', hard: ['delay'] });
-  it('asks the study follow-up, never the work one', () => {
-    const q = questionsFor(p);
-    expect(q).toContain('free_study');
-    expect(q).not.toContain('free_work');
+  it('offers study times, never work ones', () => {
     expect(optionsFor('when', p)).toContain('after_class');
     expect(optionsFor('when', p)).not.toContain('after_work');
   });
@@ -51,11 +48,9 @@ describe('Test 1: university student', () => {
 
 describe('Test 2: working adult', () => {
   const p = prof({ life: ['work'], goals: ['organize'], when: ['after_work'] });
-  it('asks about after work and invents no timetable', () => {
-    expect(followFor(p)).toBe('free_work');
+  it('offers after work and invents no timetable', () => {
     expect(optionsFor('when', p)).not.toContain('after_class');
     expect(JSON.stringify(buildPlan(p))).not.toMatch(/\d{1,2}:\d{2}|university|lecture/i);
-    expect(p.follow).toBeNull();
   });
   it('plans around work and has no study practice', () => {
     const plan = buildPlan(p);
@@ -102,11 +97,13 @@ describe('Test 4: different people, different starts', () => {
     expect(new Set(plans.map((x) => ids(x).join())).size).toBe(plans.length);
     plans.flatMap(ids).forEach((id) => expect(Object.hasOwn(CHALLENGES, id)).toBe(true));
   });
-  it('branches the questions by life', () => {
-    expect(followFor({ life: ['both'] })).toBe('busy_both');
-    expect(followFor({ life: ['uni', 'work'] })).toBe('busy_both');
-    expect(followFor({ life: ['flex'] })).toBe('me_time');
-    expect(followFor({ life: ['skip'] })).toBeNull();
+  it('asks at most six questions, without repeating itself', () => {
+    expect(questionsFor(prof({ life: ['uni'], goals: ['focus', 'sleep'] }))).toEqual(['life', 'goals', 'primary', 'tasks', 'when', 'style']);
+    expect(questionsFor(prof({ life: ['skip'], goals: ['stress'] }))).toEqual(['life', 'goals', 'when', 'style']);
+  });
+  it('still uses answers saved before those questions were removed', () => {
+    expect(firstPlay(buildPlan(prof({ goals: ['organize'], hard: ['tired'] })))).toBe('micro_start');
+    expect(validProfile({ ...prof({ sleep: 'late', hard: ['thoughts'] }), follow: { q: 'free_work', a: 'weekend' } })).toMatchObject({ sleep: 'late', hard: ['thoughts'] });
   });
   it('only asks for a main goal when there are several', () => {
     expect(questionsFor(prof({ goals: ['focus'] }))).not.toContain('primary');
@@ -301,7 +298,7 @@ describe('Test 9: both languages', () => {
     expect(ar.q.life.title).toBe('وش يشغل أغلب يومك؟');
     expect(en.q.goals.title).toBe('What would you like Khowayk to help you with?');
     expect(ar.opt.style.talk).toBe('نسولف ونفكر بحل');
-    for (const q of ['life', 'goals', 'when', 'sleep', 'hard', 'style']) {
+    for (const q of ['life', 'goals', 'when', 'style']) {
       const p = prof({ life: ['uni', 'work'] });
       optionsFor(q as 'life', p).forEach((o) => { expect(en.opt[q][o]).toBeTruthy(); expect(ar.opt[q][o]).toBeTruthy(); });
     }
@@ -349,5 +346,22 @@ describe('Privacy and the AI', () => {
     expect(ctx).toContain('"daily_life":["uni"]');
     expect(ctx).toContain('"help_style":"talk"');
     expect(ctx).not.toMatch(/diagnosed_adhd/);
+  });
+});
+
+describe('smart replies consent', () => {
+  const page = readFileSync('src/pages/Onboarding/index.tsx', 'utf8');
+
+  it('stays off until the user answers', () => {
+    expect(defaultState().aiConsent).toBeNull();
+  });
+
+  it('is asked in onboarding, with a real way to say no', () => {
+    expect(page).toContain('finish(answers, 1)');
+    expect(page).toContain('finish(answers, 0)');
+  });
+
+  it('is only asked when it has not been answered and the AI can be used', () => {
+    expect(page).toMatch(/aiReady && store\.getState\(\)\.aiConsent == null/);
   });
 });

@@ -60,24 +60,24 @@
 .jm__foot { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 16px; margin: 14px 0 6px; }
 
 /* The level sheet rises from the bottom on a phone. */
-.ls { position: fixed; inset: 0; z-index: 40; display: flex; align-items: flex-end; justify-content: center; background: rgba(38, 61, 55, .5); animation: fade .2s var(--ease); }
-.ls__card { position: relative; width: 100%; max-width: 480px; max-height: 88dvh; overflow: auto; background: var(--iv); border-radius: 24px 24px 0 0; padding: 10px 18px calc(18px + var(--sab)); text-align: start; box-shadow: var(--shadow-lift); }
-.ls__grab { display: block; width: 44px; height: 5px; border-radius: 999px; background: var(--line); margin: 0 auto 10px; }
-.ls__x { position: absolute; top: 10px; inset-inline-end: 10px; width: 44px; height: 44px; border: 0; border-radius: 50%; background: var(--cr); color: var(--ink); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
-.ls__top { display: flex; gap: 12px; align-items: center; padding-inline-end: 44px; }
-.ls__top .eyebrow { margin: 0; }
-.ls__art { flex: 0 0 76px; height: 60px; border-radius: 14px; overflow: hidden; }
-.ls__desc { margin: 12px 0 8px; }
-.ls__facts { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
-.ls__facts li { display: inline-flex; gap: 5px; align-items: center; background: var(--cr); border-radius: 999px; padding: 3px 11px; font-size: 13px; }
-.ls__locked { display: flex; gap: 6px; align-items: flex-start; background: var(--sun-l); border-radius: var(--r-sm); padding: 8px 11px; font-size: 13.5px; margin: 8px 0; }
-.ls__locked svg { flex: none; margin-top: 3px; }
-.ls__act { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 4px; }
-.ls__act .btn--lg { flex: 1; justify-content: center; }
+.lsheet { position: fixed; inset: 0; z-index: 40; display: flex; align-items: flex-end; justify-content: center; background: rgba(38, 61, 55, .5); animation: fade .2s var(--ease); }
+.lsheet__card { position: relative; width: 100%; max-width: 480px; max-height: 88dvh; overflow: auto; background: var(--iv); border-radius: 24px 24px 0 0; padding: 10px 18px calc(18px + var(--sab)); text-align: start; box-shadow: var(--shadow-lift); }
+.lsheet__grab { display: block; width: 44px; height: 5px; border-radius: 999px; background: var(--line); margin: 0 auto 10px; }
+.lsheet__x { position: absolute; top: 10px; inset-inline-end: 10px; width: 44px; height: 44px; border: 0; border-radius: 50%; background: var(--cr); color: var(--ink); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+.lsheet__top { display: flex; gap: 12px; align-items: center; padding-inline-end: 44px; }
+.lsheet__top .eyebrow { margin: 0; }
+.lsheet__art { flex: 0 0 76px; height: 60px; border-radius: 14px; overflow: hidden; }
+.lsheet__desc { margin: 12px 0 8px; }
+.lsheet__facts { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+.lsheet__facts li { display: inline-flex; gap: 5px; align-items: center; background: var(--cr); border-radius: 999px; padding: 3px 11px; font-size: 13px; }
+.lsheet__locked { display: flex; gap: 6px; align-items: flex-start; background: var(--sun-l); border-radius: var(--r-sm); padding: 8px 11px; font-size: 13.5px; margin: 8px 0; }
+.lsheet__locked svg { flex: none; margin-top: 3px; }
+.lsheet__act { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 4px; }
+.lsheet__act .btn--lg { flex: 1; justify-content: center; }
 @media (min-width: 700px) {
-  .ls { align-items: center; }
-  .ls__card { border-radius: var(--r-lg); padding-bottom: 20px; }
-  .ls__grab { display: none; }
+  .lsheet { align-items: center; }
+  .lsheet__card { border-radius: var(--r-lg); padding-bottom: 20px; }
+  .lsheet__grab { display: none; }
 }
 
 /* Reduced motion: everything is still there, nothing moves. */

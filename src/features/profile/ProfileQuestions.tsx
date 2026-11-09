@@ -1,24 +1,20 @@
 import {
-  ArrowRight, BedDouble, BookOpen, Briefcase, Check, Clock, Coffee, Compass, Dumbbell, GraduationCap, HeartHandshake, HelpCircle, ListChecks,
-  MessageCircle, Moon, Plus, Rocket, School, Shuffle, Sparkles, Sunset, Target, Timer, Users, Wind, X, Zap, type LucideIcon,
+  ArrowRight, BedDouble, BookOpen, Briefcase, Check, Coffee, Dumbbell, GraduationCap, HelpCircle, ListChecks,
+  MessageCircle, Moon, Plus, Rocket, School, Shuffle, Sparkles, Target, Users, Wind, X, Zap, type LucideIcon,
 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MAX_TASKS, MAX_TASK_LEN } from '../plan/config';
 import {
-  emptyProfile, EXCLUSIVE, followFor, groupOf, isMulti, optionsFor, questionsFor, suggestWhen, type FollowId, type GoalId, type LifeProfile, type QuestionId,
+  emptyProfile, EXCLUSIVE, groupOf, isMulti, optionsFor, questionsFor, suggestWhen, type GoalId, type LifeProfile, type QuestionId,
 } from './questions';
 
 const ICONS: Record<string, LucideIcon> = {
   school: School, uni: GraduationCap, work: Briefcase, both: BookOpen, flex: Shuffle, other: HelpCircle, skip: X,
   organize: ListChecks, focus: Target, start: Rocket, stress: Wind, sleep: Moon, social: Users, habits: Dumbbell,
   after_class: School, after_work: Briefcase, bedtime: BedDouble, free: Coffee, suggest: Sparkles,
-  regular: Clock, late: Moon, varies: Shuffle, tasks: ListChecks, delay: Timer, thoughts: Compass, tired: Coffee,
   games: Zap, steps: ListChecks, talk: MessageCircle, calm: Wind, auto: Sparkles, unsure: HelpCircle,
-  afternoon: Sunset, evening: Moon, weekend: Coffee, right_after: Clock, late_evening: Moon, morning: Sunset, study: BookOpen, both_equal: HeartHandshake,
 };
-
-const follows = ['free_study', 'free_work', 'busy_both', 'me_time'];
 
 /**
  * The adaptive questions, used by onboarding and when an existing user sets up or updates their journey.
@@ -42,16 +38,12 @@ export function ProfileQuestions({ initial, busy, onBack, onDone, onGroup }: {
 
   useEffect(() => { onGroup?.(groupOf(q)); }, [q, onGroup]);
 
-  const followQ = follows.includes(q) ? (q as FollowId) : null;
   const chosen = (): string[] => {
-    if (followQ) return p.follow?.q === followQ ? [p.follow.a] : [];
     switch (q) {
       case 'life': return p.life;
       case 'goals': return p.goals;
       case 'primary': return p.primary ? [p.primary] : [];
       case 'when': return p.when;
-      case 'sleep': return p.sleep ? [p.sleep] : [];
-      case 'hard': return p.hard;
       case 'style': return p.style ? [p.style] : [];
       default: return [];
     }
@@ -66,21 +58,14 @@ export function ProfileQuestions({ initial, busy, onBack, onDone, onGroup }: {
       else next = [...cur.filter((x) => !EXCLUSIVE.includes(x)), o];
     } else next = cur.includes(o) ? [] : [o];
     setP((a) => {
-      if (followQ) return { ...a, follow: next[0] ? { q: followQ, a: next[0] } : null };
       switch (q) {
-        case 'life': {
-          // A follow-up from a life that no longer applies is dropped, never kept as a fact.
-          const life = next as LifeProfile['life'];
-          return { ...a, life, follow: a.follow && followFor({ life }) === a.follow.q ? a.follow : null };
-        }
+        case 'life': return { ...a, life: next as LifeProfile['life'] };
         case 'goals': {
           const goals = next as GoalId[];
           return { ...a, goals, primary: a.primary && goals.includes(a.primary) ? a.primary : null };
         }
         case 'primary': return { ...a, primary: (next[0] as GoalId) ?? null };
         case 'when': return { ...a, when: next as LifeProfile['when'] };
-        case 'sleep': return { ...a, sleep: (next[0] as LifeProfile['sleep']) ?? null };
-        case 'hard': return { ...a, hard: next as LifeProfile['hard'] };
         case 'style': return { ...a, style: (next[0] as LifeProfile['style']) ?? null };
         default: return a;
       }
@@ -107,8 +92,8 @@ export function ProfileQuestions({ initial, busy, onBack, onDone, onGroup }: {
   const opts = optionsFor(q, p);
   const sel = chosen();
   const suggestion = q === 'when' && p.when.includes('suggest') ? suggestWhen(p) : undefined;
-  const title = followQ ? `profile.follow.${followQ}` : `profile.q.${q}`;
-  const optKey = (o: string) => (followQ ? `profile.opt.follow.${o}` : q === 'primary' ? `profile.opt.goals.${o}` : `profile.opt.${q}.${o}`);
+  const title = `profile.q.${q}`;
+  const optKey = (o: string) => (q === 'primary' ? `profile.opt.goals.${o}` : `profile.opt.${q}.${o}`);
 
   return (
     <div className="pq">

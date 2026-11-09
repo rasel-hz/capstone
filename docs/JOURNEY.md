@@ -26,18 +26,16 @@ After the name and account steps, questions depend on earlier answers, and every
 | Question | Asked when |
 |---|---|
 | Daily life | Always |
-| Follow-up: time after study, after work, what takes most time, or time for yourself | Depends on daily life. None for "something else" or "prefer not to say" |
 | Goals | Always |
 | Main goal | Only if more than one goal was chosen |
 | Something to start or organize (free text) | Organizing, starting, focus or habit goals, or anyone studying |
 | When to help | Always. "After school" and "after work" appear only if they apply |
-| Sleep | Always, optional |
-| What makes a hard day harder | Always |
 | How to help | Always |
 
 - Answers are stable IDs in `AppState.prof`, marked as self-reported. A category never implies a timetable, an age or a condition, and goals are never mapped to a diagnosis.
 - Typed tasks are saved only if the "keep these" box is ticked. Settings → delete typed text removes them.
 - Sound, motion, prayer times and the protected minutes moved to My Profile.
+- The last step asks for consent to smart replies, only if the AI is available and the user has not answered. Nothing goes to OpenAI without "I agree". "Not now" keeps the simple replies and the limited-mode notice.
 - **Age policy is still open.** The reference requires separate safeguarding, consent and regulatory review for minors before launch. "School student" is only recorded as said, with a note about a parent or guardian. The product owner needs to decide the policy.
 
 ## The journey
@@ -47,7 +45,7 @@ After the name and account steps, questions depend on earlier answers, and every
 - Studying adds Study Sprint for organizing, starting or focus goals. Work alone doesn't.
 - Two or more kept tasks put the personal planning board first, with exactly those tasks.
 - "Talk things through" starts with a conversation step. "Calm" starts with a break. "Step-by-step" starts with planning.
-- "Feeling exhausted" starts with something gentle. "Too many thoughts" adds Let's Think It Through.
+- Sleep, hard-day and free-time questions were removed to keep onboarding short. Sleep and hard-day answers saved before that still count: "Feeling exhausted" starts with something gentle, and "Too many thoughts" adds Let's Think It Through.
 - No answers gives a gentle start.
 
 Each chapter ends with a reflection and a milestone. Only challenges that exist can appear. `sleep_winddown` and `routine_builder` aren't built yet, so sleep journeys use the calm activities.

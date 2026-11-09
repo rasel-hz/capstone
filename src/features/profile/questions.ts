@@ -1,7 +1,7 @@
 import type { AppState, JourneyId } from '../../types/index.ts';
 import { MAX_TASKS, MAX_TASK_LEN } from '../plan/config.ts';
 
-// Adaptive onboarding: which questions to ask follows from the earlier answers. Everything is optional.
+// Onboarding questions. Which ones appear follows from the earlier answers, and everything is optional.
 // Answers are what the user said about themselves, nothing more. They never imply a schedule or a condition.
 
 export const LIFE = ['school', 'uni', 'work', 'both', 'flex', 'other', 'skip'] as const;
@@ -18,64 +18,44 @@ export type SleepId = (typeof SLEEP)[number];
 export type HardId = (typeof HARD)[number];
 export type StyleId = (typeof STYLE)[number];
 
-const FOLLOW_OPTS = {
-  free_study: ['afternoon', 'evening', 'weekend', 'varies'],
-  free_work: ['right_after', 'late_evening', 'weekend', 'varies'],
-  busy_both: ['study', 'work', 'both_equal', 'other'],
-  me_time: ['morning', 'afternoon', 'evening', 'varies'],
-} as const;
-export type FollowId = keyof typeof FOLLOW_OPTS;
-
 export interface LifeProfile {
   v: 1;
   life: LifeId[];
-  /** One follow-up, chosen from the life answer. Never turned into a timetable. */
-  follow: { q: FollowId; a: string } | null;
   goals: GoalId[];
   primary: GoalId | null;
   /** The user's own wording. Kept only if they ticked the box to keep it. */
   tasks: string[];
   when: WhenId[];
+  /** No longer asked. Kept so answers saved earlier still shape the journey and the chat. */
   sleep: SleepId | null;
+  /** No longer asked. Kept for the same reason. */
   hard: HardId[];
   style: StyleId | null;
   at: number;
 }
 
-export const emptyProfile = (): LifeProfile => ({ v: 1, life: [], follow: null, goals: [], primary: null, tasks: [], when: [], sleep: null, hard: [], style: null, at: 0 });
+export const emptyProfile = (): LifeProfile => ({ v: 1, life: [], goals: [], primary: null, tasks: [], when: [], sleep: null, hard: [], style: null, at: 0 });
 
-export type QuestionId = 'life' | FollowId | 'goals' | 'primary' | 'tasks' | 'when' | 'sleep' | 'hard' | 'style';
+export type QuestionId = 'life' | 'goals' | 'primary' | 'tasks' | 'when' | 'style';
 
 const isStudent = (p: Pick<LifeProfile, 'life'>) => p.life.includes('school') || p.life.includes('uni');
 const isWorker = (p: Pick<LifeProfile, 'life'>) => p.life.includes('work');
 const isBoth = (p: Pick<LifeProfile, 'life'>) => p.life.includes('both') || (isStudent(p) && isWorker(p));
 
-/** The follow-up that fits this answer, or none. Different lives get different questions. */
-export function followFor(p: Pick<LifeProfile, 'life'>): FollowId | null {
-  if (isBoth(p)) return 'busy_both';
-  if (isStudent(p)) return 'free_study';
-  if (isWorker(p)) return 'free_work';
-  if (p.life.includes('flex')) return 'me_time';
-  return null;
-}
-
 /** The questions to ask, in order, given the answers so far. */
 export function questionsFor(p: LifeProfile): QuestionId[] {
-  const q: QuestionId[] = ['life'];
-  const f = followFor(p);
-  if (f) q.push(f);
-  q.push('goals');
+  const q: QuestionId[] = ['life', 'goals'];
   if (p.goals.length > 1) q.push('primary');
   if (p.goals.some((g) => g === 'organize' || g === 'start' || g === 'focus' || g === 'habits') || isStudent(p) || isBoth(p)) q.push('tasks');
-  q.push('when', 'sleep', 'hard', 'style');
+  q.push('when', 'style');
   return q;
 }
 
 /** The stepper group each question belongs to. */
 export function groupOf(q: QuestionId): 0 | 1 | 2 | 3 {
-  if (q === 'life' || q in FOLLOW_OPTS) return 0;
+  if (q === 'life') return 0;
   if (q === 'goals' || q === 'primary' || q === 'tasks') return 1;
-  if (q === 'when' || q === 'sleep') return 2;
+  if (q === 'when') return 2;
   return 3;
 }
 
@@ -85,16 +65,13 @@ export function optionsFor(q: QuestionId, p: LifeProfile): readonly string[] {
     case 'life': return LIFE;
     case 'goals': return GOALS;
     case 'primary': return p.goals;
-    case 'sleep': return SLEEP;
-    case 'hard': return HARD;
     case 'style': return STYLE;
     case 'tasks': return [];
-    case 'when': return WHEN.filter((w) => (w !== 'after_class' || isStudent(p) || isBoth(p)) && (w !== 'after_work' || isWorker(p) || isBoth(p)));
-    default: return FOLLOW_OPTS[q];
+    default: return WHEN.filter((w) => (w !== 'after_class' || isStudent(p) || isBoth(p)) && (w !== 'after_work' || isWorker(p) || isBoth(p)));
   }
 }
 
-export const isMulti = (q: QuestionId) => q === 'life' || q === 'goals' || q === 'when' || q === 'hard';
+export const isMulti = (q: QuestionId) => q === 'life' || q === 'goals' || q === 'when';
 /** Options that mean "none of this", so picking one clears the rest. */
 export const EXCLUSIVE = ['skip'];
 
@@ -118,11 +95,9 @@ export function validProfile(raw: unknown): LifeProfile | null {
   const r = raw as Partial<LifeProfile> | null;
   if (!r || r.v !== 1) return null;
   const goals = only(r.goals, GOALS);
-  const f = r.follow as LifeProfile['follow'];
-  const follow = f && Object.hasOwn(FOLLOW_OPTS, f.q) && (FOLLOW_OPTS[f.q] as readonly string[]).includes(f.a) ? { q: f.q, a: f.a } : null;
   const primary = one(r.primary, GOALS);
   return {
-    v: 1, life: only(r.life, LIFE), follow, goals, primary: primary && goals.includes(primary) ? primary : null,
+    v: 1, life: only(r.life, LIFE), goals, primary: primary && goals.includes(primary) ? primary : null,
     tasks: [...new Set((Array.isArray(r.tasks) ? r.tasks : []).map(cleanTask).filter(Boolean))].slice(0, MAX_TASKS),
     when: only(r.when, WHEN), sleep: one(r.sleep, SLEEP), hard: only(r.hard, HARD), style: one(r.style, STYLE),
     at: typeof r.at === 'number' ? r.at : 0,

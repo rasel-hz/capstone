@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { completeItem, createMission, exitMission, hasOpenMission } from '../src/features/mission/engine';
 import { buildPlan, currentNode, completeReflect, pathItem, replan, type PathPlan } from '../src/features/path/planner';
@@ -167,5 +168,13 @@ describe('Revising a journey', () => {
     expect(w.stops).toHaveLength(next.nodes.length);
     expect(new Set(w.stops.map((x) => x.key)).size).toBe(w.stops.length);
     expect(standKey(next)).toBe(next.nodes[1].key);
+  });
+});
+
+describe('journey styles', () => {
+  it('do not reuse a landing page class name', () => {
+    const classes = (f: string) => new Set(readFileSync(f, 'utf8').match(/\.[a-zA-Z][\w-]*/g));
+    const landing = classes('src/styles/landing.css');
+    expect([...classes('src/styles/journey.css')].filter((c) => landing.has(c))).toEqual([]);
   });
 });

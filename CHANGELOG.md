@@ -10,6 +10,8 @@
 
 ### Changed
 - The finish screen links back to the journey after a journey step.
+- Onboarding is shorter: the free-time follow-up, the sleep question and the "harder days" question are gone, leaving at most six questions.
+- Consent to smart replies is now asked as the last onboarding step, so new users do not meet the card in the chat. Accounts that never answered are still asked once there.
 - Removed every emoji from the app text, the reward data and the docs. Streak milestones now use icons.
 
 ## Unreleased: personal onboarding, journey map and daily streak

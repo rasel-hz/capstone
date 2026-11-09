@@ -9,7 +9,7 @@ The companion answers what the person actually asked first, with practical help,
 1. Create an API key in your OpenAI account.
 2. Open `.env` in the project root (copy `.env.example` if it's missing) and set `OPENAI_API_KEY=` to your key.
 3. Save. The dev server restarts on its own.
-4. In the app, open **خويّك** and accept the consent card.
+4. In the app, agree to smart replies. New accounts are asked as the last onboarding step. Accounts that never answered get the card once in **خويّك**.
 
 **Key rules:**
 
