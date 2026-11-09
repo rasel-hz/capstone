@@ -58,7 +58,7 @@
     "collected_one": "You have collected {{count}} point!",
     "collected_other": "You have collected {{count}} points!",
     "today": "Today’s points",
-    "lifetime": "All your achievements",
+    "lifetime": "Total points",
     "pts_one": "{{count}} point",
     "pts_other": "{{count}} points",
     "left_one": "{{count}} point to go!",

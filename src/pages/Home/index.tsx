@@ -26,6 +26,7 @@ import { recommend } from '../../features/recommend/engine';
 import { currentLang, formatDate, iso } from '../../i18n';
 import type { ChallengeId, EnergyLevel, PlannedItem, ViewId } from '../../types';
 import { level, today } from '../../utils';
+import { usePointsTotal } from '../../hooks/usePointsTotal';
 
 const ENERGY: { value: EnergyLevel; icon: LucideIcon }[] = [
   { value: 'high', icon: BatteryFull },
@@ -41,6 +42,7 @@ export function Home({ onNavigate }: { onNavigate(v: ViewId): void }) {
   const s = useAppState();
   const store = useStore();
   const missions = useMissions();
+  const points = usePointsTotal();
   const low = isLowEnergy(s);
   // The buddy wakes up as today's energy comes in, and reacts to each new point.
   // Sad only for today's own low-energy answer, not for a "short missions" preference.
@@ -109,11 +111,11 @@ export function Home({ onNavigate }: { onNavigate(v: ViewId): void }) {
       <div className="world">
         <section className={`hero hero--${sky} hero--e${nrg}`} aria-label={t('dashboard.welcomeLabel')}>
           <span className="sky" aria-hidden="true"><i className="sky__orb" /><i className="sky__cloud" /><i className="sky__cloud sky__cloud--2" /><i className="sky__dots" /></span>
-          {/* Total points and the streak, small, at the top. Points open Rewards; the streak opens Progress, where its days are shown. */}
+          {/* Total points earned (from Supabase) and the streak, small, at the top. Points open Rewards; the streak opens Progress, where its days are shown. */}
           <div className="hero__top">
             <p className="eyebrow">{formatDate(new Date(), { weekday: 'long', day: 'numeric', month: 'long' })}</p>
             <span className="hero__chips">
-              <button type="button" className="sk-chip hero__pts" aria-label={t('path.xpLabel', { n: s.xp })} onClick={() => onNavigate('rew')}><Sparkles size={14} aria-hidden="true" /> <b>{s.xp}</b></button>
+              <button type="button" className="sk-chip hero__pts" aria-label={t('path.xpLabel', { n: points ?? 0 })} onClick={() => onNavigate('rew')}><Sparkles size={14} aria-hidden="true" />{points != null && <> <b>{points}</b></>}</button>
               {s.streakOn ? <button type="button" className="hero__streak" onClick={() => onNavigate('prog')}><StreakChip /></button> : null}
             </span>
           </div>
