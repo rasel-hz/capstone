@@ -1,15 +1,142 @@
-import { Moon, Sun, Volume2, VolumeX } from 'lucide-react';
+import { Brain, Eye, Footprints, Moon, Sun, Sunset, Volume2, VolumeX, type LucideIcon } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { startAmbient } from '../../../animations/effects';
+import type { GameResult } from '../../../types';
 import { Palm } from '../ChallengeArt';
 import type { GameProps } from '../types';
+import { CalmGame } from './CalmGame';
+import { EyeRestGame } from './EyeRestGame';
+import { AskNext, Ring } from './parts';
 
 // Staying a little while is the completion rule, so the reward isn't for tapping straight through.
 export const MIN_STAY_SEC = 20;
 const LANTERNS = [{ x: 150, y: 150 }, { x: 330, y: 132 }, { x: 490, y: 154 }];
 
-export function CalmLandscapeGame({ env, onDone }: GameProps) {
+export type Need = 'eyes' | 'move' | 'mind' | 'quiet';
+const NEEDS: { id: Need; i: LucideIcon }[] = [{ id: 'eyes', i: Eye }, { id: 'move', i: Footprints }, { id: 'mind', i: Brain }, { id: 'quiet', i: Sunset }];
+const isNeed = (v: unknown): v is Need => NEEDS.some((n) => n.id === v);
+// Four gentle moves, half a minute each.
+const MOVES = ['neck', 'shoulders', 'stretch', 'walk'] as const;
+const MOVE_SEC = 30;
+
+/**
+ * "A break your way" (calm_landscape). One question first: what do you need right now? Rest the eyes ("Rest your eyes"), move a
+ * little, a busy mind (the breathing from "Take it easy"), or just quiet (the oasis). After a focus session
+ * it offers another session at the end. A need chosen elsewhere, such as in "How do you feel?", skips the question.
+ */
+export function CalmLandscapeGame(props: GameProps) {
+  const { t } = useTranslation();
+  const { env, onDone, seed } = props;
+  const [need, setNeed] = useState<Need | null>(isNeed(seed?.option) ? seed.option : null);
+  const [held, setHeld] = useState<GameResult | null>(null);
+
+  useEffect(() => {
+    if (!need) env.say('curious', 'games.landscape.pickSay');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // After a focus session, the break ends with the way back.
+  const end = (r: GameResult) => {
+    const res = { ...r, data: { need, ...(r.data as object) } };
+    if (seed?.from === 'study_sprint') setHeld(res);
+    else onDone(res);
+  };
+
+  if (held) {
+    return (
+      <AskNext
+        q={t('games.study.againQ')}
+        yes={t('games.study.againYes')}
+        no={t('games.study.againNo')}
+        onYes={() => onDone({ ...held, then: { id: 'study_sprint', seed: { task: seed?.task, from: 'calm_landscape' } } })}
+        onNo={() => onDone(held)}
+      />
+    );
+  }
+
+  if (!need) {
+    return (
+      <div className="scene q">
+        <h2 className="q__t">{t('games.landscape.pickQ')}</h2>
+        <div className="choices choices--2">
+          {NEEDS.map(({ id, i: Ic }) => (
+            <button key={id} type="button" className="opt opt--icon" onClick={() => { env.sfx('tap'); setNeed(id); }}>
+              <Ic size={20} aria-hidden="true" /> {t(`games.landscape.needs.${id}`)}
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  }
+  if (need === 'mind') return <CalmGame {...props} onDone={end} />;
+  if (need === 'eyes') return <EyeRestGame {...props} onDone={end} />;
+  if (need === 'move') return <TimedBreak steps={[...MOVES]} sec={MOVE_SEC} kind="moves" env={env} onDone={end} />;
+  return <Oasis env={env} onDone={end} />;
+}
+
+// One or more short timed steps with a ring, then "how was it?".
+function TimedBreak({ steps, sec, kind, env, onDone }: { steps: string[]; sec: number; kind: 'moves'; env: GameProps['env']; onDone(r: GameResult): void }) {
+  const { t } = useTranslation();
+  const prefix = `games.landscape.${kind}`;
+  const [i, setI] = useState(0);
+  const [left, setLeft] = useState(sec);
+  const [asking, setAsking] = useState(false);
+
+  useEffect(() => {
+    if (asking) return;
+    env.round(i + 1, steps.length, 'games.common.step');
+    env.say('calm', `${prefix}.${steps[i]}.say`);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [i, asking]);
+
+  useEffect(() => {
+    if (asking || env.paused) return;
+    const iv = setInterval(() => setLeft((v) => v - 1), 1000);
+    return () => clearInterval(iv);
+  }, [asking, env.paused]);
+
+  useEffect(() => {
+    if (asking || left > 0) return;
+    env.sfx('tap');
+    if (i + 1 < steps.length) {
+      setI(i + 1);
+      setLeft(sec);
+    } else {
+      setAsking(true);
+      env.round(0, 0);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [left]);
+
+  if (asking) return <HowWasIt q={`${prefix}.after`} onAnswer={(help) => onDone({ acc: null, retries: 0, mood: 'calm', say: 'games.landscape.done', data: { help } })} />;
+  return (
+    <div className="scene timer-v">
+      <h2 className="q__t">{t(`${prefix}.${steps[i]}.title`)}</h2>
+      <Ring value={Math.max(0, left) / sec} size={180}>
+        <span className="timer-big" role="timer">{Math.max(0, left)}</span>
+      </Ring>
+      <p className="center">{t(`${prefix}.${steps[i]}.how`)}</p>
+      <div className="row row--c"><button type="button" className="btn-link" onClick={() => setLeft(0)}>{t(i + 1 < steps.length ? 'common.next' : 'games.landscape.end')}</button></div>
+    </div>
+  );
+}
+
+function HowWasIt({ q, onAnswer }: { q: string; onAnswer(help: string | null): void }) {
+  const { t } = useTranslation();
+  return (
+    <div className="scene q">
+      <h2 className="q__t">{t(q)}</h2>
+      <div className="choices choices--3">
+        {['y', 's', 'n'].map((k) => <button key={k} type="button" className="opt" onClick={() => onAnswer(k)}>{t(`games.common.help.${k}`)}</button>)}
+      </div>
+      <div className="row row--c"><button type="button" className="btn-link" onClick={() => onAnswer(null)}>{t('games.common.preferNot')}</button></div>
+    </div>
+  );
+}
+
+// Just quiet: the oasis to look at or touch.
+function Oasis({ env, onDone }: { env: GameProps['env']; onDone(r: GameResult): void }) {
   const { t } = useTranslation();
   const [phase, setPhase] = useState<'scene' | 'ask'>('scene');
   const [dusk, setDusk] = useState(false);
@@ -51,17 +178,7 @@ export function CalmLandscapeGame({ env, onDone }: GameProps) {
     onDone({ acc: null, retries: 0, mood: 'calm', say: 'games.landscape.done', data: { help, secs, touches: touches.current } });
   }
 
-  if (phase === 'ask') {
-    return (
-      <div className="scene q">
-        <h2 className="q__t">{t('games.landscape.how')}</h2>
-        <div className="choices choices--3">
-          {['y', 's', 'n'].map((k) => <button key={k} type="button" className="opt" onClick={() => answer(k)}>{t(`games.common.help.${k}`)}</button>)}
-        </div>
-        <div className="row row--c"><button type="button" className="btn-link" onClick={() => answer(null)}>{t('games.common.preferNot')}</button></div>
-      </div>
-    );
-  }
+  if (phase === 'ask') return <HowWasIt q="games.landscape.how" onAnswer={answer} />;
 
   const canEnd = secs >= MIN_STAY_SEC;
   return (

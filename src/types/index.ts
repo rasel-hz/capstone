@@ -4,7 +4,7 @@ export type JourneyId = 'adhd' | 'anx' | 'ocd' | 'mood' | 'sleep' | 'soc' | 'aut
 export type ChallengeId =
   | 'video' | 'mem' | 'seq' | 'time' | 'calm' | 'start2'
   | 'attention_scene' | 'priority_board' | 'breakdown' | 'study_sprint' | 'emotion_map' | 'calm_landscape'
-  | 'micro_start' | 'thought_sort'
+  | 'micro_start' | 'thought_sort' | 'eye_rest' | 'grounding'
   | 'dhikr_morning' | 'dhikr_evening' | 'dhikr_calm_heart' | 'dhikr_moment' | 'dhikr_sleep';
 export type ChallengeCategory = 'focus' | 'memory' | 'planning' | 'time' | 'relax' | 'real';
 export type Difficulty = 'easy' | 'normal';
@@ -28,6 +28,8 @@ export interface Challenge {
   selfReport?: boolean;
   /** Ends without a sound, confetti or a cheering mascot, such as dhikr before sleep. */
   quiet?: boolean;
+  /** No longer offered or suggested anywhere. Kept so old history and saved missions still read. */
+  retired?: boolean;
 }
 
 export interface Journey {
@@ -53,6 +55,20 @@ export interface PlannedItem {
   jn?: string;
   /** Personal content for the game, validated before use. Without it a game shows its general example. */
   cfg?: import('../features/plan/config').PlanConfig;
+  /** What the challenge before it handed over, such as a task and its first step. */
+  seed?: Seed;
+  /** Added because the user chose to go on from the challenge before. Not needed to finish the mission. */
+  extra?: 1;
+}
+
+/** Handed from one challenge to the next, in the user's own words. */
+export interface Seed {
+  task?: string;
+  step?: string;
+  /** Where the user came from, so the next challenge can offer the way back (a break after a focus session). */
+  from?: ChallengeId;
+  /** A choice made already, such as which kind of break. Each game checks it against its own options. */
+  option?: string;
 }
 
 export interface MissionItem extends PlannedItem {
@@ -212,6 +228,8 @@ export interface AppState {
   missed: number;
   /** Today's progress brief from the AI (headline in text, plus a nudge), written at most once a day unless refreshed. */
   brief: { d: string; lang: string; text: string; nudge?: string } | null;
+  /** Things set aside in "Let's think it through" with a time to come back to them. Shown on Home once due. */
+  later: Reminder[];
   /** What the user told us during onboarding. Self-reported, optional, and never a diagnosis. */
   prof: import('../features/profile/questions').LifeProfile | null;
   /** The personal journey. Only real completions mark its steps done. */
@@ -274,8 +292,21 @@ export interface PrayerBreak {
 export interface GameResult {
   acc: number | null;
   retries: number;
+  /** Share of the challenge's level points for the effort the user reported, from 0 to 1. Reward points don't change. */
+  xpScale?: number;
+  /** A challenge the user chose to go on to, added right after this one. */
+  then?: { id: ChallengeId; seed?: Seed };
+  /** A page the user chose to go to after this, such as the chat. Offered on the result screen. */
+  go?: ViewId;
   say?: import('../i18n').Msg;
   mood?: import('../components/mascot/manifest').MascotState;
   note?: import('../i18n').Msg;
   data?: unknown;
+}
+
+/** Something the user chose to come back to, in their own words, and when. */
+export interface Reminder {
+  id: string;
+  text: string;
+  at: number;
 }

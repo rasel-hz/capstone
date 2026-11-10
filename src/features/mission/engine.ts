@@ -1,4 +1,4 @@
-import type { AppState, ChallengeId, GameResult, ItemStatus, Mission, MissionItem, PlannedItem } from '../../types';
+import type { AppState, ChallengeId, GameResult, ItemStatus, Mission, MissionItem, PlannedItem, Seed } from '../../types';
 import { tr } from '../../i18n';
 import { level, today } from '../../utils';
 import { CHALLENGES } from '../challenges/catalog';
@@ -78,7 +78,8 @@ export function completeItem(s: AppState, r: GameResult): FinishOutcome | null {
   it.data = r.data;
   it.status = 'COMPLETED';
   const base = CHALLENGES[it.id].xp;
-  it.xp = r.acc == null || r.acc >= 50 ? base : Math.round(base / 2);
+  const scale = r.xpScale == null ? 1 : Math.max(0, Math.min(1, r.xpScale));
+  it.xp = Math.round((r.acc == null || r.acc >= 50 ? base : base / 2) * scale);
   const before = level(s);
   s.xp += it.xp;
   M.xp = (M.xp || 0) + it.xp;
@@ -89,6 +90,33 @@ export function completeItem(s: AppState, r: GameResult): FinishOutcome | null {
   // Self-report check-ins give nothing, the same as for points.
   if (!CHALLENGES[it.id].selfReport) addEnergy(s);
   return { xp: it.xp, leveledUp: level(s) > before, newLevel: level(s) };
+}
+
+const SEED_LEN = 100;
+const seedText = (v: unknown) => (typeof v === 'string' ? v.replace(/\s+/g, ' ').trim().slice(0, SEED_LEN) : '');
+
+/** Keeps only short text and a known challenge, so a saved seed can't carry anything else into a game. */
+export function cleanSeed(raw: unknown): Seed | undefined {
+  const r = (raw ?? null) as Record<string, unknown> | null;
+  if (!r || typeof r !== 'object') return undefined;
+  const task = seedText(r.task);
+  const step = seedText(r.step);
+  const from = typeof r.from === 'string' && Object.hasOwn(CHALLENGES, r.from) ? (r.from as ChallengeId) : undefined;
+  const option = typeof r.option === 'string' && /^[a-z_]{1,20}$/.test(r.option) ? r.option : undefined;
+  if (!task && !step && !from && !option) return undefined;
+  return { ...(task ? { task } : {}), ...(step ? { step } : {}), ...(from ? { from } : {}), ...(option ? { option } : {}) };
+}
+
+/** Puts the challenge the user chose to go on to right after the current one, once. */
+export function addFollowUp(s: AppState, then: NonNullable<GameResult['then']>) {
+  const M = s.mission;
+  if (!M || !Object.hasOwn(CHALLENGES, then.id) || CHALLENGES[then.id].retired) return;
+  if (M.items[M.idx + 1]?.extra && M.items[M.idx + 1].id === then.id) return;
+  const seed = cleanSeed(then.seed);
+  M.items.splice(M.idx + 1, 0, {
+    id: then.id, why: [], diff: 'normal', extra: 1, ...(seed ? { seed } : {}),
+    status: 'NOT_STARTED', retries: 0, xp: 0, acc: null,
+  });
 }
 
 export function skipItem(s: AppState) {
@@ -176,7 +204,8 @@ export function finishMission(s: AppState): MissionSummary {
   markDone(s, M);
   const its = M.items;
   const dn = its.filter((i) => i.status === 'COMPLETED');
-  const all = dn.length === its.length;
+  // A challenge the user chose to go on to is a bonus: leaving it doesn't make the mission partial.
+  const all = its.every((i) => i.status === 'COMPLETED' || i.extra);
   if (its.every((i) => CHALLENGES[i.id].selfReport)) {
     return { all, doneCount: dn.length, total: its.length, xp: 0, retryId: null, avgAcc: null, suggestion: 'quiet', quiet: true, solo: M.solo };
   }

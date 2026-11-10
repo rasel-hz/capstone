@@ -10,7 +10,7 @@ import { useAppState, useStore } from '../../context/AppStateContext';
 import { CHALLENGES } from '../../features/challenges/catalog';
 import { ChallengeArt } from '../../features/challenges/ChallengeArt';
 import { buddyMood, ENERGY_FULL, energyToday as buddyEnergy } from '../../features/buddy/buddy';
-import { GoalsCard, MissedYou } from '../../features/buddy/BuddyCards';
+import { GoalsCard, LaterCards, MissedYou } from '../../features/buddy/BuddyCards';
 import { currentItem, hasOpenMission } from '../../features/mission/engine';
 import { MissionTimeline } from '../../features/mission/MissionTimeline';
 import { useMissions } from '../../features/mission/MissionProvider';
@@ -158,6 +158,7 @@ export function Home({ onNavigate }: { onNavigate(v: ViewId): void }) {
 
         <div className="meadow">
           <MissedYou />
+          <LaterCards />
 
           {s.prayerBreak && !s.driving && <BreakRow onOpen={() => missions.openBreak(null)} />}
           {askWindow && !s.prayerBreak && !s.driving && (

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useTimers } from '../../../hooks/useTimers';
 import { tr } from '../../../i18n';
 import { shuffled } from '../../../utils';
-import { COLOR_IDS, COLORS, SHAPES } from '../catalog';
+import { COLOR_IDS, COLORS, MEM_ITEMS } from '../catalog';
 import type { GameProps } from '../types';
 import { HintButton } from './parts';
 
@@ -11,12 +11,12 @@ interface Obj { k: string; c: number }
 const SHOW_MS = 5000;
 const same = (a: Obj, b: Obj) => a.k === b.k && a.c === b.c;
 const colorName = (c: number) => tr(`games.colors.${COLOR_IDS[c]}`);
-const describe = (o: Obj) => tr('games.mem.object', { shape: tr(`games.shapes.${o.k}`), color: colorName(o.c) });
+const describe = (o: Obj) => tr('games.mem.object', { shape: tr(`games.mem.items.${o.k}`), color: colorName(o.c) });
 
 // The answer options include objects that weren't on the tray: the same shape in another color and
 // another shape in the same color. Otherwise the answer is just the one you can't see any more.
 export function makeRound(n: number) {
-  const keys = shuffled(Object.keys(SHAPES));
+  const keys = shuffled(Object.keys(MEM_ITEMS));
   const cols = shuffled([0, 1, 2, 3, 4, 5]);
   const items: Obj[] = keys.slice(0, n).map((k, i) => ({ k, c: cols[i % cols.length] }));
   const miss = Math.floor(Math.random() * n);
@@ -31,7 +31,7 @@ export function makeRound(n: number) {
 }
 
 const Shape = ({ o, s }: { o: Obj; s: number }) => (
-  <svg width={s} height={s} viewBox="0 0 24 24" fill={COLORS[o.c]} stroke="rgba(38,61,55,.28)" aria-hidden="true" dangerouslySetInnerHTML={{ __html: SHAPES[o.k] }} />
+  <svg width={s} height={s} viewBox="0 0 24 24" fill={COLORS[o.c]} stroke="rgba(38,61,55,.28)" aria-hidden="true" dangerouslySetInnerHTML={{ __html: MEM_ITEMS[o.k] }} />
 );
 
 export function MemoryGame({ diff, env, onDone }: GameProps) {

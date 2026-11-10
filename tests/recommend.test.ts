@@ -8,15 +8,16 @@ const state = (p: Partial<AppState> = {}): AppState => ({ ...defaultState(), ...
 const ids = (r: { id: ChallengeId }[]) => r.map((x) => x.id);
 
 describe('recommendation engine', () => {
-  it('puts the prioritising board first for an overwhelmed user', () => {
+  it('puts the day planner first for an overwhelmed user, and never a retired challenge', () => {
     const r = recommend(state(), { goals: ['prioritize'] });
-    expect(r[0].id).toBe('priority_board');
+    expect(r[0].id).toBe('seq');
+    expect(ids(r)).not.toContain('priority_board');
     expect(r[0].why[0]).toEqual({ k: 'goal_prioritize' });
   });
 
   it('only returns challenges that support the goal', () => {
     const r = recommend(state(), { goals: ['start'] });
-    expect(ids(r).sort()).toEqual(['breakdown', 'micro_start', 'start2', 'study_sprint'].sort());
+    expect(ids(r).sort()).toEqual(['breakdown', 'micro_start', 'study_sprint'].sort());
   });
 
   it('never suggests anything longer than the time the user has', () => {
@@ -30,7 +31,7 @@ describe('recommendation engine', () => {
     const r = recommend(state(), { goals: ['start'], low: true });
     expect(ids(r)).not.toContain('study_sprint');
     expect(ids(r)).not.toContain('breakdown');
-    expect(r[0].id).toBe('start2');
+    expect(r[0].id).toBe('micro_start');
     expect(r[0].why).toContainEqual({ k: 'gentle' });
   });
 
@@ -55,11 +56,11 @@ describe('recommendation engine', () => {
     const fb = [
       { id: 'breakdown' as const, v: -1 as const, ts: 1 },
       { id: 'breakdown' as const, v: -1 as const, ts: 2 },
-      { id: 'start2' as const, v: 1 as const, ts: 3 },
+      { id: 'study_sprint' as const, v: 1 as const, ts: 3 },
     ];
     const r = recommend(state({ fb }), { goals: ['start'] });
     expect(ids(r)).not.toContain('breakdown');
-    expect(r[0].id).toBe('start2');
+    expect(r[0].id).toBe('study_sprint');
     expect(r[0].why).toContainEqual({ k: 'helped' });
   });
 

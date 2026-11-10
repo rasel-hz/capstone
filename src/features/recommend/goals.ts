@@ -19,14 +19,15 @@ export interface ChallengeMeta {
 }
 
 // Which everyday goals each challenge supports. See docs/CHALLENGES.md for purposes and limits.
+// Retired challenges keep an entry but are never recommended.
 // These are support and practice, not treatment, and say nothing about anyone's health.
 export const CHALLENGE_META: Record<ChallengeId, ChallengeMeta> = {
   priority_board: { goals: ['prioritize'] },
-  breakdown: { goals: ['start', 'prioritize'] },
-  micro_start: { goals: ['start'], gentle: true },
+  breakdown: { goals: ['start', 'prioritize', 'time'] },
+  micro_start: { goals: ['start', 'time'], gentle: true },
   start2: { goals: ['start'], gentle: true },
   thought_sort: { goals: ['worry', 'prioritize'] },
-  study_sprint: { goals: ['focus', 'start'] },
+  study_sprint: { goals: ['focus', 'start', 'time'] },
   seq: { goals: ['social', 'prioritize'] },
   video: { goals: ['focus'] },
   attention_scene: { goals: ['focus'] },
@@ -34,6 +35,8 @@ export const CHALLENGE_META: Record<ChallengeId, ChallengeMeta> = {
   time: { goals: ['time'], gentle: true },
   calm: { goals: ['stress', 'sleep', 'worry'], gentle: true },
   calm_landscape: { goals: ['rest', 'stress', 'sleep'], gentle: true },
+  grounding: { goals: ['worry', 'stress'], gentle: true },
+  eye_rest: { goals: ['rest', 'focus'], gentle: true },
   emotion_map: { goals: ['worry'], onRequest: true, gentle: true },
   dhikr_morning: { goals: ['rest'], gentle: true, dhikr: true },
   dhikr_evening: { goals: ['rest'], gentle: true, dhikr: true },

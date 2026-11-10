@@ -567,3 +567,5 @@ html[lang='en'] h1, html[lang='en'] h2 { letter-spacing: -.01em; }
 .brief { display: flex; gap: 14px; align-items: flex-start; background: linear-gradient(160deg, #F4EFFF, #EEF7F1); box-shadow: none; }
 .brief h2 { font-size: 17px; margin: 0 0 4px; }
 .brief__t { margin: 0 0 6px; line-height: 1.75; white-space: pre-wrap; }
+.later-card { border-inline-start-color: var(--em); }
+.later-card > svg { color: var(--em); flex: none; }

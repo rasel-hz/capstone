@@ -30,16 +30,16 @@ export interface PathPlan {
 }
 
 const BASE: Record<GoalId, ChallengeId[]> = {
-  organize: ['priority_board', 'breakdown', 'micro_start', 'time'],
-  focus: ['attention_scene', 'video', 'time', 'mem'],
-  start: ['micro_start', 'breakdown', 'start2', 'time'],
-  stress: ['calm_landscape', 'thought_sort', 'calm', 'micro_start'],
-  sleep: ['calm_landscape', 'calm', 'thought_sort', 'time'],
-  social: ['seq', 'thought_sort', 'calm', 'micro_start'],
-  habits: ['micro_start', 'start2', 'time', 'calm_landscape'],
-  other: ['micro_start', 'calm_landscape', 'priority_board', 'time'],
+  organize: ['breakdown', 'micro_start', 'thought_sort', 'calm_landscape'],
+  focus: ['attention_scene', 'video', 'mem', 'calm_landscape', 'eye_rest'],
+  start: ['micro_start', 'breakdown', 'study_sprint', 'calm_landscape'],
+  stress: ['calm_landscape', 'thought_sort', 'calm', 'grounding', 'micro_start'],
+  sleep: ['calm_landscape', 'calm', 'thought_sort', 'emotion_map'],
+  social: ['thought_sort', 'calm', 'micro_start', 'emotion_map'],
+  habits: ['micro_start', 'breakdown', 'study_sprint', 'calm_landscape'],
+  other: ['micro_start', 'calm_landscape', 'breakdown', 'calm'],
 };
-const GENTLE: ChallengeId[] = ['calm_landscape', 'micro_start', 'priority_board', 'time'];
+const GENTLE: ChallengeId[] = ['calm_landscape', 'micro_start', 'calm', 'breakdown'];
 const ACTS = 4;
 
 const student = (p: LifeProfile) => p.life.includes('school') || p.life.includes('uni') || p.life.includes('both');
@@ -57,12 +57,12 @@ function chooseActs(p: LifeProfile, goal: GoalId | null): ChallengeId[] {
   let a = [...(goal ? BASE[goal] : GENTLE)];
   // Study practice only for someone who said they study.
   if (student(p) && (goal === 'organize' || goal === 'start' || goal === 'focus')) a = [...a.slice(0, 2), 'study_sprint', ...a.slice(2)];
-  // The personal board needs real tasks. Without them it would show an example.
-  if (p.tasks.length >= 2 && (goal === 'organize' || goal === 'start')) a = toFront(a.filter((x) => x !== 'priority_board'), 'seq');
+  // Arranging the day works only on the user's own tasks, so it comes in only when they named some.
+  if (p.tasks.length >= 2 && (goal === 'organize' || goal === 'start' || goal === 'social')) a = toFront(a, 'seq');
   if (p.hard.includes('thoughts') && !a.includes('thought_sort') && goal !== 'focus') a.splice(2, 0, 'thought_sort');
   if (p.style.includes('calm')) a = toFront(a.includes('calm_landscape') ? a : [...a, 'calm_landscape'], 'calm_landscape');
   if (p.style.includes('steps')) {
-    const plan = a.find((x) => x === 'seq' || x === 'priority_board' || x === 'breakdown');
+    const plan = a.find((x) => x === 'seq' || x === 'breakdown');
     if (plan) a = toFront(a, plan);
   }
   // Someone worn out starts with something gentle.

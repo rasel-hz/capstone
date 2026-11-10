@@ -2,38 +2,59 @@ import { ChevronsDown, Pencil, Play, Timer, TimerOff } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { clock } from '../../../utils';
+import type { CrisisLevel } from '../../companion/crisis';
+import type { GameResult } from '../../../types';
 import type { GameProps } from '../types';
-import { Ring } from './parts';
+import { AskNext, CrisisStop, crisisIn, Ring } from './parts';
 
 // From a real chunk of work down to the smallest possible move. Generic, so they fit any task, and
 // always shown as suggestions the user can replace. Stable IDs, so a language switch keeps the place.
 export const LADDER = ['block', 'part', 'where', 'ready', 'open'] as const;
+// Examples for someone who already knows their first step. Picking one only fills the box.
+const STEP_EXAMPLES = ['open', 'line', 'ready', 'one'] as const;
 type Mode = 60 | 120 | 0;
-const MODES: Mode[] = [60, 120, 0];
+// Two minutes first: it's the suggested length.
+const MODES: Mode[] = [120, 60, 0];
+// Level points for the effort the user reported. Trying counts too; reward points don't change.
+const EFFORT = { started: 1, bit: 0.6, not: 0.3 } as const;
+type Outcome = keyof typeof EFFORT;
+
+type Phase = 'task' | 'know' | 'write' | 'shrink' | 'mode' | 'go' | 'ask' | 'later';
+const ROUND: Record<Phase, number> = { task: 1, know: 1, write: 2, shrink: 2, mode: 3, go: 3, ask: 4, later: 4 };
 
 /**
- * "Just the first step" (micro_start). The user shrinks the first step until it feels easy enough,
- * then tries it, with a 60-second timer, a 2-minute timer or none. Any outcome is fine: there's no score.
+ * "Just the first step" (micro_start). The user names a task, then either writes the first step they already
+ * know or shrinks one until it feels easy, and tries it with a 2-minute timer, 60 seconds or none.
+ * Level points follow the effort they report. "Not yet" can turn into a plan with "Break it down".
+ * A task and step handed over from another challenge are filled in, so the user goes straight on.
  */
-export function MicroStartGame({ diff, env, onDone, cfg }: GameProps) {
+export function MicroStartGame({ diff, env, onDone, cfg, seed }: GameProps) {
   const { t } = useTranslation();
   const mine = cfg?.tasks.filter((x) => x.src === 'user').map((x) => x.text) ?? [];
-  const [phase, setPhase] = useState<'task' | 'shrink' | 'mode' | 'go' | 'ask'>('task');
-  const [task, setTask] = useState('');
+  const [phase, setPhase] = useState<Phase>(seed?.task ? (seed.step ? 'mode' : 'know') : 'task');
+  const [task, setTask] = useState(seed?.task ?? '');
   const [level, setLevel] = useState(diff === 'easy' ? 2 : 0);
-  const [own, setOwn] = useState('');
+  const [own, setOwn] = useState(seed?.step ?? '');
   const [editing, setEditing] = useState(false);
   const [shrinks, setShrinks] = useState(0);
-  const [mode, setMode] = useState<Mode>(60);
-  const [left, setLeft] = useState(60);
+  const [mode, setMode] = useState<Mode>(120);
+  const [left, setLeft] = useState(120);
+  const [crisis, setCrisis] = useState<CrisisLevel>(0);
+  const [held, setHeld] = useState<GameResult | null>(null);
   const started = useRef(0);
 
   useEffect(() => {
-    const steps = ['task', 'shrink', 'mode', 'go', 'ask'];
-    env.round(Math.min(4, steps.indexOf(phase) + 1), 4, 'games.common.step');
-    env.say(phase === 'go' ? 'calm' : phase === 'ask' ? 'curious' : 'encouraging', `games.micro.say.${phase}`);
+    env.round(ROUND[phase], 4, 'games.common.step');
+    env.say(phase === 'go' ? 'calm' : phase === 'ask' || phase === 'later' ? 'curious' : 'encouraging', `games.micro.say.${phase}`);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase]);
+
+  // Typed text is checked on the device before going on.
+  function onward(next: Phase, ...texts: string[]) {
+    const lv = crisisIn(...texts);
+    if (lv) setCrisis(lv);
+    else setPhase(next);
+  }
 
   useEffect(() => {
     if (phase !== 'go' || !mode || env.paused) return;
@@ -56,17 +77,38 @@ export function MicroStartGame({ diff, env, onDone, cfg }: GameProps) {
     env.sfx('tap');
   }
 
-  function answer(outcome: 'started' | 'bit' | 'not') {
+  function answer(outcome: Outcome) {
     env.sfx('ok');
-    onDone({
+    const r: GameResult = {
       acc: null,
       retries: 0,
+      xpScale: EFFORT[outcome],
       mood: outcome === 'not' ? 'calm' : 'celebrating',
       say: `games.micro.done.${outcome}`,
       note: outcome === 'not' ? 'games.micro.note.not' : 'games.micro.note.started',
       // Saved exactly as typed, on the device only.
       data: { task: task.trim(), step, ownStep: !!own.trim(), level: LADDER[level], shrinks, mode, outcome, secs: Math.round((Date.now() - started.current) / 1000) },
-    });
+    };
+    // Not started yet: offer to plan it for another time instead of leaving it there.
+    if (outcome === 'not') {
+      setHeld(r);
+      setPhase('later');
+    } else onDone(r);
+  }
+
+  if (crisis) return <CrisisStop level={crisis} onBack={() => setCrisis(0)} />;
+
+  if (phase === 'later' && held) {
+    return (
+      <AskNext
+        q={t('games.micro.laterQ')}
+        detail={task.trim()}
+        yes={t('games.micro.laterYes')}
+        no={t('games.micro.laterNo')}
+        onYes={() => onDone({ ...held, then: { id: 'breakdown', seed: { task: task.trim(), from: 'micro_start' } } })}
+        onNo={() => onDone(held)}
+      />
+    );
   }
 
   if (phase === 'task') {
@@ -79,7 +121,37 @@ export function MicroStartGame({ diff, env, onDone, cfg }: GameProps) {
           </div>
         )}
         <input id="ms-task" dir="auto" maxLength={80} placeholder={t('games.micro.taskPh')} value={task} onChange={(e) => setTask(e.target.value)} />
-        <div className="row row--c"><button type="button" className="btn" disabled={!task.trim()} onClick={() => setPhase('shrink')}>{t('common.next')}</button></div>
+        <div className="row row--c"><button type="button" className="btn" disabled={!task.trim()} onClick={() => onward('know', task)}>{t('common.next')}</button></div>
+      </div>
+    );
+  }
+
+  if (phase === 'know') {
+    return (
+      <div className="scene q">
+        <p className="eyebrow center" dir="auto">{task.trim()}</p>
+        <h2 className="q__t">{t('games.micro.knowQ')}</h2>
+        <div className="choices choices--2">
+          <button type="button" className="opt" onClick={() => setPhase('write')}>{t('games.micro.knowYes')}</button>
+          <button type="button" className="opt" onClick={() => { setOwn(''); setPhase('shrink'); }}>{t('games.micro.knowHelp')}</button>
+        </div>
+      </div>
+    );
+  }
+
+  if (phase === 'write') {
+    return (
+      <div className="scene form ms">
+        <p className="eyebrow center" dir="auto">{task.trim()}</p>
+        <label htmlFor="ms-own"><h2 className="q__t">{t('games.micro.writeQ')}</h2></label>
+        <input id="ms-own" dir="auto" maxLength={80} placeholder={t('games.micro.ownPh')} value={own} onChange={(e) => setOwn(e.target.value)} />
+        <div className="tags" role="group" aria-label={t('games.common.examples')}>
+          {STEP_EXAMPLES.map((k) => <button key={k} type="button" className="tag tag--btn" onClick={() => setOwn(t(`games.micro.stepExamples.${k}`))}>{t(`games.micro.stepExamples.${k}`)}</button>)}
+        </div>
+        <div className="row row--c">
+          <button type="button" className="btn alt" onClick={() => setPhase('know')}>{t('common.back')}</button>
+          <button type="button" className="btn" disabled={!own.trim()} onClick={() => onward('mode', own)}>{t('common.next')}</button>
+        </div>
       </div>
     );
   }
@@ -94,7 +166,7 @@ export function MicroStartGame({ diff, env, onDone, cfg }: GameProps) {
           {LADDER.map((k, i) => <i key={k} className={i <= level ? 'on' : ''} />)}
         </div>
         {editing ? (
-          <form className="pb__add" onSubmit={(e) => { e.preventDefault(); setEditing(false); }}>
+          <form className="pb__add" onSubmit={(e) => { e.preventDefault(); const lv = crisisIn(own); if (lv) setCrisis(lv); else setEditing(false); }}>
             <input dir="auto" autoFocus aria-label={t('games.micro.ownLabel')} maxLength={80} placeholder={t('games.micro.ownPh')} value={own} onChange={(e) => setOwn(e.target.value)} />
             <button type="submit" className="btn sm alt">{t('common.ok')}</button>
           </form>
@@ -108,7 +180,7 @@ export function MicroStartGame({ diff, env, onDone, cfg }: GameProps) {
           <button type="button" className="btn alt" disabled={smallest || !!own.trim()} onClick={() => { setLevel(level + 1); setShrinks(shrinks + 1); env.sfx('tap'); }}>
             <ChevronsDown size={16} aria-hidden="true" /> {t('games.micro.smaller')}
           </button>
-          <button type="button" className="btn" onClick={() => setPhase('mode')}>{t('games.micro.doable')}</button>
+          <button type="button" className="btn" onClick={() => onward('mode', own)}>{t('games.micro.doable')}</button>
         </div>
         <div className="row row--c">
           <button type="button" className="btn-link" onClick={() => setEditing(true)}><Pencil size={14} aria-hidden="true" /> {t('games.micro.writeOwn')}</button>

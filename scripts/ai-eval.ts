@@ -44,7 +44,7 @@ const BRIEF_RAW = "I hade a long day at work, what I did from 9 am to 5 pm. When
 
 const BRIEF = "I had a long day at work. I worked from 9 AM to 5 PM. When I get home, I want to continue my personal projects, including an advanced Udacity course that I am paying for. I am also interested in quantitative trading and playing chess. I have difficulty organizing my time appropriately. What do you think?";
 
-const PLAN_IDS = ['seq', 'priority_board', 'breakdown', 'start2', 'micro_start', 'study_sprint', 'thought_sort'];
+const PLAN_IDS = ['seq', 'breakdown', 'micro_start', 'study_sprint', 'thought_sort'];
 const NOT_THEIRS = /universit|lecture|exam|coffee|errand|appointment|class/i;
 
 const CASES: Case[] = [
@@ -55,22 +55,22 @@ const CASES: Case[] = [
   { name: 'Test C: exhausted and stressed after work', message: "I'm exhausted and stressed after work.", app: 'en', expect: { lang: 'en', maxSuggest: 1, suggestFrom: ['calm', 'calm_landscape'], noTasks: true } },
   { name: 'Test D: asks for the memory game', message: 'I want to play the memory game.', app: 'en', expect: { lang: 'en', mustSuggest: 'mem', noTasks: true } },
   { name: 'Test E: Arabic, lots to do after work, none named', message: 'عندي أشياء واجد أبي أسويها بعد الدوام وما أدري وش أبدأ فيه.', expect: { lang: 'ar', suggestFrom: PLAN_IDS, noTasks: true } },
-  { name: 'Overwhelmed, Saudi Arabic', message: 'عندي أشياء كثير وما أدري من وين أبدأ', expect: { lang: 'ar', suggestFrom: ['seq', 'priority_board', 'breakdown', 'start2', 'micro_start', 'thought_sort'], noTasks: true } },
-  { name: 'Hard to start studying', message: "I really want to study but can't get myself to begin.", app: 'en', expect: { lang: 'en', suggestFrom: ['micro_start', 'start2', 'breakdown', 'study_sprint'] } },
+  { name: 'Overwhelmed, Saudi Arabic', message: 'عندي أشياء كثير وما أدري من وين أبدأ', expect: { lang: 'ar', suggestFrom: ['seq', 'breakdown', 'micro_start', 'thought_sort'], noTasks: true } },
+  { name: 'Hard to start studying', message: "I really want to study but can't get myself to begin.", app: 'en', expect: { lang: 'en', suggestFrom: ['micro_start', 'breakdown', 'study_sprint'] } },
   { name: 'Stressed after a long day', message: "I'm feeling stressed after a long day.", app: 'en', expect: { lang: 'en', suggestFrom: ['calm', 'calm_landscape'] } },
   { name: 'Winding down for sleep, Arabic', message: 'ما أقدر أهدى قبل النوم، أفكر كثير', expect: { lang: 'ar', suggestFrom: ['calm', 'calm_landscape', 'emotion_map', 'thought_sort'] } },
   { name: 'Worry about what cannot be controlled', message: "I keep thinking about things I can't control.", app: 'en', expect: { lang: 'en', suggestFrom: ['thought_sort', 'calm', 'emotion_map', 'calm_landscape'] } },
-  { name: 'Exam and distraction', message: 'I have an exam and I keep getting distracted.', app: 'en', expect: { lang: 'en', suggestFrom: ['study_sprint', 'priority_board', 'video', 'attention_scene', 'mem', 'breakdown', 'start2', 'micro_start'] } },
-  { name: 'Nervous about a meeting', message: "I'm nervous about talking during a meeting tomorrow.", app: 'en', expect: { lang: 'en', suggestFrom: ['seq', 'calm', 'calm_landscape', 'priority_board', 'thought_sort'] } },
+  { name: 'Exam and distraction', message: 'I have an exam and I keep getting distracted.', app: 'en', expect: { lang: 'en', suggestFrom: ['study_sprint', 'video', 'attention_scene', 'mem', 'breakdown', 'micro_start'] } },
+  { name: 'Nervous about a meeting', message: "I'm nervous about talking during a meeting tomorrow.", app: 'en', expect: { lang: 'en', suggestFrom: ['seq', 'calm', 'calm_landscape', 'thought_sort'] } },
   { name: 'Exhausted, wants to rest', message: "I'm exhausted and don't feel like doing anything.", app: 'en', energy: 'low', expect: { lang: 'en', maxSuggest: 1, suggestFrom: ['calm', 'calm_landscape'], intents: ['rest', 'support', 'chat', 'advice'] } },
-  { name: 'Asks for a diagnosis', message: "Do I have ADHD? I can never focus on anything.", app: 'en', expect: { lang: 'en', suggestFrom: ['study_sprint', 'video', 'attention_scene', 'priority_board', 'breakdown', 'start2', 'micro_start', 'mem'] } },
+  { name: 'Asks for a diagnosis', message: "Do I have ADHD? I can never focus on anything.", app: 'en', expect: { lang: 'en', suggestFrom: ['study_sprint', 'video', 'attention_scene', 'breakdown', 'micro_start', 'mem'] } },
   { name: 'Out of scope: code', message: 'Write me a Python script that sorts a list.', app: 'en', expect: { lang: 'en', noSuggest: true } },
   { name: 'Mixed Arabic and English', message: 'اليوم كان long day في الدوام وأبي أرتاح شوي', expect: { lang: 'ar', maxSuggest: 1, suggestFrom: ['calm', 'calm_landscape'] } },
   { name: 'Greeting only', message: 'هلا والله', expect: { lang: 'ar', noSuggest: true } },
   { name: 'Asks about results with none recorded', message: 'How are my results so far?', app: 'en', expect: { lang: 'en', noSuggest: true, mentions: /\b(no|not yet|haven['’]t|don['’]t have|nothing|aren['’]t|isn['’]t|none|0)\b/i } },
   { name: 'Prayer: 20 minutes before Maghrib, times known', message: 'I only have 20 minutes before Maghrib. What can I do?', app: 'en', prayer: { next: 'maghrib', minutesUntil: 20, inWindow: false }, expect: { lang: 'en', notMentions: /did you pray|have you prayed/i } },
   { name: 'Prayer: asks how long until Maghrib, times unknown', message: 'How long do I have until Maghrib?', app: 'en', expect: { lang: 'en', noSuggest: true, mentions: /\b(city|profile|don['’]t have|what time|tell me)\b/i, notMentions: /\b\d{1,2}:\d{2}\b|\b\d+\s*(minutes|mins)\s*(left|until|before)/i } },
-  { name: 'Only 20 minutes tonight', message: 'I have too many projects and only 20 minutes tonight.', app: 'en', expect: { lang: 'en', noPending: true, suggestFrom: ['seq', 'priority_board', 'breakdown', 'start2', 'micro_start', 'study_sprint'] } },
+  { name: 'Only 20 minutes tonight', message: 'I have too many projects and only 20 minutes tonight.', app: 'en', expect: { lang: 'en', noPending: true, suggestFrom: ['seq', 'breakdown', 'micro_start', 'study_sprint'] } },
 ];
 
 async function ask(c: Case): Promise<Reply> {

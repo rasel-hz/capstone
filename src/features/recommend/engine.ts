@@ -58,7 +58,7 @@ export function recommend(s: AppState, o: RecOptions = {}): Recommendation[] {
     const matched = goals.filter((g) => m.goals.includes(g));
 
     // Eligibility.
-    if (o.exclude?.includes(id)) continue;
+    if (c.retired || o.exclude?.includes(id)) continue;
     if (m.dhikr && (!asked || !dhikrFitsNow(id, new Date(now)))) continue;
     if (o.minutes != null && c.min > o.minutes) continue;
     if (m.onRequest && !asked && !(goals[0] && m.goals[0] === goals[0])) continue;

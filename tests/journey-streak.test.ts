@@ -56,7 +56,7 @@ describe('Test 2: working adult', () => {
     const plan = buildPlan(p);
     expect(plan.themes[0]).toBe('work');
     expect(ids(plan)).not.toContain('study_sprint');
-    expect(firstPlay(plan)).toBe('priority_board');
+    expect(firstPlay(plan)).toBe('breakdown');
   });
   it('uses their real tasks only when they kept some', () => {
     const plan = buildPlan({ ...p, tasks: ['Udacity AI course', 'chess'] });
@@ -114,7 +114,7 @@ describe('Test 4: different people, different starts', () => {
     expect(firstPlay(buildPlan(prof({ goals: ['organize'], style: ['calm'] })))).toBe('calm_landscape');
   });
   it('starts someone worn out gently', () => {
-    expect(firstPlay(buildPlan(prof({ goals: ['focus'], hard: ['tired'] })))).toBe('time');
+    expect(firstPlay(buildPlan(prof({ goals: ['focus'], hard: ['tired'] })))).toBe('calm_landscape');
   });
   it('has a gentle start with no answers at all, and invents no tasks', () => {
     const plan = buildPlan(emptyProfile());

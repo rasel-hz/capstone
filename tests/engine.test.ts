@@ -3,6 +3,7 @@ import { defaultState, hydrate } from '../src/services/storage';
 import { advance, beginItem, completeItem, createMission, exitMission, finishMission, hasOpenMission, pauseItem, resumeItem, settle, shouldOfferEasier, skipItem } from '../src/features/mission/engine';
 import { generateMission, inPrayerWindow } from '../src/features/mission/planner';
 import type { AppState } from '../src/types';
+import { today } from '../src/utils';
 
 const fresh = (o: Partial<AppState> = {}) => ({ ...defaultState(), ...o });
 const three = [
@@ -121,9 +122,11 @@ describe('mission state', () => {
 
 describe('planner', () => {
   it('uses confirmed context and low energy', () => {
-    const s = fresh({ ctx: ['event'], pref: 'short' });
+    // Arranging the day comes in only with at least two open goals of the user's own.
+    const s = fresh({ ctx: ['event'], pref: 'short', goals: { d: today(), items: [{ id: 'g1', text: 'Report', done: 0 }, { id: 'g2', text: 'Gym', done: 0 }] } });
     const m = generateMission(s);
     expect(m.map((i) => i.id)).toEqual(['video', 'seq', 'calm']);
+    expect(generateMission(fresh({ ctx: ['event'], pref: 'short' })).map((i) => i.id)).toEqual(['video', 'mem', 'calm']);
     expect(m[0].diff).toBe('easy');
     expect(m[2].diff).toBe('normal');
   });

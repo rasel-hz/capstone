@@ -2,6 +2,7 @@ import { formatList, tr } from '../../i18n';
 import type { AppState, ChallengeId, PlannedItem, Why, WhyPart } from '../../types';
 import { today } from '../../utils';
 import { JOURNEYS } from '../challenges/catalog';
+import { todayGoals } from '../buddy/buddy';
 import { currentWindow } from '../prayer/gate';
 
 export function isLowEnergy(s: AppState): boolean {
@@ -20,7 +21,7 @@ export function lastAccuracy(s: AppState, id: ChallengeId): number | null {
 }
 
 // Reasons are saved as codes and written out when shown, so they follow the selected language.
-const DEFAULT_WHY: Partial<Record<ChallengeId, string>> = { video: 'video', mem: 'mem', time: 'time', start2: 'start2' };
+const DEFAULT_WHY: Partial<Record<ChallengeId, string>> = { video: 'video', mem: 'mem', micro_start: 'start2', attention_scene: 'scene', seq: 'seq' };
 
 // Each reason states what actually led to the choice, so items don't repeat the same generic line.
 export function whyChosen(s: AppState, id: ChallengeId, index = 0, named = new Set<string>()): WhyPart[] {
@@ -58,11 +59,12 @@ export function missionReason(s: AppState): string {
 
 // Rule-based planner, not AI inference. An AI planner can propose later, and these rules stay as the validator.
 export function generateMission(s: AppState): PlannedItem[] {
-  const event = s.ctx.includes('event');
+  // Arranging the day only works on the user's own tasks, so it comes in only when today has at least two open goals.
+  const open = todayGoals(s).filter((g) => !g.done).length;
   const ids: ChallengeId[] = [
     'video',
-    event ? 'seq' : 'mem',
-    isLowEnergy(s) ? 'calm' : s.needs.some((n) => n === 'adhd' || n === 'mood') ? 'start2' : 'time',
+    open >= 2 ? 'seq' : 'mem',
+    isLowEnergy(s) ? 'calm' : s.needs.some((n) => n === 'adhd' || n === 'mood') ? 'micro_start' : 'attention_scene',
   ];
   const named = new Set<string>();
   return ids.map((id, i) => {

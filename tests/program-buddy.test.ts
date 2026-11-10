@@ -20,19 +20,19 @@ describe('journey program', () => {
 
   it('has seven steps, repeating short journeys', () => {
     expect(programSteps('adhd')).toHaveLength(PROGRAM_DAYS);
-    expect(programSteps('ocd')).toEqual(['calm', 'time', 'calm', 'time', 'calm', 'time', 'calm']);
+    expect(programSteps('ocd')).toEqual(['calm', 'thought_sort', 'calm', 'thought_sort', 'calm', 'thought_sort', 'calm']);
   });
 
   it('counts a day only for that day\'s step, once a day, and never resets for a gap', () => {
     const s = defaultState();
     startProgram(s, 'ocd', 2);
-    expect(recordProgramDay(s, 'time', D(1))).toBe(false);
+    expect(recordProgramDay(s, 'thought_sort', D(1))).toBe(false);
     expect(recordProgramDay(s, 'calm', D(1))).toBe(true);
-    expect(recordProgramDay(s, 'time', D(1))).toBe(false);
+    expect(recordProgramDay(s, 'thought_sort', D(1))).toBe(false);
     expect(currentStep(s.prog!, D(1))).toEqual({ day: 1, id: 'calm' });
     // Five days later: nothing lost, the next step was waiting.
-    expect(currentStep(s.prog!, D(6))).toEqual({ day: 2, id: 'time' });
-    expect(recordProgramDay(s, 'time', D(6))).toBe(true);
+    expect(currentStep(s.prog!, D(6))).toEqual({ day: 2, id: 'thought_sort' });
+    expect(recordProgramDay(s, 'thought_sort', D(6))).toBe(true);
     expect(s.prog!.days).toEqual([D(1), D(6)]);
   });
 

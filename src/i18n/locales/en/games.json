@@ -28,32 +28,23 @@
     "green": "green",
     "peach": "peach"
   },
-  "shapes": {
-    "circle": "circle",
-    "square": "square",
-    "tri": "triangle",
-    "star": "star",
-    "heart": "heart",
-    "moon": "crescent",
-    "drop": "drop",
-    "leaf": "leaf"
-  },
   "video": {
-    "sceneLabel": "An animated oasis scene with rising balloons and passing birds",
+    "sceneLabel": "An animated oasis scene with balloons and birds, and sometimes a camel or a star",
     "captions": {
       "calm": "A calm day at the oasis",
-      "b1": "A balloon rises into the sky",
-      "r1": "A bird passes",
-      "b2": "A second balloon",
-      "b3": "A third balloon",
-      "r2": "Another bird passes",
+      "balloon": "A {{color}} balloon rises",
+      "birdRight": "A bird flies in from the right",
+      "birdLeft": "A bird flies in from the left",
+      "camelRight": "A camel walks in from the right",
+      "camelLeft": "A camel walks in from the left",
+      "star": "A star twinkles in the sky",
       "end": "End of the scene"
     },
     "pause": "Pause the scene",
     "play": "Play the scene",
     "restart": "From the start",
     "captionsToggle": "Captions",
-    "clipNote": "A short 24-second animated scene. Watch the balloons and birds.",
+    "clipNote": "A short 24-second scene that changes every time. Watch everything that moves.",
     "intro_m": "Watch the scene closely, and then I'll ask you a few things.",
     "intro_f": "Watch the scene closely, and then I'll ask you a few things.",
     "askIntro": "Let's see what you caught.",
@@ -65,16 +56,57 @@
     "questions": {
       "balloons": {
         "q": "How many balloons rose into the sky?",
-        "hint": "Count the colored balloons that rose."
+        "hint": "Count every balloon, in every colour."
       },
       "lastColor": {
-        "q": "What color was the last balloon?",
-        "hint": "The last balloon matched the sky."
+        "q": "What colour was the last balloon?",
+        "hint": "Think of the balloon just before the scene ended."
+      },
+      "firstColor": {
+        "q": "What colour was the first balloon?",
+        "hint": "The first balloon rose near the start."
+      },
+      "colorCount": {
+        "q": "How many {{color}} balloons rose?",
+        "hint": "Count only the {{color}} balloons."
       },
       "birds": {
-        "q": "How many times did a bird pass?",
-        "hint": "One bird passed early in the scene, and another came later."
+        "q": "How many birds flew past?",
+        "hint": "The birds fly high, across the sky."
+      },
+      "birdFrom": {
+        "q": "Where did the first bird come from?",
+        "hint": "Remember the first bird and which side it came in from."
+      },
+      "camelFrom": {
+        "q": "Where did the camel come from?",
+        "hint": "The camel walked low, on the sand."
+      },
+      "star": {
+        "q": "Did a star appear in the sky?",
+        "hint": "The star twinkles for a moment, then fades."
+      },
+      "palms": {
+        "q": "How many palm trees were in the scene?",
+        "hint": "The palms stand still, down by the water."
+      },
+      "first": {
+        "q": "What appeared first?",
+        "hint": "Think of the first thing that moved."
       }
+    },
+    "dirs": {
+      "right": "From the right",
+      "left": "From the left"
+    },
+    "yesno": {
+      "yes": "Yes",
+      "no": "No"
+    },
+    "kinds": {
+      "balloon": "A balloon",
+      "bird": "A bird",
+      "camel": "A camel"
     }
   },
   "mem": {
@@ -85,11 +117,21 @@
     "right": "Nice work! You got it!",
     "wasThis": "No worries, let's try a different approach. It was a {{object}}.",
     "colorHint": "Close! Hint: it was {{color}}.",
-    "memorize": "Memorize the shapes and colors",
+    "memorize": "Remember the things and their colours",
     "whichMissing": "What vanished from its place?",
-    "shown": "The shapes: {{list}}",
+    "shown": "Things: {{list}}",
     "remaining": "Still here: {{list}}",
-    "hint": "It was in space {{slot}}, and its color was {{color}}."
+    "hint": "It was in space {{slot}}, and its color was {{color}}.",
+    "items": {
+      "dallah": "Dallah",
+      "finjan": "Finjan",
+      "date": "Date",
+      "lantern": "Lantern",
+      "palm": "Palm",
+      "camel": "Camel",
+      "tent": "Tent",
+      "incense": "Incense burner"
+    }
   },
   "seq": {
     "whyLast": "because leaving comes after you finish getting ready",
@@ -168,7 +210,7 @@
   "calm": {
     "intro": "Take it easy. Choose what suits you, and you can stop any time.",
     "breathGuide": "Breathe in through your nose and out through your mouth.",
-    "quietGuide": "No guided breathing. Just take half a minute of quiet.",
+    "quietGuide": "No guided breathing. Just take this time to be quiet.",
     "done": "You took it at your own pace.",
     "how": "How would you like it today?",
     "pace": "Breathing pace",
@@ -186,10 +228,32 @@
       "ready": "Get ready",
       "in": "Breathe in",
       "out": "Breathe out",
-      "quiet": "Quiet"
+      "quiet": "Quiet",
+      "top": "A little more in"
     },
     "left": "{{time}} left",
-    "breathOf": "Breath {{n}} of {{total}}"
+    "breathOf": "Breath {{n}} of {{total}}",
+    "lengthQ": "How many minutes?",
+    "methodQ": "Breathing method",
+    "methods": {
+      "sigh": {
+        "name": "Sigh",
+        "note": "Two breaths in, a long breath out"
+      },
+      "long": {
+        "name": "Longer out",
+        "note": "4 in, 6 out"
+      },
+      "even": {
+        "name": "Calm and even",
+        "note": "5 in, 5 out"
+      }
+    },
+    "guide": {
+      "sigh": "Breathe in, then a short extra breath in, then a long breath out through the mouth.",
+      "long": "In through the nose, a longer breath out through the mouth.",
+      "even": "Breathe in and out for the same length, at your ease."
+    }
   },
   "start": {
     "intro": "We'll start with just one small step.",
@@ -245,11 +309,40 @@
       "lamp": "The lantern",
       "cushion": "The cushion",
       "frame": "The picture",
-      "plant": "The plant"
+      "plant": "The plant",
+      "camel": "The camel",
+      "incense": "The incense burner",
+      "spice": "The spices",
+      "jar": "The jar",
+      "carpet": "The rug",
+      "basket": "The basket",
+      "shoplamp": "The shop lamp",
+      "sign": "The sign",
+      "bag": "The bag",
+      "cat": "The cat",
+      "moon": "The moon",
+      "star1": "The first star",
+      "star2": "The second star",
+      "fire": "The fire",
+      "nighttent": "The tent",
+      "lantern": "The lantern",
+      "kettle": "The kettle",
+      "owl": "The owl",
+      "pot": "The pot",
+      "mug": "The mug",
+      "plate": "The plate",
+      "clock": "The clock",
+      "fruit": "The fruit bowl",
+      "towel": "The towel",
+      "jarK": "The jar",
+      "spoon": "The spoon"
     },
     "scenes": {
       "oasis": "The oasis",
-      "majlis": "The majlis"
+      "majlis": "The majlis",
+      "souq": "The souq",
+      "night": "Desert night",
+      "kitchen": "The kitchen"
     },
     "intro_one": "There's {{count}} difference. Take your time, there's no timer.",
     "intro_other": "There are {{count}} differences. Take your time, there's no timer.",
@@ -268,7 +361,7 @@
     "second": "Second scene: tap here",
     "foundLabel": "{{item}}, difference found",
     "progress": "Found {{found}} of {{total}}.",
-    "explain": "A difference can be a new color, something that moved, or something missing. If it's missing, tap where it was."
+    "explain": "A difference can be a new colour, something moved, something missing or something new. If something is missing, tap where it was."
   },
   "priority": {
     "seeds": {
@@ -376,18 +469,22 @@
     "whenPh": "For example: 5 pm",
     "done": "There, that feels lighter.",
     "note": "Your plan: {{when}}, you will: {{step}}. The points are for the plan, not for doing it, because we can't verify that.",
-    "finish": "Finish the plan"
+    "finish": "Finish the plan",
+    "nowQ": "Start the first step now?",
+    "nowYes": "Yes, let's go",
+    "nowNo": "No, save them to my goals",
+    "savedGoals": "I put your steps in today's goals."
   },
   "study": {
     "intro": "A short session at your pace.",
     "timeUp": "Time's up. How did it go?",
     "doneNo": "That's okay, some sessions go that way.",
     "doneGood": "Nice. Another session whenever it suits you.",
-    "note": "You studied for {{time}}.",
-    "noteParked_one": "You studied for {{time}} and parked {{count}} distraction.",
-    "noteParked_other": "You studied for {{time}} and parked {{count}} distractions.",
-    "topicQ": "What are you studying? (optional)",
-    "topicPh": "For example: chapter three",
+    "note": "You focused for {{time}}.",
+    "noteParked_one": "You focused for {{time}} and parked one distraction.",
+    "noteParked_other": "You focused for {{time}} and parked {{count}} distractions.",
+    "topicQ": "What will you work on? (optional)",
+    "topicPh": "For example: chapter three, or the work report",
     "lengthQ": "What length suits you?",
     "length": "Length",
     "noTimer": "No timer",
@@ -406,7 +503,17 @@
     "parkedCount_one": "You've parked {{count}}. We'll come back to it after the session.",
     "parkedCount_other": "You've parked {{count}}. We'll come back to them after the session.",
     "finished": "I'm done",
-    "minNote": "You can finish after the first minute. If this isn't working, use \"End\" at the top."
+    "minNote": "You can finish after the first minute. If this isn't working, use \"End\" at the top.",
+    "phoneTip": "Put your phone away or on silent before you start.",
+    "goalsQ": "Add what you parked to today's goals?",
+    "goalsYes": "Yes, add them",
+    "goalsNo": "No",
+    "breakQ": "Done! Want a 5-minute break?",
+    "breakYes": "Yes, a break",
+    "breakNo": "No",
+    "againQ": "Another session?",
+    "againYes": "Yes, let's go",
+    "againNo": "No, that's enough"
   },
   "emotion": {
     "feelings": {
@@ -417,7 +524,12 @@
       "tense": "Tense",
       "upset": "Upset",
       "lost": "A bit lost",
-      "unsure": "Not sure"
+      "unsure": "Not sure",
+      "proud": "Proud",
+      "grateful": "Grateful",
+      "anxious": "Anxious",
+      "sad": "Sad",
+      "lonely": "Lonely"
     },
     "helps": {
       "walk": "A short walk",
@@ -443,7 +555,15 @@
     "strengthQ": "How strong is it? (optional)",
     "strength": "Strength",
     "helpQ": "What might help? (optional)",
-    "finish": "Done"
+    "finish": "Done",
+    "ownLabel": "Write your feeling",
+    "ownPh": "Or write it in your own word",
+    "heavy": "This feeling sounds heavy right now. You don't have to carry it alone: talk to me, or to someone you trust.",
+    "heavySay": "I'm here with you.",
+    "tryQ": "Try \"{{help}}\" now?",
+    "chatQ": "Want to talk with me for a bit now?",
+    "tryYes": "Yes",
+    "tryNo": "No, later"
   },
   "landscape": {
     "intro": "Take a moment. There's nothing you have to do.",
@@ -458,10 +578,41 @@
     "sound": "Soft sound",
     "end": "End my break",
     "ready": "Take your time, and come back when you're ready.",
-    "guide": "Tap the lanterns, water or palm tree, or just look. The end button will be ready shortly."
+    "guide": "Tap the lanterns, water or palm tree, or just look. The end button will be ready shortly.",
+    "pickQ": "What do you need right now?",
+    "pickSay": "A break your way.",
+    "needs": {
+      "eyes": "Rest my eyes",
+      "move": "Move a little",
+      "mind": "My mind is busy",
+      "quiet": "Just some quiet"
+    },
+    "moves": {
+      "neck": {
+        "title": "Your neck",
+        "how": "Tilt your head gently to each side.",
+        "say": "Easy, no pushing."
+      },
+      "shoulders": {
+        "title": "Your shoulders",
+        "how": "Lift your shoulders up, then let them drop. Repeat.",
+        "say": "Let them loosen."
+      },
+      "stretch": {
+        "title": "Stretch",
+        "how": "Stand up, raise your arms over your head and stretch.",
+        "say": "Stretch as far as feels good."
+      },
+      "walk": {
+        "title": "Walk a little",
+        "how": "Walk around the room or get some water.",
+        "say": "Just a few light steps."
+      },
+      "after": "How do you feel after moving?"
+    }
   },
   "plan": {
-    "title": "Let's Organize Your Tasks",
+    "title": "Plan Your Day",
     "instructions": "These are the things you mentioned. Put each one under Now, Later or Not today. There's no wrong answer, and not everything has to happen today.",
     "example": "Example scenario",
     "suggestion": "Suggestion",
@@ -508,7 +659,10 @@
       "later": "{{items}} can wait for later.",
       "notToday": "{{items}} isn't for today."
     },
-    "followUp": "Want help turning that into a plan for the week?"
+    "followUp": "Want help turning that into a plan for the week?",
+    "startNowQ": "Start the first one now?",
+    "startNowYes": "Yes, let's go",
+    "startNowNo": "Later"
   },
   "micro": {
     "taskQ": "What do you want to get started on?",
@@ -537,7 +691,7 @@
     "modesNote": {
       "0": "Go at your own pace",
       "60": "Quick and done",
-      "120": "A little more room"
+      "120": "Suggested"
     },
     "noTimer": "No clock. Come back whenever you're ready.",
     "goNow": "Go do it. I'll wait here.",
@@ -555,7 +709,10 @@
       "shrink": "Smaller is better. Shrink it till it feels easy.",
       "mode": "Pick a pace that suits you.",
       "go": "Just this one step.",
-      "ask": "How did it go?"
+      "ask": "How did it go?",
+      "know": "Let's find the first step.",
+      "write": "Write it your way. Small is enough.",
+      "later": "That's fine."
     },
     "done": {
       "started": "You started. That's the hardest part.",
@@ -565,7 +722,20 @@
     "note": {
       "started": "Starting with a small step often makes the next one easier.",
       "not": "Not starting today is fine. Your first step is saved for next time."
-    }
+    },
+    "knowQ": "Do you know your first step?",
+    "knowYes": "Yes, I know it",
+    "knowHelp": "Help me shrink it",
+    "writeQ": "What's the first step?",
+    "stepExamples": {
+      "open": "Open the file",
+      "line": "Write the first line",
+      "ready": "Put my things in front of me",
+      "one": "Do one question"
+    },
+    "laterQ": "Plan it for another time?",
+    "laterYes": "Yes, let's plan it",
+    "laterNo": "No, that's all"
   },
   "thought": {
     "addQ": "What's on your mind?",
@@ -603,15 +773,32 @@
     "finish": "Done",
     "skipStep": "Skip the step for now",
     "noActQ": "Nothing to act on right now",
-    "noActNote": "That's okay. Some things can't be solved today. You can come back to them later.",
-    "unsureNote": "For the uncertain ones, it's okay to set them down for now.",
     "doneSay": "Nice. That's a bit clearer now.",
     "note": "You sorted {{act}} you can act on, {{unsure}} uncertain and {{later}} for later.",
     "noteStep": "You sorted {{act}} you can act on, {{unsure}} uncertain and {{later}} for later. Next step: {{step}}",
     "say": {
       "add": "What's on your mind?",
       "sort": "Let's sort them gently.",
-      "step": "Just one small step."
+      "step": "Just one small step.",
+      "later": "Let's give it a time, and I'll remind you.",
+      "unsure": "Just one question."
+    },
+    "laterQ": "When will you come back to it?",
+    "when": {
+      "hour": "In an hour",
+      "tonight": "Tonight",
+      "tomorrow": "Tomorrow morning"
+    },
+    "orTime": "Or pick a time",
+    "noReminder": "No reminder",
+    "unsureQ": "Is there something that, if you knew it, would make this clearer?",
+    "unsureLabel": "What you'd need to know",
+    "unsurePh": "For example, exactly when it is",
+    "unsureNo": "No",
+    "go": {
+      "goals": "Add to my goals",
+      "now": "Start it now",
+      "plan": "Plan it"
     }
   },
   "dhikr": {
@@ -640,5 +827,98 @@
     "doneNight": "Good night.",
     "quranSource": "Quran text from {{name}}",
     "ayah": "﴿{{n}}﴾"
+  },
+  "crisis": {
+    "call997": "Call 997",
+    "call937": "Call 937"
+  },
+  "eye_rest": {
+    "readyQ": "Look at something far away, a window or the far end of the room.",
+    "go": "Let's go",
+    "lookTitle": "Look far away",
+    "left_one": "{{count}} second left",
+    "left_other": "{{count}} seconds left",
+    "stop": "Pause",
+    "resume": "Continue",
+    "blink": "Blink a few times, gently.",
+    "done": "Done",
+    "again": "Once more?",
+    "said": "Your eyes got a rest.",
+    "say": {
+      "ready": "Let your eyes rest from the screen for a moment.",
+      "look": "Just look far away, at your ease.",
+      "blink": "That's it."
+    }
+  },
+  "grounding": {
+    "beforeQ": "How are you right now?",
+    "afterQ": "How are you now, after the exercise?",
+    "scale": "How you are",
+    "finish": "Done",
+    "levels": {
+      "1": "At ease",
+      "2": "A little",
+      "3": "Medium",
+      "4": "Heavy",
+      "5": "Very heavy"
+    },
+    "found": "Found one",
+    "moveOn": "Move on",
+    "none": "Didn't find one",
+    "heavy": "It still sounds heavy. You don't have to carry it alone: talk to me, or to someone you trust.",
+    "said": "You're back in the place you're in.",
+    "senses": {
+      "see": {
+        "q": "5 things you can see",
+        "ex": {
+          "a": "The wall colour",
+          "b": "The window",
+          "c": "A cup in front of you"
+        }
+      },
+      "touch": {
+        "q": "4 things you can touch",
+        "ex": {
+          "a": "Your scarf or sleeve",
+          "b": "The sofa",
+          "c": "Your phone"
+        }
+      },
+      "hear": {
+        "q": "3 sounds you can hear",
+        "ex": {
+          "a": "The air conditioner",
+          "b": "The call to prayer",
+          "c": "Cars outside"
+        }
+      },
+      "smell": {
+        "q": "2 things you can smell",
+        "ex": {
+          "a": "Coffee",
+          "b": "Oud",
+          "c": "Incense"
+        }
+      },
+      "taste": {
+        "q": "1 thing you can taste",
+        "ex": {
+          "a": "A sip of water",
+          "b": "A date",
+          "c": "Coffee"
+        }
+      }
+    },
+    "say": {
+      "before": "Take a breath, and let's start.",
+      "see": "Look around, slowly.",
+      "touch": "Feel what is under your hand.",
+      "hear": "Listen to the sounds around you.",
+      "smell": "What can you smell around you?",
+      "taste": "And last, one taste.",
+      "after": "How are you now?",
+      "heavy": "I'm here with you."
+    },
+    "progress": "Found {{found}} of {{total}}"
   }
 }

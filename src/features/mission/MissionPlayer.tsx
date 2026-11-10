@@ -27,7 +27,7 @@ import { ChallengeArt, OasisBackdrop } from '../challenges/ChallengeArt';
 import { GAMES } from '../challenges/games';
 import type { GameEnv } from '../challenges/types';
 import {
-  abandonItem, advance, beginItem, completeItem, exitMission, finishMission, isPastEnd, pauseItem, resumeItem,
+  abandonItem, addFollowUp, advance, beginItem, cleanSeed, completeItem, exitMission, finishMission, isPastEnd, pauseItem, resumeItem,
   shouldOfferEasier, skipItem, summaryLines, summarySuggestion, type MissionSummary,
 } from './engine';
 import { reportStart } from '../../services/points';
@@ -46,6 +46,8 @@ interface ResultView {
   leveledUp: boolean;
   newLevel: number;
   last: boolean;
+  /** A page the user chose to go to next, such as the chat. */
+  go?: ViewId;
 }
 
 const PREROLL_MS = 3200;
@@ -160,7 +162,10 @@ export function MissionPlayer({ start, onClose, onNavigate }: { start: PlayerSta
 
   function onDone(r: GameResult) {
     let out: ReturnType<typeof completeItem> = null;
-    store.update((d) => { out = completeItem(d, r); });
+    store.update((d) => {
+      out = completeItem(d, r);
+      if (out && r.then) addFollowUp(d, r.then);
+    });
     const o = out as ReturnType<typeof completeItem>;
     if (!o) return;
     // The companion follows up only on what was actually chosen and saved.
@@ -178,7 +183,7 @@ export function MissionPlayer({ start, onClose, onNavigate }: { start: PlayerSta
     say(r.mood || 'celebrating', r.say ?? (r.acc == null ? 'player.sayDone' : r.retries ? 'player.sayRetried' : 'player.sayGood'));
     if (o.leveledUp && !CHALLENGES[done.id].quiet) fireConfetti(!!st.rm);
     setRound(null);
-    setResult({ xp: o.xp, base: CHALLENGES[done.id].xp, acc: r.acc, retries: r.retries, note: r.note, leveledUp: o.leveledUp, newLevel: o.newLevel, last: !nextItem });
+    setResult({ xp: o.xp, base: CHALLENGES[done.id].xp, acc: r.acc, retries: r.retries, note: r.note, leveledUp: o.leveledUp, newLevel: o.newLevel, last: !nextItem, go: r.go });
     setPhase('result');
     // A prayer window that began during the game is raised here, between challenges, never mid-round.
     const pw = nextItem ? needsCheckIn(st) : null;
@@ -186,6 +191,8 @@ export function MissionPlayer({ start, onClose, onNavigate }: { start: PlayerSta
       setPrayerAsk(pw);
       return;
     }
+    // The user asked to go somewhere next, so the result waits for them instead of moving on by itself.
+    if (r.go && !nextItem) return;
     if (shouldOfferEasier(done, nextItem)) {
       timers.after(() => {
         say('concerned', 'player.offerEasier');
@@ -319,7 +326,7 @@ export function MissionPlayer({ start, onClose, onNavigate }: { start: PlayerSta
               <button type="button" className="btn" onClick={startGame}>{t('player.startNow')}</button>
             </div>
           )}
-          {phase === 'game' && <Game key={runKey} diff={it.diff} env={env} onDone={onDone} cfg={validatePlanConfig(it.cfg)} />}
+          {phase === 'game' && <Game key={runKey} diff={it.diff} env={env} onDone={onDone} cfg={validatePlanConfig(it.cfg)} seed={cleanSeed(it.seed)} />}
           {phase === 'result' && result && (
             <div className="scene res">
               <span className="res__ok"><Check size={15} aria-hidden="true" /> {t('player.status.completed')}</span>
@@ -348,7 +355,9 @@ export function MissionPlayer({ start, onClose, onNavigate }: { start: PlayerSta
                 />
               ) : (
               <>
-              <div className="bar bar--thin"><i className="bar-drain" style={{ animationDuration: `${RESULT_MS}ms`, animationPlayState: held ? 'paused' : 'running' }} /></div>
+              {result.go && result.last ? (
+                <button type="button" className="btn" onClick={() => { const v = result.go!; finish(); onClose(); onNavigate(v); }}>{t(`player.go.${result.go}`)}</button>
+              ) : <div className="bar bar--thin"><i className="bar-drain" style={{ animationDuration: `${RESULT_MS}ms`, animationPlayState: held ? 'paused' : 'running' }} /></div>}
               <button type="button" className="btn" onClick={() => { if (shouldOfferEasier(M.items[M.idx], M.items[M.idx + 1])) { timers.clear(); setPhase('easier'); say('concerned', 'player.offerEasierShort'); } else next(); }}>
                 {t(result.last ? 'player.seeSummary' : 'common.next')} <ChevronLeft size={17} className="flip" aria-hidden="true" />
               </button>

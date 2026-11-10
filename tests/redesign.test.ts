@@ -28,7 +28,7 @@ describe('catalog', () => {
   });
 
   it('adds nothing beyond the reviewed activities to the OCD journey', () => {
-    expect(JOURNEYS.find((j) => j.id === 'ocd')!.a).toEqual(['calm', 'time']);
+    expect(JOURNEYS.find((j) => j.id === 'ocd')!.a).toEqual(['calm', 'thought_sort']);
   });
 });
 

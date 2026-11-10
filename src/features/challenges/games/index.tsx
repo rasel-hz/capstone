@@ -6,6 +6,8 @@ import { BreakdownGame } from './BreakdownGame';
 import { CalmGame } from './CalmGame';
 import { CalmLandscapeGame } from './CalmLandscapeGame';
 import { EmotionMapGame } from './EmotionMapGame';
+import { EyeRestGame } from './EyeRestGame';
+import { GroundingGame } from './GroundingGame';
 import { MemoryGame } from './MemoryGame';
 import { MicroStartGame } from './MicroStartGame';
 import { ThoughtSortGame } from './ThoughtSortGame';
@@ -35,6 +37,8 @@ export const GAMES: Record<ChallengeId, ComponentType<GameProps>> = {
   calm_landscape: CalmLandscapeGame,
   micro_start: MicroStartGame,
   thought_sort: ThoughtSortGame,
+  eye_rest: EyeRestGame,
+  grounding: GroundingGame,
   dhikr_morning: dhikr('dhikr_morning'),
   dhikr_evening: dhikr('dhikr_evening'),
   dhikr_calm_heart: dhikr('dhikr_calm_heart'),

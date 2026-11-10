@@ -96,5 +96,8 @@
     "some": "It was okay",
     "no": "Not for me",
     "thanks": "Thanks. I'll keep that in mind when I suggest something next time."
+  },
+  "go": {
+    "chat": "Talk to Zaho"
   }
 }

@@ -17,7 +17,7 @@ export interface SuggestInput {
   afterWork?: boolean;
 }
 
-const PLANNING: ChallengeId[] = ['seq', 'priority_board', 'breakdown'];
+const PLANNING: ChallengeId[] = ['seq', 'breakdown'];
 
 /**
  * Turns a proposal into what the chat card shows: up to three approved activities, the AI's picks first.

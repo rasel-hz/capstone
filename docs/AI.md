@@ -58,6 +58,8 @@ The model can't start missions, award XP, change plans or save anything. It can 
 
 ### How suggestions are chosen
 
+For what each challenge is for and when Zaho should offer it, see [ZAHO_CHALLENGE_GUIDE.md](ZAHO_CHALLENGE_GUIDE.md).
+
 `src/features/recommend/` holds an explainable, deterministic engine (`recommend`). It is used by the chat card, the offline rules and the dashboard.
 
 1. **Filters first.** Only catalog activities. Nothing longer than the time the person has. Gentle, short ones only on a low-energy day. The feelings map only when worry is the main goal. Nothing the person marked "not for me" twice, unless they ask for it by name.

@@ -20,5 +20,11 @@
     "titleNoName": "I missed you!",
     "text": "Nothing is lost. Everything is saved as you left it, and we start at your pace.",
     "ok": "Good to see you"
+  },
+  "later": {
+    "label": "Reminder",
+    "title": "You said you would come back to this now",
+    "done": "Done",
+    "tomorrow": "Remind me tomorrow"
   }
 }

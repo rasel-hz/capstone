@@ -160,6 +160,8 @@
 .br { width: 118px; height: 118px; border-radius: 50%; background: rgba(255, 255, 255, .72); box-shadow: 0 0 0 16px rgba(255, 255, 255, .28), 0 0 0 34px rgba(255, 255, 255, .14); margin: 44px; }
 .br--in { animation-name: breathe-in; animation-timing-function: ease-in-out; animation-fill-mode: forwards; }
 .br--out { animation-name: breathe-out; animation-timing-function: ease-in-out; animation-fill-mode: forwards; }
+.br--in.br--part { animation-name: breathe-part; }
+.br--top { animation-name: breathe-top; animation-timing-function: ease-out; animation-fill-mode: forwards; }
 .calm-set { text-align: center; max-width: 520px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; gap: 9px; }
 .calm-set__art { height: 110px; border-radius: var(--r-md); overflow: hidden; }
 .calm-set h3 { font-weight: 500; }
@@ -316,3 +318,17 @@
 .dk--night .dk-count__b.is-done, .dk--night .dk-count__b.is-done .dk-count__n { background: #A78BFA; color: #141433; }
 .dk--night .btn { background: #A78BFA; color: #141433; }
 .dk--night .btn-link { color: #CFC6FF; }
+
+/* A short tip before a challenge starts, such as putting the phone away. */
+.tip { display: flex; align-items: center; justify-content: center; gap: 8px; margin: 12px auto 0; padding: 9px 14px; max-width: 420px; border-radius: var(--r-sm); background: var(--cr); font-size: .92rem; text-align: center; }
+.row--wrap { flex-wrap: wrap; }
+.crisis-stop p { font-size: 1.02rem; line-height: 1.7; text-align: center; max-width: 460px; margin: 0 auto 14px; }
+.opt--icon { display: flex; align-items: center; justify-content: center; gap: 9px; }
+/* Clearer support when a hard feeling is strong: shown first, before anything else on the step. */
+.support { background: var(--cr); border-radius: var(--r-md); padding: 12px 14px; margin-bottom: 14px; text-align: center; }
+.support p { margin: 0 0 10px; line-height: 1.6; }
+.ring--still .ring__v { transition: none; }
+/* "What's around you?": one dot per thing noticed. */
+.gr__dots { display: flex; justify-content: center; gap: 12px; margin: 14px 0 12px; }
+.gr__dots i { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--em); background: transparent; transition: background var(--t-micro) var(--ease); }
+.gr__dots i.on { background: var(--em); }

@@ -28,7 +28,9 @@
     "gentle": "it's gentle, to suit your energy today",
     "fits": "it fits the {{n}} minutes you have",
     "chat": "Suggested in your chat",
-    "path": "The next step on your journey"
+    "path": "The next step on your journey",
+    "scene": "We end with a light noticing game",
+    "seq": "We arrange the tasks you wrote for today"
   },
   "reason": {
     "low": "at your energy today",

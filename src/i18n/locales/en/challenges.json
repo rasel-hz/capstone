@@ -22,21 +22,21 @@
   "items": {
     "video": {
       "name": "Focus for a Moment",
-      "desc": "A short oasis scene, then questions about what you saw.",
+      "desc": "An oasis scene that changes every time, then questions about what you saw.",
       "purpose": "A short attention exercise for a spare moment.",
       "instructions": "You'll watch a 24-second oasis scene. Watch the details, then I'll ask you about it."
     },
     "mem": {
       "name": "What Do You Remember?",
-      "desc": "Memorize the shapes and colors, then tell me what vanished.",
+      "desc": "Memorize the things and their colors, then tell me what vanished.",
       "purpose": "Visual memory rounds that gradually get harder.",
-      "instructions": "Memorize the shapes and their colors, then tell me what vanished."
+      "instructions": "Memorize the things and their colors, then tell me what vanished."
     },
     "seq": {
-      "name": "Put It in Order",
-      "desc": "Order the steps of a real day by dragging or tapping.",
-      "purpose": "Practice ordering steps before you start them.",
-      "instructions": "Put the steps in the order that makes sense to you. Drag or tap them."
+      "name": "Plan Your Day",
+      "desc": "Sort today's tasks: what's for now and what's for later.",
+      "purpose": "Arranges your own tasks, the ones you write or today's goals.",
+      "instructions": "Write what's on your plate, or take it from your goals, then put each under now, later or not today."
     },
     "time": {
       "name": "Where Did the Time Go?",
@@ -46,7 +46,7 @@
     },
     "calm": {
       "name": "Take It Easy",
-      "desc": "Calm breathing at your pace, or a break without breathing.",
+      "desc": "Calm breathing your way, for a minute or more, or quiet without breathing.",
       "purpose": "A quiet pause in your day, and you can skip it.",
       "instructions": "Breathe with me at your own pace, or take a break without breathing. Your call."
     },
@@ -75,9 +75,9 @@
       "instructions": "Write down a big task, split it into small steps, and make a simple plan."
     },
     "study_sprint": {
-      "name": "Study Sprint",
-      "desc": "A short study session with a place to park distractions.",
-      "purpose": "A short focus session for study or work.",
+      "name": "Focus Sprint",
+      "desc": "A short focus session for any task, with a place to park distractions.",
+      "purpose": "A short focus session for study, work or any task.",
       "instructions": "Pick a length that suits you and start. Note down anything distracting, then come back."
     },
     "emotion_map": {
@@ -87,16 +87,16 @@
       "instructions": "Choose how you feel right now, if you want to. I don't guess your feelings. This is your answer."
     },
     "calm_landscape": {
-      "name": "Take a Break",
-      "desc": "A calm oasis to interact with at your own pace.",
-      "purpose": "A short visual break between tasks.",
-      "instructions": "A calm oasis. Tap the lanterns, water and palm, or just look."
+      "name": "A Break Your Way",
+      "desc": "A short break for what you need: your eyes, moving, quiet or a busy mind.",
+      "purpose": "A short break between tasks, shaped by what you need right now.",
+      "instructions": "Pick what you need right now, and I'll take it from there."
     },
     "micro_start": {
       "name": "Just the First Step",
       "desc": "Shrink the first step of a task until it feels easy, then try it.",
       "purpose": "Makes starting smaller when a task feels too big to begin.",
-      "instructions": "Pick a task, make its first step smaller until it feels doable, then try it with a short timer or none."
+      "instructions": "Pick a task, write its first step or shrink one until it feels doable, then try it with a 2-minute timer or none."
     },
     "thought_sort": {
       "name": "Let's Think It Through",
@@ -133,11 +133,22 @@
       "desc": "Bedtime adhkar, quietly, with no sounds or celebration.",
       "purpose": "The established bedtime adhkar, with their text, source and number of times.",
       "instructions": "Read each dhikr and tap the counter gently. Everything here stays quiet to help you wind down."
+    },
+    "eye_rest": {
+      "name": "Rest Your Eyes",
+      "desc": "Look at something far away for 20 seconds and rest your eyes from the screen.",
+      "purpose": "A short pause that rests your eyes after a long time at a screen.",
+      "instructions": "Look at something far away, a window or the far end of the room, until the timer ends."
+    },
+    "grounding": {
+      "name": "What's Around You?",
+      "desc": "5 things you see, 4 you touch, 3 you hear, 2 you smell, 1 you taste.",
+      "purpose": "Brings your attention back to where you are, and can calm you a little.",
+      "instructions": "Look around for each thing we ask about, and tap each time you find one. It's fine if you don't."
     }
   },
   "groups": {
     "all": "All",
-    "arrange": "Arrange",
     "start": "Get started",
     "focus": "Focus",
     "calm": "Calm down",

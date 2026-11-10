@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
-import { CATEGORIES, CHALLENGES, COLOR_IDS, JOURNEYS, SHAPES } from '../src/features/challenges/catalog';
+import { CATEGORIES, CHALLENGES, COLOR_IDS, JOURNEYS, MEM_ITEMS } from '../src/features/challenges/catalog';
 import { crisisMessage, detectCrisis, isCrisisText } from '../src/features/companion/crisis';
 import { buildChatRequest } from '../src/features/companion/request';
 import { ruleReply } from '../src/features/companion/rules';
@@ -69,7 +69,7 @@ describe('translation completeness', () => {
     const g: Record<string, string> = {
       'journeys.items.adhd.name': 'Focus & Organization', 'journeys.items.anx.name': 'Calm & Anxiety Support', 'journeys.items.ocd.name': 'Navigating Uncertainty', 'journeys.items.mood.name': 'Mood & Motivation',
       'journeys.items.sleep.name': 'Sleep & Routine', 'journeys.items.soc.name': 'Social Confidence', 'journeys.items.aut.name': 'Comfortable Routines', 'journeys.items.gen.name': 'General Wellbeing',
-      'challenges.items.video.name': 'Focus for a Moment', 'challenges.items.mem.name': 'What Do You Remember?', 'challenges.items.seq.name': 'Put It in Order', 'challenges.items.time.name': 'Where Did the Time Go?', 'challenges.items.calm.name': 'Take It Easy', 'challenges.items.start2.name': 'Just Two Minutes',
+      'challenges.items.video.name': 'Focus for a Moment', 'challenges.items.mem.name': 'What Do You Remember?', 'challenges.items.seq.name': 'Plan Your Day', 'challenges.items.time.name': 'Where Did the Time Go?', 'challenges.items.calm.name': 'Take It Easy', 'challenges.items.start2.name': 'Just Two Minutes',
       'challenges.categories.all': 'All', 'challenges.categories.focus': 'Focus', 'challenges.categories.memory': 'Memory', 'challenges.categories.planning': 'Planning', 'challenges.categories.time': 'Time Awareness', 'challenges.categories.relax': 'Relaxation', 'challenges.categories.real': 'Real-World Task',
       'dashboard.todayMission': "Today's Mission", 'dashboard.energy.high': 'Feeling Energetic', 'dashboard.energy.mid': 'Doing Okay', 'dashboard.energy.low': 'Low Energy',
     };
@@ -95,7 +95,7 @@ describe('every key used in the code exists', () => {
     JOURNEYS.forEach((j) => ['name', 'desc'].forEach((f) => expect(EN[`journeys.items.${j.id}.${f}`]).toBeDefined()));
     CATEGORIES.forEach((c) => expect(EN[`challenges.categories.${c}`]).toBeDefined());
     COLOR_IDS.forEach((c) => expect(EN[`games.colors.${c}`]).toBeDefined());
-    Object.keys(SHAPES).forEach((s) => expect(EN[`games.shapes.${s}`]).toBeDefined());
+    Object.keys(MEM_ITEMS).forEach((s) => expect(EN[`games.mem.items.${s}`]).toBeDefined());
     achievements(defaultState()).forEach((a) => expect(EN[`rewards.items.${a.art}.label`]).toBeDefined());
   });
 });

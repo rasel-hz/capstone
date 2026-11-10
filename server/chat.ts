@@ -181,7 +181,7 @@ export function acceptOutput(rawText: string, lang: 'ar-SA' | 'en' = 'ar-SA', sa
   const goals = (Array.isArray(o.goals) ? o.goals : []).filter(isGoal).slice(0, 3);
   const s = (o.suggest ?? {}) as { challenge_ids?: unknown; reason?: unknown };
   // Only real catalog IDs, no repeats, at most three. The model can't invent an activity.
-  const ids = [...new Set((Array.isArray(s.challenge_ids) ? s.challenge_ids : []).filter((id): id is string => typeof id === 'string' && Object.hasOwn(CHALLENGES, id)))].slice(0, 3);
+  const ids = [...new Set((Array.isArray(s.challenge_ids) ? s.challenge_ids : []).filter((id): id is string => typeof id === 'string' && Object.hasOwn(CHALLENGES, id) && !CHALLENGES[id as keyof typeof CHALLENGES].retired))].slice(0, 3);
   const why = typeof s.reason === 'string' ? s.reason.trim().slice(0, 240) : '';
   const tasks = groundedTasks(o.tasks, said);
   const mins = typeof o.available_minutes === 'number' && Number.isFinite(o.available_minutes) && o.available_minutes > 0 ? Math.min(240, Math.round(o.available_minutes)) : undefined;
@@ -205,7 +205,7 @@ export function acceptOutput(rawText: string, lang: 'ar-SA' | 'en' = 'ar-SA', sa
 const DHIKR_NOTE = 'Islamic remembrance (dhikr). The app shows the verified texts with their sources: never quote, write or paraphrase any dhikr, dua or verse yourself, only suggest the activity. Offer it gently and only when the user seems open to it, asks for it, or the time fits; not every time the user is stressed, and keep suggesting the other activities too. Never present it as treatment or promise that it removes anxiety.';
 function activities(lang: 'ar-SA' | 'en', dhikrNow: string[] = []) {
   const L = lang === 'en' ? en : ar;
-  return (Object.keys(CHALLENGES) as (keyof typeof CHALLENGES)[]).filter((id) => !isDhikr(id) || dhikrNow.includes(id)).map((id) => ({
+  return (Object.keys(CHALLENGES) as (keyof typeof CHALLENGES)[]).filter((id) => !CHALLENGES[id].retired && (!isDhikr(id) || dhikrNow.includes(id))).map((id) => ({
     id,
     name: L.items[id].name,
     minutes: CHALLENGES[id].min,
@@ -213,7 +213,7 @@ function activities(lang: 'ar-SA' | 'en', dhikrNow: string[] = []) {
     supports: CHALLENGE_META[id].goals,
     ...(CHALLENGE_META[id].onRequest ? { note: 'only if the user wants to reflect on their feelings' } : {}),
     ...(isDhikr(id) ? { note: DHIKR_NOTE } : {}),
-    ...(id === 'seq' ? { note: "with the user's own tasks it becomes a personal planning board: now, later or not today, then time blocks if they know their time. Without tasks it shows a general example." } : {}),
+    ...(id === 'seq' ? { note: "works only on the user's own tasks: now, later or not today, then time blocks if they know their time. Suggest it only when they named at least two tasks or have goals today; without tasks it asks them to write some." } : {}),
   }));
 }
 

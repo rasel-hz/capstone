@@ -1,8 +1,13 @@
 import { ArrowDown, ArrowUp, Plus, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useStore } from '../../../context/AppStateContext';
 import { tr } from '../../../i18n';
+import type { GameResult } from '../../../types';
+import { addGoals } from '../../buddy/buddy';
+import type { CrisisLevel } from '../../companion/crisis';
 import type { GameProps } from '../types';
+import { AskNext, CrisisStop, crisisIn } from './parts';
 
 const SEEDS: Record<string, string[]> = { exam: ['a', 'b', 'c', 'd'], talk: ['a', 'b', 'c', 'd'], room: ['a', 'b', 'c', 'd'], paperwork: ['a', 'b', 'c', 'd'] };
 const WHEN = ['prayer', 'coffee', 'home', 'lunch'];
@@ -15,11 +20,16 @@ function label(v: string) {
   return step ? tr(`games.breakdown.seeds.${id}.steps.${step}`) : tr(`games.breakdown.seeds.${id}.task`);
 }
 
-export function BreakdownGame({ diff, env, onDone }: GameProps) {
+// A task handed over from "Just the first step" starts at the steps, already filled in.
+// At the end the first step can start now, or every step goes into today's goals.
+export function BreakdownGame({ diff, env, onDone, seed }: GameProps) {
   const { t } = useTranslation();
+  const store = useStore();
   const max = diff === 'easy' ? 1 : 5;
-  const [step, setStep] = useState<1 | 2 | 3>(1);
-  const [task, setTask] = useState('');
+  const [step, setStep] = useState<1 | 2 | 3>(seed?.task ? 2 : 1);
+  const [task, setTask] = useState(seed?.task ?? '');
+  const [crisis, setCrisis] = useState<CrisisLevel>(0);
+  const [held, setHeld] = useState<GameResult | null>(null);
   const [steps, setSteps] = useState<string[]>([]);
   const [draft, setDraft] = useState('');
   const [when, setWhen] = useState('');
@@ -35,6 +45,8 @@ export function BreakdownGame({ diff, env, onDone }: GameProps) {
   function add(v: string) {
     const c = v.trim();
     if (!c || steps.includes(c) || steps.length >= max) return;
+    const lv = crisisIn(label(c));
+    if (lv) return setCrisis(lv);
     setSteps([...steps, c]);
     setDraft('');
     env.sfx('tap');
@@ -45,6 +57,25 @@ export function BreakdownGame({ diff, env, onDone }: GameProps) {
     setSteps(n);
   }
 
+  if (crisis) return <CrisisStop level={crisis} onBack={() => setCrisis(0)} />;
+
+  if (held) {
+    const first = label(steps[0]);
+    return (
+      <AskNext
+        q={t('games.breakdown.nowQ')}
+        detail={first}
+        yes={t('games.breakdown.nowYes')}
+        no={t('games.breakdown.nowNo')}
+        onYes={() => onDone({ ...held, then: { id: 'micro_start', seed: { task: label(task).trim(), step: first, from: 'breakdown' } } })}
+        onNo={() => {
+          store.update((d) => { addGoals(d, steps.map(label)); });
+          onDone({ ...held, note: 'games.breakdown.savedGoals' });
+        }}
+      />
+    );
+  }
+
   if (step === 1) {
     return (
       <div className="scene form">
@@ -53,7 +84,7 @@ export function BreakdownGame({ diff, env, onDone }: GameProps) {
         <div className="tags" role="group" aria-label={t('games.common.examples')}>
           {Object.keys(SEEDS).map((x) => <button key={x} type="button" className="tag tag--btn" onClick={() => setTask(`seed:task/${x}`)}>{t(`games.breakdown.seeds.${x}.task`)}</button>)}
         </div>
-        <div className="row row--c"><button type="button" className="btn" disabled={!task.trim()} onClick={() => setStep(2)}>{t('common.next')}</button></div>
+        <div className="row row--c"><button type="button" className="btn" disabled={!task.trim()} onClick={() => { const lv = crisisIn(label(task)); if (lv) setCrisis(lv); else setStep(2); }}>{t('common.next')}</button></div>
       </div>
     );
   }
@@ -115,10 +146,12 @@ export function BreakdownGame({ diff, env, onDone }: GameProps) {
           className="btn"
           disabled={!whenText}
           onClick={() => {
+            const lv = crisisIn(whenText);
+            if (lv) return setCrisis(lv);
             env.sfx('ok');
             const first = steps[0];
             const w = when;
-            onDone({
+            setHeld({
               acc: null,
               retries: 0,
               say: 'games.breakdown.done',

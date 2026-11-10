@@ -1,4 +1,4 @@
-import { Check, Plus, X } from 'lucide-react';
+import { BellRing, Check, Plus, X } from 'lucide-react';
 import { useRef, useState, type FormEvent, type MouseEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Mascot } from '../../components/mascot/Mascot';
@@ -6,6 +6,8 @@ import ClickSpark, { type ClickSparkHandle } from '../../components/reactbits/Cl
 import { useAppState, useStore } from '../../context/AppStateContext';
 import { iso } from '../../i18n';
 import { addGoals, GOAL_LEN, MAX_GOALS, removeGoal, todayGoals, toggleGoal } from './buddy';
+import { doneLater, dueLater, laterTime } from '../later/later';
+import { useMinute } from '../prayer/PrayerCity';
 
 /** A warm hello after a long gap. Nothing was lost, and it says so. */
 export function MissedYou() {
@@ -22,6 +24,31 @@ export function MissedYou() {
       </div>
       <button type="button" className="btn sm" onClick={() => store.update((d) => { d.missed = 0; })}>{t('buddy.missed.ok')}</button>
     </section>
+  );
+}
+
+// What the user set aside in "Let's think it through", once its time comes. Done, or again tomorrow.
+export function LaterCards() {
+  const { t } = useTranslation();
+  const s = useAppState();
+  const store = useStore();
+  useMinute();
+  const due = dueLater(s);
+  if (!due.length) return null;
+  return (
+    <>
+      {due.map((x) => (
+        <section key={x.id} className="missed later-card" aria-label={t('buddy.later.label')}>
+          <BellRing size={22} aria-hidden="true" />
+          <div className="grow">
+            <h2>{t('buddy.later.title')}</h2>
+            <p className="flush" dir="auto">{x.text}</p>
+          </div>
+          <button type="button" className="btn sm" onClick={() => store.update((d) => doneLater(d, x.id))}>{t('buddy.later.done')}</button>
+          <button type="button" className="btn sm alt" onClick={() => store.update((d) => { const it = d.later.find((y) => y.id === x.id); if (it) it.at = laterTime('tomorrow'); })}>{t('buddy.later.tomorrow')}</button>
+        </section>
+      ))}
+    </>
   );
 }
 

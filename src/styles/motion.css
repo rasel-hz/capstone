@@ -5,6 +5,8 @@
 @keyframes drain { to { width: 0; } }
 @keyframes breathe-in { from { transform: scale(.82); } to { transform: scale(1.32); } }
 @keyframes breathe-out { from { transform: scale(1.32); } to { transform: scale(.82); } }
+@keyframes breathe-part { from { transform: scale(.82); } to { transform: scale(1.18); } }
+@keyframes breathe-top { from { transform: scale(1.18); } to { transform: scale(1.32); } }
 @keyframes fall { to { transform: translateY(105vh) rotate(540deg); } }
 @keyframes grow-bar { from { transform: scaleY(0); } }
 @keyframes grow-x { from { transform: scaleX(0); } }

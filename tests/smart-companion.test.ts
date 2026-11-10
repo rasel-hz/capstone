@@ -20,8 +20,9 @@ const model = (o: object) => JSON.stringify({
 
 describe('model output checks', () => {
   it('keeps only real catalog IDs, without repeats, and at most three', () => {
-    const r = acceptOutput(model({ suggest: { challenge_ids: ['priority_board', 'made_up', 'priority_board', 'breakdown', 'start2', 'calm'], reason: 'Because you mentioned several projects.' } }), 'en');
-    expect(r.suggest).toEqual({ ids: ['priority_board', 'breakdown', 'start2'], why: 'Because you mentioned several projects.' });
+    const r = acceptOutput(model({ suggest: { challenge_ids: ['seq', 'made_up', 'seq', 'priority_board', 'breakdown', 'start2', 'micro_start', 'calm'], reason: 'Because you mentioned several projects.' } }), 'en');
+    // Retired challenges are dropped like unknown ones.
+    expect(r.suggest).toEqual({ ids: ['seq', 'breakdown', 'micro_start'], why: 'Because you mentioned several projects.' });
   });
 
   it('suggests nothing when the model suggests nothing', () => {
@@ -53,7 +54,7 @@ describe('model output checks', () => {
   });
 
   it('limits the schema to catalog IDs, so the model cannot name anything else', () => {
-    expect(REPLY_SCHEMA.properties.suggest.properties.challenge_ids.items.enum).toEqual(Object.keys(CHALLENGES));
+    expect(REPLY_SCHEMA.properties.suggest.properties.challenge_ids.items.enum).toEqual(Object.keys(CHALLENGES).filter((id) => !CHALLENGES[id as keyof typeof CHALLENGES].retired));
   });
 });
 
@@ -107,9 +108,9 @@ describe('offline replies, labelled as limited', () => {
 });
 
 describe('suggestion card', () => {
-  it('offers the personal planning board, then the priority board, for an organising request', () => {
+  it('offers the personal planning board, then breaking it down, for an organising request', () => {
     const sug = buildSuggestion(defaultState(), { goals: ['prioritize'] });
-    expect(sug?.ids.slice(0, 2)).toEqual(['seq', 'priority_board']);
+    expect(sug?.ids.slice(0, 2)).toEqual(['seq', 'breakdown']);
     expect(sug?.cfg?.kind).toBe('personal');
   });
 
@@ -127,7 +128,7 @@ describe('suggestion card', () => {
   it('offers only gentle options on a low-energy day', () => {
     const s = { ...defaultState(), en: [{ d: today(), e: 'low' as const, ts: 1 }] };
     const sug = buildSuggestion(s, { goals: ['start'] });
-    expect(sug?.ids.sort()).toEqual(['micro_start', 'start2']);
+    expect(sug?.ids.sort()).toEqual(['micro_start']);
   });
 
   it('shows nothing while driving', () => {

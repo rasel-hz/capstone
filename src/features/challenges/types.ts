@@ -1,6 +1,6 @@
 import type { MascotState } from '../../components/mascot/manifest';
 import type { Msg } from '../../i18n';
-import type { Difficulty, Gender, GameResult } from '../../types';
+import type { Difficulty, Gender, GameResult, Seed } from '../../types';
 import type { PlanConfig } from '../plan/config';
 
 export type SoundKey = 'ok' | 'bad' | 'fin' | 'tap';
@@ -30,4 +30,6 @@ export interface GameProps {
   onDone(r: GameResult): void;
   /** Personal content from the chat, already validated. Games that don't use it ignore it. */
   cfg?: PlanConfig;
+  /** Handed over from the challenge before, already cleaned. */
+  seed?: Seed;
 }

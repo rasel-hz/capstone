@@ -209,7 +209,10 @@ describe('the companion', () => {
     expect(note).toMatch(/not every time the user is stressed/);
     expect(note).toMatch(/Never present it as treatment/);
     // Every other activity is still offered as before.
-    for (const id of Object.keys(CHALLENGES).filter((x) => !x.startsWith('dhikr_'))) expect(ids).toContain(id);
+    for (const id of Object.keys(CHALLENGES).filter((x) => !x.startsWith('dhikr_'))) {
+      if (CHALLENGES[id as keyof typeof CHALLENGES].retired) expect(ids).not.toContain(id);
+      else expect(ids).toContain(id);
+    }
   });
 
   it('ignores anything that is not a dhikr challenge in the time list', async () => {

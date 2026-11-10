@@ -1,19 +1,30 @@
-import { Play, Plus } from 'lucide-react';
+import { Play, Plus, Smartphone } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useStore } from '../../../context/AppStateContext';
 import { tr } from '../../../i18n';
+import type { GameResult } from '../../../types';
 import { clock } from '../../../utils';
+import { addGoals } from '../../buddy/buddy';
+import type { CrisisLevel } from '../../companion/crisis';
 import type { GameProps } from '../types';
-import { Ring } from './parts';
+import { AskNext, CrisisStop, crisisIn, Ring } from './parts';
 
 // Finishing needs a real minute of active time, so tapping through can't earn the reward.
 export const MIN_ACTIVE_SEC = 60;
-const LENGTHS = [5, 10, 15, 0];
+const LENGTHS = [5, 10, 15, 25, 0];
 
-export function StudySprintGame({ env, onDone }: GameProps) {
+/**
+ * "Focus your way" (study_sprint): a short focus session for study or any work. Distractions are parked
+ * and can go into today's goals afterwards. Then a 5-minute break, and another session if the user wants.
+ */
+export function StudySprintGame({ env, onDone, seed }: GameProps) {
   const { t } = useTranslation();
-  const [phase, setPhase] = useState<'setup' | 'run' | 'reflect'>('setup');
-  const [topic, setTopic] = useState('');
+  const store = useStore();
+  const [phase, setPhase] = useState<'setup' | 'run' | 'reflect' | 'goals' | 'break' | 'again'>('setup');
+  const [topic, setTopic] = useState(seed?.task ?? '');
+  const [crisis, setCrisis] = useState<CrisisLevel>(0);
+  const [held, setHeld] = useState<GameResult | null>(null);
   const [mins, setMins] = useState(5);
   const [secs, setSecs] = useState(0);
   const [note, setNote] = useState('');
@@ -42,6 +53,8 @@ export function StudySprintGame({ env, onDone }: GameProps) {
   function park() {
     const v = note.trim();
     if (!v) return;
+    const lv = crisisIn(v);
+    if (lv) return setCrisis(lv);
     setNotes([...notes, v]);
     setNote('');
     env.sfx('tap');
@@ -51,13 +64,52 @@ export function StudySprintGame({ env, onDone }: GameProps) {
     env.sfx('ok');
     const time = clock(secs);
     const parked = notes.length;
-    onDone({
+    setHeld({
       acc: null,
       retries: 0,
       say: reflect === 'no' ? 'games.study.doneNo' : 'games.study.doneGood',
       note: () => tr(parked ? 'games.study.noteParked' : 'games.study.note', { time, count: parked }),
       data: { topic: topic.trim(), plannedMin: mins, secs, notes, reflect },
     });
+    setPhase(parked ? 'goals' : 'break');
+  }
+
+  const fromHere = { task: topic.trim(), from: 'study_sprint' as const };
+
+  if (crisis) return <CrisisStop level={crisis} onBack={() => setCrisis(0)} />;
+
+  if (phase === 'goals' && held) {
+    return (
+      <AskNext
+        q={t('games.study.goalsQ')}
+        yes={t('games.study.goalsYes')}
+        no={t('games.study.goalsNo')}
+        onYes={() => { store.update((d) => { addGoals(d, notes); }); setPhase('break'); }}
+        onNo={() => setPhase('break')}
+      />
+    );
+  }
+  if (phase === 'break' && held) {
+    return (
+      <AskNext
+        q={t('games.study.breakQ')}
+        yes={t('games.study.breakYes')}
+        no={t('games.study.breakNo')}
+        onYes={() => onDone({ ...held, then: { id: 'calm_landscape', seed: fromHere } })}
+        onNo={() => setPhase('again')}
+      />
+    );
+  }
+  if (phase === 'again' && held) {
+    return (
+      <AskNext
+        q={t('games.study.againQ')}
+        yes={t('games.study.againYes')}
+        no={t('games.study.againNo')}
+        onYes={() => onDone({ ...held, then: { id: 'study_sprint', seed: fromHere } })}
+        onNo={() => onDone(held)}
+      />
+    );
   }
 
   if (phase === 'setup') {
@@ -66,10 +118,11 @@ export function StudySprintGame({ env, onDone }: GameProps) {
         <label htmlFor="ss-topic"><h2 className="q__t">{t('games.study.topicQ')}</h2></label>
         <input id="ss-topic" dir="auto" maxLength={80} placeholder={t('games.study.topicPh')} value={topic} onChange={(e) => setTopic(e.target.value)} />
         <h3>{t('games.study.lengthQ')}</h3>
-        <div className="row row--c" role="group" aria-label={t('games.study.length')}>
+        <div className="row row--c row--wrap" role="group" aria-label={t('games.study.length')}>
           {LENGTHS.map((v) => <button key={v} type="button" className={`pace ${mins === v ? 'on' : ''}`} aria-pressed={mins === v} onClick={() => setMins(v)}><b>{v ? t('common.minutes', { count: v }) : t('games.study.noTimer')}</b></button>)}
         </div>
-        <div className="row row--c"><button type="button" className="btn btn--lg" onClick={() => { setPhase('run'); env.say('calm', 'games.study.quiet'); }}><Play size={17} aria-hidden="true" /> {t('common.start')}</button></div>
+        <p className="tip"><Smartphone size={16} aria-hidden="true" /> {t('games.study.phoneTip')}</p>
+        <div className="row row--c"><button type="button" className="btn btn--lg" onClick={() => { const lv = crisisIn(topic); if (lv) return setCrisis(lv); setPhase('run'); env.say('calm', 'games.study.quiet'); }}><Play size={17} aria-hidden="true" /> {t('common.start')}</button></div>
       </div>
     );
   }
