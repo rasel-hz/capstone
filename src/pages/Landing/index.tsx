@@ -85,7 +85,7 @@ export function Landing() {
 
   return (
     <div id="app">
-      <div className={`zw ${menu ? 'is-menu' : ''} ${reduce ? 'zw-still' : ''}`} ref={root}>
+      <div className={`zw ${menu ? 'is-menu' : ''} ${reduce ? 'zw-still' : ''} ${login ? 'is-dialog' : ''}`} ref={root}>
         <div className="zw-prog" data-zw="prog" />
         <header className="zw-nav" data-zw="nav">
           <button type="button" className="brand zw-brand" onClick={() => go('hero')}>{t('common.brand')}</button>

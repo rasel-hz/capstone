@@ -17,6 +17,8 @@
 :where(.zw) button { font: inherit; color: inherit; }
 .zw-links button, .zw-sheet > button, .zw-brand { border: 0; background: none; cursor: pointer; }
 .zw-span { grid-column: 1 / -1; }
+/* The page's ZAHO and top bar float above everything, so they step aside while the log-in window (with its own ZAHO) is open. */
+.zw.is-dialog .zw-zaho, .zw.is-dialog .zw-bubble, .zw.is-dialog .zw-nav, .zw.is-dialog .zw-prog { visibility: hidden; }
 .zw-mb { margin-bottom: 24px; }
 .zw-mem { width: 100%; text-align: start; }
 .zw-dist.is-gone { animation: zw-pop .38s ease-in forwards; pointer-events: none; }
