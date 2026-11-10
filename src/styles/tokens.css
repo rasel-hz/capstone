@@ -58,3 +58,28 @@ body.lilac {
   --em-l: #EFE8FF;
 }
 body.lg { --fs-body: 17px; --fs-meta: 15px; --fs-card: 18px; --fs-sec: 20px; }
+
+/* Dark: a deep green-navy page, slightly lighter cards, and light text. The brand colours stay; the shades
+   that are used as text (em-d, lav-d) turn light so they keep their contrast. Illustrations keep their own
+   colours inside their frames. */
+body.dark {
+  --iv: #13201C;
+  --cr: #1A2925;
+  --surface: #1F302B;
+  --ink: #E4EEE9;
+  --mut: #9FB5AD;
+  --line: rgba(228, 238, 233, .12);
+  --em: #2F8F6B;
+  --em-d: #8FD8B5;
+  --em-l: #22392F;
+  --lav-d: #C4B0FF;
+  --lil: #2B2645;
+  --cor-d: #FF9C91;
+  --cor-l: #3A2422;
+  --sun-l: #352F1C;
+  --sky-l: #1C3140;
+  --pe-l: #36281F;
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 22px rgba(0, 0, 0, .25);
+  --shadow-lift: 0 2px 4px rgba(0, 0, 0, .35), 0 14px 30px rgba(0, 0, 0, .35);
+  color-scheme: dark;
+}

@@ -7,7 +7,7 @@
 /* Zaho and the brief bubble. */
 .pv-hero { display: flex; align-items: flex-end; gap: 6px; margin: 6px 0 4px; }
 .pv-hero__buddy { flex: none; margin-bottom: -4px; }
-.pv-bubble { position: relative; flex: 1; min-width: 0; background: #fff; border-radius: 26px 26px 26px 26px; padding: 16px 18px 16px 44px; box-shadow: 0 10px 30px -18px rgba(31, 94, 72, .45); }
+.pv-bubble { position: relative; flex: 1; min-width: 0; background: var(--surface); border-radius: 26px 26px 26px 26px; padding: 16px 18px 16px 44px; box-shadow: 0 10px 30px -18px rgba(31, 94, 72, .45); }
 [dir='rtl'] .pv-bubble { padding: 16px 18px 16px 44px; border-end-start-radius: 6px; }
 [dir='ltr'] .pv-bubble { padding: 16px 44px 16px 18px; border-end-start-radius: 6px; }
 .pv-headline { margin: 0; font-size: 19px; line-height: 1.45; font-weight: 700; color: var(--deep); }
@@ -66,3 +66,10 @@
   .pv-big b { font-size: 72px; }
   .pv-day__o { width: 38px; height: 38px; border-radius: 12px; }
 }
+body.dark .pv-day--rest .pv-day__o { background: #2B2645; }
+body.dark .pv { --deep: #8FD8B5; --warm-l: #3B3420; }
+body.dark .pv-day__o { background: #22302C; color: #9FB5AD; }
+body.dark .pv-day--done .pv-day__o { background: var(--em); color: #fff; }
+body.dark .pv-chip { color: #FFE7A3; }
+body.dark .pv-chip:hover { background: #4A4128; }
+body.dark .pv-j__tag { color: #FFE7A3; }

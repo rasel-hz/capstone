@@ -70,11 +70,11 @@
 .hero__scene { height: auto !important; }
 .hero__ask { position: relative; z-index: 2; margin: -6px -22px 0; padding: 4px 22px 14px; background: var(--meadow); display: flex; justify-content: center; }
 .ebubble {
-  position: relative; background: #fff; border-radius: 26px; padding: 12px 16px 10px; max-width: 320px; width: 100%;
+  position: relative; background: var(--surface); border-radius: 26px; padding: 12px 16px 10px; max-width: 320px; width: 100%;
   box-shadow: 0 12px 28px -14px rgba(31, 94, 72, .45); text-align: center; animation: pop .35s var(--ease);
 }
 /* The tail points up at the buddy. */
-.ebubble::before { content: ''; position: absolute; top: -9px; left: 50%; width: 20px; height: 20px; margin-left: -10px; background: #fff; border-radius: 4px; transform: rotate(45deg); }
+.ebubble::before { content: ''; position: absolute; top: -9px; left: 50%; width: 20px; height: 20px; margin-left: -10px; background: var(--surface); border-radius: 4px; transform: rotate(45deg); }
 .ebubble__q { position: relative; margin: 0 0 8px; font-weight: 700; color: var(--forest); font-size: 16px; }
 .seg--bubble { display: flex; justify-content: center; gap: 18px; background: none; box-shadow: none; padding: 0; border-radius: 0; width: 100%; }
 .seg--bubble .seg__b { --orb: #FFD36E; flex-direction: column; gap: 4px; background: none; padding: 0; min-height: 0; font-size: 12px; color: var(--ink); border-radius: 0; }
@@ -133,7 +133,7 @@
 .trail .goals__list::before { content: ''; position: absolute; top: 18px; bottom: 18px; inset-inline-start: 19px; border-inline-start: 3px dotted rgba(31, 94, 72, .28); }
 .trail .goals__list li { position: relative; border: 0; background: none; border-radius: 0; padding: 0; }
 .trail .goal__tick { padding: 6px 0; min-height: 50px; gap: 14px; }
-.trail .goal__box { width: 38px; height: 38px; border-radius: 50%; background: #fff; box-shadow: 0 6px 14px -6px rgba(31, 94, 72, .35), inset 0 0 0 2px rgba(31, 94, 72, .16); transition: background var(--t-card) var(--ease), transform var(--t-card) var(--ease); }
+.trail .goal__box { width: 38px; height: 38px; border-radius: 50%; background: var(--surface); box-shadow: 0 6px 14px -6px rgba(31, 94, 72, .35), inset 0 0 0 2px rgba(31, 94, 72, .16); transition: background var(--t-card) var(--ease), transform var(--t-card) var(--ease); }
 .trail .is-done .goal__box { background: var(--forest); color: #fff; box-shadow: 0 0 0 5px rgba(141, 191, 163, .35); transform: scale(1.05); }
 .trail .goal__t { font-size: 15.5px; }
 .trail .is-done .goal__t { opacity: .6; }
@@ -153,7 +153,7 @@
 .garden .tile { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; padding: 18px; min-height: 128px; box-shadow: none; text-align: start; background: #EEE6FF; border-radius: 30px 30px 30px 8px; transition: transform var(--t-micro) var(--ease); }
 [dir='rtl'] .garden .tile { border-radius: 30px 30px 8px 30px; }
 .garden .tile.tile--path { background: #DDF0E4; border-radius: 8px 46px 8px 46px; }
-.garden .tile .talk__icon { width: 46px; height: 46px; border-radius: 50%; background: #fff; color: var(--lav-d); }
+.garden .tile .talk__icon { width: 46px; height: 46px; border-radius: 50%; background: var(--surface); color: var(--lav-d); }
 .garden .tile--path .talk__icon { color: var(--em-d); }
 .garden .tile b { font-size: 15.5px; }
 .garden .tile:hover { transform: translateY(-2px); box-shadow: none; }
@@ -191,3 +191,19 @@ body.rm .sky__cloud, body.rm .meadow .next__art, body.rm .ebubble, body.rm .ebad
   .nav-pill { inset: 3px 4px; border-radius: 14px; background: var(--em-l); }
   nav button.on { color: var(--em-d); font-weight: 700; }
 }
+
+/* Dark: Home becomes the same small world at night, so it sits with the dark pages instead of glowing on them. */
+body.dark .world { --meadow: #1B362E; --trail: #182B26; --forest: #9EE0C0; }
+body.dark .hero, body.dark .hero--day, body.dark .hero--evening { background: linear-gradient(180deg, #171B3D 0%, #232A55 55%, #1B362E 100%); --glow: rgba(167, 139, 250, .28); }
+body.dark .hill__back { fill: #24463B; }
+body.dark .sky__cloud { background: rgba(255, 255, 255, .12); }
+body.dark .sky__dots { opacity: .85; }
+body.dark .hero__chips .sk-chip, body.dark .meadow .next > .eyebrow { background: color-mix(in srgb, var(--surface) 88%, transparent); }
+body.dark .meadow .missed, body.dark .meadow .pci, body.dark .meadow .pbk-row { background: color-mix(in srgb, var(--surface) 75%, transparent); }
+body.dark .meadow .next__art { border-color: var(--surface); }
+body.dark .meadow .next__act .btn--lg { background: var(--em); }
+body.dark .ebadge { background: color-mix(in srgb, var(--surface) 92%, transparent); }
+body.dark .ebadge--high { background: #3B3420; }
+body.dark .ebadge--low { background: #2B2645; }
+body.dark .garden .tile { background: #2A2545; }
+body.dark .garden .tile.tile--path { background: #1F3A31; }

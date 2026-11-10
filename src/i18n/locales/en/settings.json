@@ -50,6 +50,7 @@
   "flashManual": "Back to entering the time yourself.",
   "themes": {
     "base": "Classic",
-    "lilac": "Lavender"
+    "lilac": "Lavender",
+    "dark": "Dark"
   }
 }

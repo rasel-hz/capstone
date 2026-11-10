@@ -15,7 +15,7 @@ import type { Gender, ViewId } from '../../types';
 import type { LucideIcon } from 'lucide-react';
 
 // App themes, open to everyone. An empty id is the base look; each other id is a body class in tokens.css.
-const THEMES = ['', 'lilac'];
+const THEMES = ['', 'lilac', 'dark'];
 
 const Group = ({ id, title, icon, children }: { id: string; title: string; icon: LucideIcon; children: React.ReactNode }) => (
   <section className="panel set-g" id={id} aria-labelledby={`${id}-t`}>
