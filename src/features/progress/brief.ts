@@ -3,6 +3,7 @@ import { tr } from '../../i18n/index.ts';
 import { apiUrl } from '../../services/native.ts';
 import { today } from '../../utils/index.ts';
 import { todayGoals } from '../buddy/buddy.ts';
+import { CHALLENGES } from '../challenges/catalog.ts';
 import { streakOf } from '../streak/streak.ts';
 
 // What the progress brief is written from: counts the app already shows, and the user's own last few chat lines.
@@ -36,7 +37,8 @@ export interface BriefInput {
 }
 
 export function briefInput(s: AppState, now = Date.now()): BriefInput {
-  const done = s.hist.filter((h) => h.status === 'COMPLETED');
+  // Self-report check-ins and dhikr stay out of the progress summary.
+  const done = s.hist.filter((h) => h.status === 'COMPLETED' && !CHALLENGES[h.id]?.selfReport);
   const week = done.filter((h) => now - h.ts < WEEK);
   const startOfToday = new Date(now).setHours(0, 0, 0, 0);
   const todays = done.filter((h) => h.ts >= startOfToday);

@@ -1,6 +1,7 @@
 import { Check, ExternalLink, RotateCcw } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useTimers } from '../../hooks/useTimers';
 import type { GameProps } from '../challenges/types';
 import { DHIKR_SOURCES, dhikrItems, stepsOf, type DhikrId, type DhikrItem } from './content';
 
@@ -100,6 +101,7 @@ export function DhikrGame({ id, env, onDone }: GameProps & { id: DhikrId }) {
   const [step, setStep] = useState(0);
   const [progress, setProgress] = useState<DhikrProgress[]>(() => list.map(({ key, item }) => ({ key, counts: stepsOf(item).map(() => 0), done: false })));
   const sent = useRef(false);
+  const timers = useTimers(env.paused);
   const { key, item } = list[i];
   const steps = stepsOf(item);
   const counts = progress[i].counts;
@@ -119,8 +121,18 @@ export function DhikrGame({ id, env, onDone }: GameProps & { id: DhikrId }) {
   function onTap() {
     const next = tap(counts, step, target);
     update(next);
+    if (target == null || next[step] < target) return;
     // A fixed count reached moves to the next phrase of the same dhikr by itself.
-    if (target != null && next[step] >= target && step < steps.length - 1) setStep(step + 1);
+    if (step < steps.length - 1) return setStep(step + 1);
+    // The whole dhikr is done: after a moment to see the tick, the next one opens by itself, or the last one finishes.
+    const all = progress.map((x, k) => (k === i ? { ...x, counts: next, done: itemDone(item, next) } : x));
+    timers.after(() => (last ? finish(all) : goTo(i + 1)), env.rm ? 450 : 900);
+  }
+
+  function goTo(n: number) {
+    timers.clear();
+    setI(n);
+    setStep(0);
   }
 
   function finish(all: DhikrProgress[]) {
@@ -132,8 +144,7 @@ export function DhikrGame({ id, env, onDone }: GameProps & { id: DhikrId }) {
 
   function next() {
     if (last) return finish(progress);
-    setI(i + 1);
-    setStep(0);
+    goTo(i + 1);
   }
 
   return (
@@ -158,7 +169,8 @@ export function DhikrGame({ id, env, onDone }: GameProps & { id: DhikrId }) {
 
       <div className="row row--c">
         {!progress[i].done && <button type="button" className="btn-link" onClick={next}>{t(last ? 'games.dhikr.skipLast' : 'games.dhikr.skip')}</button>}
-        {(stepDone || progress[i].done) && (
+        {/* A counted dhikr moves on by itself; only a free count, which has no number to reach, needs the button. */}
+        {target == null && (stepDone || progress[i].done) && (
           <button type="button" className="btn" onClick={next} disabled={last && !canFinish(progress)}>{t(last ? 'games.dhikr.finish' : 'games.dhikr.next')}</button>
         )}
       </div>

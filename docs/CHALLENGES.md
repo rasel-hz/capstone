@@ -26,6 +26,10 @@ Every activity supports practice, planning, reflection or an optional break. **N
 
 **Resume:** a resumed challenge restarts from its beginning, and says so. Earlier attempts stay saved.
 
+## Dhikr has its own page
+
+The five dhikr activities are worship, not challenges. They live on «أذكاري» (`pages/Dhikr`), reached from Home and from the map, with the one that fits the time first, and open straight into the counter. They're marked `selfReport` and `quiet` with 0 XP: no level points, no reward points (the server excludes them since `20261111120000_dhikr_not_a_challenge.sql`), no streak day, no achievements, no sound or celebration, and they never appear in the challenge library or on the journey (`replaceRetired` swaps any dhikr step out). Points already given before stay.
+
 ## Typed text is checked first
 
 Every challenge where the user types freely (Just the First Step, Break It Down, Let's Think It Through, How Are You Feeling?, Focus Sprint, Plan Your Day) checks the text on the device with the same crisis wording as the chat (`crisisIn` in `games/parts.tsx`). If it matches, the game stops and shows the same support message and numbers as the chat. Nothing from that screen is saved.

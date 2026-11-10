@@ -1,4 +1,4 @@
-import { Clock, Gauge, Lock, MessageCircle, Play, RotateCcw, Sparkles, X } from 'lucide-react';
+import { Clock, Gauge, Lock, MessageCircle, Play, RotateCcw, Shuffle, Sparkles, X } from 'lucide-react';
 import { motion, useReducedMotion } from 'motion/react';
 import { useEffect, useRef, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -9,7 +9,7 @@ import { potentialXp, type NodeState, type PathNode } from '../planner';
 const Fact = ({ icon, children }: { icon: ReactNode; children: ReactNode }) => <li>{icon}<span>{children}</span></li>;
 
 /** Details for one step. A bottom sheet on a phone, a centred card on a wider screen. */
-export function LevelSheet({ node, state, name, position, total, resume, rm, onClose, onStart, onReplay, onTalk, onReflect }: {
+export function LevelSheet({ node, state, name, position, total, resume, rm, swapsLeft, onClose, onStart, onSwap, onReplay, onTalk, onReflect }: {
   node: PathNode;
   state: NodeState;
   name: string;
@@ -17,7 +17,10 @@ export function LevelSheet({ node, state, name, position, total, resume, rm, onC
   total: number;
   resume: boolean;
   rm: boolean;
+  /** How many more times the current step can be swapped for another. */
+  swapsLeft: number;
   onClose(): void;
+  onSwap(): void;
   onStart(): void;
   onReplay(): void;
   onTalk(): void;
@@ -71,6 +74,7 @@ export function LevelSheet({ node, state, name, position, total, resume, rm, onC
             {state === 'locked' && <p className="lsheet__locked"><Lock size={14} aria-hidden="true" /> {t('path.lockedNote')}</p>}
             <div className="lsheet__act">
               {state === 'current' && node.kind === 'play' && <button type="button" className="btn btn--lg" onClick={onStart}><Play size={17} aria-hidden="true" /> {t(resume ? 'common.continue' : 'common.start')}</button>}
+              {state === 'current' && node.kind === 'play' && !resume && swapsLeft > 0 && <button type="button" className="btn-link" onClick={onSwap}><Shuffle size={15} aria-hidden="true" /> {t('path.swap')}</button>}
               {state === 'current' && node.kind === 'talk' && <button type="button" className="btn btn--lg" onClick={onTalk}><MessageCircle size={17} aria-hidden="true" /> {t('path.talkNow')}</button>}
               {node.done && node.kind === 'play' && <button type="button" className="btn alt" onClick={onReplay}><RotateCcw size={15} aria-hidden="true" /> {t('path.replay')}</button>}
             </div>

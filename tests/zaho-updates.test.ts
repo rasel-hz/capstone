@@ -94,8 +94,9 @@ describe('streak days from Supabase', () => {
   });
 
   it('use the same self-report rule as the server', () => {
-    const sql = read('supabase/migrations/20261109120000_daily_streak_goals.sql');
-    const listed = sql.match(/challenge_id <> all \(array\[([^\]]*)\]\)/)?.[1].match(/'([a-z0-9_]+)'/g)?.map((x) => x.slice(1, -1)).sort();
+    // The newest definition of the streak function is the one in force.
+    const sql = read('supabase/migrations/20261111120000_dhikr_not_a_challenge.sql');
+    const listed = sql.slice(sql.indexOf('function public.refresh_my_streak')).match(/challenge_id <> all \(array\[([^\]]*)\]\)/)?.[1].match(/'([a-z0-9_]+)'/g)?.map((x) => x.slice(1, -1)).sort();
     const self = Object.entries(CHALLENGES).filter(([, c]) => (c as { selfReport?: boolean }).selfReport).map(([id]) => id).sort();
     expect(listed).toEqual(self);
   });

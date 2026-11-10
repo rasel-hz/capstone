@@ -30,7 +30,7 @@ function GateArt({ done }: { done: boolean }) {
   );
 }
 
-export const JourneyNode = memo(function JourneyNode({ stop, node, state, name, height, fresh, resume, onOpen }: {
+export const JourneyNode = memo(function JourneyNode({ stop, node, state, name, height, fresh, resume, veiled = false, onOpen }: {
   stop: Stop;
   node: PathNode;
   state: NodeState;
@@ -38,6 +38,8 @@ export const JourneyNode = memo(function JourneyNode({ stop, node, state, name, 
   height: number;
   fresh: boolean;
   resume: boolean;
+  /** In a chapter not reached yet: blurred and closed until the user gets there. */
+  veiled?: boolean;
   onOpen(key: string): void;
 }) {
   const { t } = useTranslation();
@@ -46,11 +48,12 @@ export const JourneyNode = memo(function JourneyNode({ stop, node, state, name, 
   const mile = node.kind === 'milestone';
   return (
     <li
-      className={`jn jn--${state} jn--${node.kind} ${fresh ? 'is-fresh' : ''}`}
+      className={`jn jn--${state} jn--${node.kind} ${fresh ? 'is-fresh' : ''} ${veiled ? 'is-veiled' : ''}`}
+      aria-hidden={veiled || undefined}
       data-stop={node.key}
       style={{ left: `${(stop.x / WORLD_W) * 100}%`, top: `${(stop.y / height) * 100}%` }}
     >
-      <button type="button" className="jn__hit" onClick={() => onOpen(node.key)} aria-label={`${name}: ${t(`path.state.${state}`)}`} aria-current={state === 'current' ? 'step' : undefined}>
+      <button type="button" className="jn__hit" disabled={veiled} tabIndex={veiled ? -1 : undefined} onClick={() => onOpen(node.key)} aria-label={`${name}: ${t(`path.state.${state}`)}`} aria-current={state === 'current' ? 'step' : undefined}>
         {mile ? <GateArt done={state === 'done'} /> : state === 'current' ? (
           <svg className="jn__pad" viewBox="0 0 136 76" aria-hidden="true">
             <ellipse cx="68" cy="56" rx="62" ry="16" fill="#263D37" opacity=".14" />
@@ -75,8 +78,8 @@ export const JourneyNode = memo(function JourneyNode({ stop, node, state, name, 
       </button>
       <div className="jn__lab">
         <b dir="auto">{name}</b>
-        {node.done && node.done.xp > 0 && <span className="jn__xp is-earned">{t('path.gotXp', { n: node.done.xp })}</span>}
-        {!node.done && xp > 0 && state !== 'current' && <span className="jn__xp">{t('path.canEarn', { n: xp })}</span>}
+        {!veiled && node.done && node.done.xp > 0 && <span className="jn__xp is-earned">{t('path.gotXp', { n: node.done.xp })}</span>}
+        {!veiled && !node.done && xp > 0 && state !== 'current' && <span className="jn__xp">{t('path.canEarn', { n: xp })}</span>}
       </div>
       {state === 'current' && !mile && (
         <button type="button" className="btn sm jn__go" tabIndex={-1} aria-hidden="true" onClick={() => onOpen(node.key)}>

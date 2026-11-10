@@ -11,7 +11,7 @@ export type ChallengeCategory = 'focus' | 'memory' | 'planning' | 'time' | 'rela
 export type Difficulty = 'easy' | 'normal';
 export type ContextTag = 'event' | 'work' | 'sleep';
 export type EnergyLevel = 'high' | 'mid' | 'low';
-export type ViewId = 'home' | 'journeys' | 'chal' | 'chat' | 'prog' | 'rew' | 'set' | 'path';
+export type ViewId = 'home' | 'journeys' | 'chal' | 'dhikr' | 'chat' | 'prog' | 'rew' | 'set' | 'path';
 
 export type ItemStatus = 'NOT_STARTED' | 'IN_PROGRESS' | 'PAUSED' | 'COMPLETED' | 'SKIPPED' | 'ABANDONED';
 export type MissionStatus = 'IN_PROGRESS' | 'PAUSED' | 'DONE';
@@ -25,7 +25,7 @@ export interface Challenge {
   hasEasy: boolean;
   /** Produces a first-try accuracy score. Unscored challenges are never compared with scored ones. */
   scored: boolean;
-  /** Self-report only: no XP and no achievements, and its results stay on the device (reference 14.2). */
+  /** No XP, reward points, streak or achievements: self-report check-ins (reference 14.2), and dhikr, which is worship. */
   selfReport?: boolean;
   /** Ends without a sound, confetti or a cheering mascot, such as dhikr before sleep. */
   quiet?: boolean;

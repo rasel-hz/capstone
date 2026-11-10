@@ -278,13 +278,16 @@
 .cf { position: fixed; top: -20px; width: 12px; height: 12px; border-radius: 3px; animation: fall 2.6s linear forwards; z-index: 90; pointer-events: none; }
 
 /* Dhikr: the words first, large and readable; the counter is a single calm tap target. */
+.stage--open { background: transparent; box-shadow: none; padding-inline: 4px; }
+@font-face { font-family: 'Zaho Dhikr'; src: url('../assets/fonts/shafigh-bakh.ttf') format('truetype'); font-display: swap; }
 .dk { display: flex; flex-direction: column; align-items: center; gap: 12px; max-width: 600px; margin: 0 auto; width: 100%; }
 .dk-bar { width: 100%; height: 6px; border-radius: 99px; background: var(--line); overflow: hidden; }
 .dk-bar span { display: block; height: 100%; background: var(--em); border-radius: inherit; transition: width var(--t-card, .3s) ease; }
-.dk-card { margin: 0; width: 100%; padding: 18px 16px; border-radius: 18px; background: var(--em-l); text-align: center; }
-.dk-words { margin: 0; font-size: clamp(19px, 3.2vw, 24px); line-height: 2.1; font-weight: 500; color: var(--ink); }
+.dk-card { margin: 0; width: 100%; padding: 6px 4px 0; text-align: center; }
+.dk-card::after { content: ''; display: block; width: 72px; height: 2px; margin: 14px auto 0; border-radius: 2px; background: linear-gradient(90deg, transparent, var(--em), transparent); opacity: .5; }
+.dk-words { margin: 0; font-family: 'Zaho Dhikr', 'IBM Plex Sans Arabic', serif; font-size: clamp(20px, 4.8vw, 26px); line-height: 1.85; font-weight: 400; color: var(--ink); }
 .dk-quran__part + .dk-quran__part { margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--line); }
-.dk-quran__basmala { margin: 0 0 2px; font-size: 16px; color: var(--mut); }
+.dk-quran__basmala { margin: 0 0 4px; font-family: 'Zaho Dhikr', 'IBM Plex Sans Arabic', serif; font-size: clamp(18px, 4.2vw, 22px); color: var(--em-d); }
 .dk-ayah { font-size: .8em; color: var(--em-d); }
 .dk-steps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
 .dk-steps li { opacity: .45; }
@@ -309,7 +312,7 @@
 
 /* Before sleep: dim and low contrast, nothing bright or moving. */
 .dk--night { padding: 14px; border-radius: 22px; background: #1E1E3A; color: #E6E2FF; }
-.dk--night .dk-card { background: rgba(167, 139, 250, .12); }
+.dk--night .dk-card::after { background: linear-gradient(90deg, transparent, #A78BFA, transparent); }
 .dk--night .dk-words, .dk--night .dk-count__n { color: #E6E2FF; }
 .dk--night .dk-ref, .dk--night .dk-ayah, .dk--night .note, .dk--night .dk-quran__basmala, .dk--night .dk-count__of { color: #B9B2E6; }
 .dk--night .dk-bar { background: rgba(255, 255, 255, .1); }
@@ -348,3 +351,46 @@
 .gr__dots { display: flex; justify-content: center; gap: 12px; margin: 14px 0 12px; }
 .gr__dots i { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--em); background: transparent; transition: background var(--t-micro) var(--ease); }
 .gr__dots i.on { background: var(--em); }
+
+/* The page before a challenge: art, name, how to play, facts and one button. Parts settle in one after another. */
+.ci { display: flex; flex-direction: column; align-items: center; gap: 12px; max-width: 520px; margin: 0 auto; width: 100%; text-align: center; }
+.ci__art { width: 100%; aspect-ratio: 16 / 8; border-radius: var(--r-lg); overflow: hidden; box-shadow: var(--shadow-card); }
+.ci__art .art { width: 100%; height: 100%; display: block; }
+.ci h1 { font-size: clamp(26px, 6vw, 32px); margin: 4px 0 0; }
+.ci__lead { margin: 0; color: var(--mut); max-width: 40ch; }
+.ci__how { width: 100%; background: var(--cr); border-radius: var(--r-lg); padding: 14px 12px 16px; }
+.ci__how h2 { font-size: 17px; margin: 0 0 12px; }
+.ci__how ol { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.ci__how li { display: flex; flex-direction: column; align-items: center; gap: 6px; position: relative; }
+.ci__n { width: 22px; height: 22px; border-radius: 50%; background: var(--em); color: #fff; font-size: 12px; font-weight: 700; display: grid; place-items: center; }
+.ci__ic { width: 58px; height: 58px; border-radius: 50%; background: #fff; color: var(--em); display: grid; place-items: center; box-shadow: var(--shadow-card); }
+.ci__t { font-size: 13.5px; line-height: 1.35; }
+.ci__facts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; }
+.ci__facts span { display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto; column-gap: 8px; align-items: center; text-align: start; background: #fff; border: 1.5px solid var(--line); border-radius: var(--r-md); padding: 10px 12px; }
+.ci__facts svg { grid-row: span 2; color: var(--em); }
+.ci__facts small { color: var(--mut); font-size: 12.5px; }
+.ci__go { width: 100%; max-width: 360px; margin-top: 4px; }
+
+.ci-in { animation: ci-in .5s cubic-bezier(.22, 1, .36, 1) both; animation-delay: calc(var(--d, 0) * 70ms); }
+@keyframes ci-in { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+/* The step icons draw themselves in, line by line. */
+.ci__ic svg :is(path, circle, rect, line, polyline, polygon, ellipse) { stroke-dasharray: 80; stroke-dashoffset: 80; animation: ci-draw .9s ease forwards; animation-delay: calc(var(--d, 0) * 70ms + 200ms); }
+@keyframes ci-draw { to { stroke-dashoffset: 0; } }
+/* A soft breath on the button, for the livelier challenges only. */
+.ci:not(.ci--quiet) .ci__go { animation: ci-in .5s cubic-bezier(.22, 1, .36, 1) both, ci-breathe 3s ease-in-out 1.4s infinite; animation-delay: calc(var(--d, 0) * 70ms), 1.4s; }
+@keyframes ci-breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03); } }
+.ci__go:active { transform: scale(.97); }
+
+@media (prefers-reduced-motion: reduce) {
+  .ci-in, .ci__go, .ci__ic svg * { animation: none !important; stroke-dashoffset: 0 !important; }
+}
+.rm .ci-in, .rm .ci__go, .rm .ci__ic svg * { animation: none !important; stroke-dashoffset: 0 !important; }
+@media (max-width: 380px) { .ci__how ol { gap: 4px; } .ci__ic { width: 50px; height: 50px; } }
+/* On a phone the dhikr and its counter fit on one screen together. */
+@media (max-width: 520px) {
+  .dk { gap: 8px; }
+  .dk-card::after { margin-top: 8px; }
+  .dk-count__b { width: 112px; height: 112px; }
+  .dk-count__n { font-size: 34px; }
+  .dk-count__of { bottom: 24px; }
+}

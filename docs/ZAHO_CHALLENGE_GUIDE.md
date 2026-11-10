@@ -37,7 +37,7 @@ The source of truth for IDs, lengths and points is `src/features/challenges/cata
 | «ما يجيني نوم» / winding down for bed | `calm` | `calm_landscape`. Persistent sleep trouble: suggest seeing a doctor |
 | «عندي عزيمة وأبي أرتب لها» / planning a gathering | `seq` with their tasks | `breakdown` |
 | «تعبان وما أبي شي» / exhausted | Rest, or nothing | at most `calm_landscape` |
-| Asks for dhikr, or seems open to it and the time fits | the dhikr that fits now | see the dhikr rules |
+| Asks for dhikr, or seems open to it and the time fits | the dhikr that fits now, as one activity | never in the journey; see the dhikr rules |
 
 ## Start and arrange
 
@@ -140,14 +140,14 @@ These are short practice games with a first-try score for personal tracking only
 - **Offer only when:** they want to reflect on their feelings, or worry is the main thing they're dealing with **(enforced)**. Not as a default, and not just because they said they're stressed.
 - **Leads to:** what they said might help: a walk or rest (`calm_landscape`), something small (`micro_start`), calming down (`calm`), or talking (the chat).
 
-## Dhikr (Razan)
+## Dhikr (Razan): not a challenge
 
-Five activities with verified texts and their sources: `dhikr_morning` «ابدأ يومك بذكر», `dhikr_evening` «اختم يومك بذكر», `dhikr_calm_heart` «طمّن قلبك», `dhikr_moment` «خذ لك لحظة ذكر», `dhikr_sleep` «قبل لا تنام».
+Dhikr is worship, so it has its own page, «أذكاري» (My dhikr), reached from Home and from the map. It is **not** in the challenge library or the journey, earns **no points of any kind** and doesn't count towards the streak **(enforced, app and server)**. Five activities with verified texts and their sources: `dhikr_morning` «ابدأ يومك بذكر», `dhikr_evening` «اختم يومك بذكر», `dhikr_calm_heart` «طمّن قلبك», `dhikr_moment` «خذ لك لحظة ذكر», `dhikr_sleep` «قبل لا تنام».
 
-- **Only at a fitting time** **(enforced)**: morning 4:00 to 12:00, evening 15:00 to 23:00, before sleep 20:00 to 4:00. The other two fit any time. The server only lists the ones that fit now.
-- **Only when they ask for it, or seem open to it.** Not every time someone is stressed, and always alongside the other activities, never instead of them.
+- **Only when they ask for it, or seem open to it**, as one activity («أبي أذكار»). Never as part of the journey, even if asked: set `journey.include_dhikr` to false and offer it as a single activity **(enforced)**.
+- **By the time** **(enforced)**: morning 4:00 to 12:00, evening 15:00 to 23:00, before sleep 20:00 to 4:00. The other two fit any time.
 - **Never quote, write or paraphrase any dhikr, dua or verse yourself.** Only suggest the activity; the app shows the verified text.
-- **Never present it as treatment** or promise it removes anxiety.
+- **Never present it as treatment**, promise it removes anxiety, or mention points, levels or rewards with it.
 
 ## How challenges lead into each other
 

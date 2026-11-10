@@ -1,4 +1,4 @@
-import { BatteryFull, BatteryLow, BatteryMedium, Check, ChevronDown, Clock, Compass, Flag, MessageCircle, Play, Shuffle, Sparkles, Timer, type LucideIcon } from 'lucide-react';
+import { BatteryFull, BookOpen, BatteryLow, BatteryMedium, Check, ChevronDown, Clock, Compass, Flag, MessageCircle, Play, Shuffle, Sparkles, Timer, type LucideIcon } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ProgressBar, Segmented } from '../../components/ui/kit';
@@ -208,6 +208,12 @@ export function Home({ onNavigate }: { onNavigate(v: ViewId): void }) {
           <span className="talk__icon"><MessageCircle size={20} aria-hidden="true" /></span>
           <span className="grow">
             <b>{t('dashboard.talkTitle')}</b>
+          </span>
+        </button>
+        <button type="button" className="talk tile tile--dhikr" onClick={() => onNavigate('dhikr')}>
+          <span className="talk__icon"><BookOpen size={20} aria-hidden="true" /></span>
+          <span className="grow">
+            <b>{t('dhikrPage.title')}</b>
           </span>
         </button>
         {!s.path && (

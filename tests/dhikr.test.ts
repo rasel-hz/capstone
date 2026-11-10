@@ -18,20 +18,21 @@ const state = (p: Partial<AppState> = {}): AppState => ({ ...defaultState(), ...
 const MARKS = /[ً-ْ]/;
 
 describe('the five dhikr challenges', () => {
-  it('are exactly five, registered like any other challenge, with no sixth', () => {
+  it('are exactly five, with their own page, outside the challenge library, and with no points or streak', () => {
     expect(DHIKR_IDS).toEqual(['dhikr_morning', 'dhikr_evening', 'dhikr_calm_heart', 'dhikr_moment', 'dhikr_sleep']);
     expect(Object.keys(content.challenges).sort()).toEqual([...DHIKR_IDS].sort());
     for (const id of DHIKR_IDS) {
       expect(CHALLENGES[id]).toBeDefined();
       expect(GAMES[id]).toBeDefined();
-      expect(CHALLENGES[id].selfReport).toBeFalsy();
+      expect(CHALLENGES[id].selfReport).toBe(true);
+      expect(CHALLENGES[id].xp).toBe(0);
     }
-    expect(GROUPS.find((g) => g.id === 'dhikr')?.ids).toEqual(DHIKR_IDS);
+    expect(GROUPS.flatMap((g) => g.ids).filter((id) => id.startsWith('dhikr_'))).toEqual([]);
     expect(Object.keys(CHALLENGES).filter((id) => id.startsWith('dhikr_'))).toHaveLength(5);
   });
 
-  it('only before sleep is quiet', () => {
-    expect(DHIKR_IDS.filter((id) => CHALLENGES[id].quiet)).toEqual(['dhikr_sleep']);
+  it('all end quietly, with no sound or celebration', () => {
+    expect(DHIKR_IDS.filter((id) => CHALLENGES[id].quiet)).toEqual(DHIKR_IDS);
   });
 
   it('every challenge has approved items', () => {
@@ -228,14 +229,37 @@ describe('the companion', () => {
 });
 
 describe('progress and rewards', () => {
-  it('a completed dhikr counts as a streak day, like any real challenge', () => {
-    const h: Attempt = { mid: 'm1', i: 0, id: 'dhikr_moment', status: 'COMPLETED', acc: null, retries: 0, xp: 10, dur: 60, d: '', ts: at(9).getTime() } as Attempt;
-    expect([...qualifyingDays(state({ hist: [h], city: 'riyadh' }))]).toHaveLength(1);
+  it('a completed dhikr is worship, not a streak day', () => {
+    const h: Attempt = { mid: 'm1', i: 0, id: 'dhikr_moment', status: 'COMPLETED', acc: null, retries: 0, xp: 0, dur: 60, d: '', ts: at(9).getTime() } as Attempt;
+    expect([...qualifyingDays(state({ hist: [h], city: 'riyadh' }))]).toHaveLength(0);
   });
 
-  it('earns points through the same server rule as other challenges: once per attempt', () => {
-    const sql = readFileSync('supabase/migrations/20261108090000_points_rewards.sql', 'utf8');
-    expect(sql).toMatch(/award_key[\s\S]*'challenge:' \|\| p_attempt_key/);
-    expect(sql).toMatch(/if a\.challenge_id <> 'emotion_map'/);
+  it('earns no reward points on the server, while points already given stay', () => {
+    const sql = readFileSync('supabase/migrations/20261111120000_dhikr_not_a_challenge.sql', 'utf8');
+    for (const id of DHIKR_IDS) expect(sql.split(id).length - 1, id).toBe(3);
+    expect(sql).not.toMatch(/delete|update public\.point_transactions/i);
+    expect(readFileSync('supabase/rollbacks/20261111120000_dhikr_not_a_challenge.down.sql', 'utf8')).toMatch(/<> 'emotion_map'/);
+  });
+
+  it('has its own page, reached from Home and My journey, opening the dhikr straight away', () => {
+    expect(readFileSync('src/pages/Home/index.tsx', 'utf8')).toMatch(/onNavigate\('dhikr'\)/);
+    expect(readFileSync('src/pages/Path/index.tsx', 'utf8')).toMatch(/onNavigate\('dhikr'\)/);
+    expect(readFileSync('src/pages/Dhikr/index.tsx', 'utf8')).toMatch(/\{ direct: true \}/);
+  });
+});
+
+describe('the dhikr page', () => {
+  const read = (p: string) => readFileSync(p, 'utf8');
+  it('shows the words in their own clear font, with no box around them', () => {
+    const css = read('src/styles/games.css');
+    expect(css).toMatch(/@font-face \{ font-family: 'Zaho Dhikr'; src: url\('..\/assets\/fonts\/shafigh-bakh\.ttf'\)/);
+    expect(css).toMatch(/\.dk-words \{[^}]*font-family: 'Zaho Dhikr'/);
+    expect(css).not.toMatch(/\.dk-card \{[^}]*background/);
+    expect(read('src/features/mission/MissionPlayer.tsx')).toMatch(/stage--open/);
+  });
+  it('moves to the next dhikr by itself once its count is reached', () => {
+    const src = read('src/features/dhikr/DhikrGame.tsx');
+    expect(src).toMatch(/timers\.after\(\(\) => \(last \? finish\(all\) : goTo\(i \+ 1\)\)/);
+    expect(src).toMatch(/\{target == null && \(stepDone/);
   });
 });

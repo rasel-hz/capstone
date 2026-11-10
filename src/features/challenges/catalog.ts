@@ -19,11 +19,12 @@ export const CHALLENGES: Record<ChallengeId, Challenge> = {
   eye_rest: { cat: 'relax', min: 1, xp: 10, k: 'w', hasEasy: false, scored: false },
   grounding: { cat: 'relax', min: 3, xp: 15, k: 'f', hasEasy: false, scored: false },
   // Dhikr. The texts are verified and generated (src/features/dhikr/content.json, docs/dhikr-challenges.md).
-  dhikr_morning: { cat: 'relax', min: 5, xp: 15, k: 'r', hasEasy: false, scored: false },
-  dhikr_evening: { cat: 'relax', min: 5, xp: 15, k: 'g', hasEasy: false, scored: false },
-  dhikr_calm_heart: { cat: 'relax', min: 3, xp: 15, k: 'h', hasEasy: false, scored: false },
-  dhikr_moment: { cat: 'relax', min: 2, xp: 10, k: 'n', hasEasy: false, scored: false },
-  dhikr_sleep: { cat: 'relax', min: 5, xp: 15, k: 'z', hasEasy: false, scored: false, quiet: true },
+  // Worship, not a challenge: no points of any kind, no streak, no celebration, and its own page ("My dhikr").
+  dhikr_morning: { cat: 'relax', min: 5, xp: 0, k: 'r', hasEasy: false, scored: false, selfReport: true, quiet: true },
+  dhikr_evening: { cat: 'relax', min: 5, xp: 0, k: 'g', hasEasy: false, scored: false, selfReport: true, quiet: true },
+  dhikr_calm_heart: { cat: 'relax', min: 3, xp: 0, k: 'h', hasEasy: false, scored: false, selfReport: true, quiet: true },
+  dhikr_moment: { cat: 'relax', min: 2, xp: 0, k: 'n', hasEasy: false, scored: false, selfReport: true, quiet: true },
+  dhikr_sleep: { cat: 'relax', min: 5, xp: 0, k: 'z', hasEasy: false, scored: false, selfReport: true, quiet: true },
   // The first eye break, replaced by eye_rest. Kept so its history still reads.
   eye_break: { cat: 'relax', min: 1, xp: 10, k: 'i', hasEasy: false, scored: false, retired: true },
 };
@@ -35,13 +36,12 @@ export const CATEGORIES: ChallengeCategory[] = ['focus', 'memory', 'planning', '
 
 // How the challenges page groups activities: by what the user wants to do now, not by a condition.
 // Text lives under challenges.groups.<id>.
-export type GroupId = 'start' | 'focus' | 'calm' | 'think' | 'dhikr';
+export type GroupId = 'start' | 'focus' | 'calm' | 'think';
 export const GROUPS: { id: GroupId; ids: ChallengeId[] }[] = [
   { id: 'start', ids: ['micro_start', 'breakdown', 'seq'] },
   { id: 'focus', ids: ['study_sprint', 'video', 'attention_scene', 'mem'] },
   { id: 'calm', ids: ['calm', 'grounding', 'eye_rest', 'calm_landscape'] },
   { id: 'think', ids: ['thought_sort', 'emotion_map'] },
-  { id: 'dhikr', ids: ['dhikr_morning', 'dhikr_evening', 'dhikr_calm_heart', 'dhikr_moment', 'dhikr_sleep'] },
 ];
 
 // A retired challenge is replaced in its own place, and new ones go at the end, so a journey already under way keeps its days.

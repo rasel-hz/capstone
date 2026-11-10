@@ -1,5 +1,5 @@
 import { motion } from 'motion/react';
-import { Gamepad2, House, MessageCircle, Trophy, UserRound, type LucideIcon } from 'lucide-react';
+import { House, Map as MapIcon, MessageCircle, Trophy, UserRound, type LucideIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { ViewId } from '../../types';
 import { Mascot } from '../mascot/Mascot';
@@ -9,13 +9,14 @@ import { LogoutButton } from '../../features/auth/AuthViews';
 // Five tabs, with the buddy raised. Journeys open from the Challenges page. Progress and Rewards share one
 // "Achievements" tab and switch with the sub-tabs at the top of the page (see SubTabs).
 const TABS: [ViewId, LucideIcon][] = [
-  ['home', House], ['chal', Gamepad2], ['chat', MessageCircle], ['prog', Trophy], ['set', UserRound],
+  ['home', House], ['path', MapIcon], ['chat', MessageCircle], ['prog', Trophy], ['set', UserRound],
 ];
 // A tab whose label differs from its first page's name.
-const TAB_LABEL: Partial<Record<ViewId, string>> = { prog: 'nav.achievements' };
+const TAB_LABEL: Partial<Record<ViewId, string>> = { prog: 'nav.achievements', path: 'nav.myJourney' };
 
 // The tab that stays lit for a view reached through a sub-tab.
-export const TAB_OF: Partial<Record<ViewId, ViewId>> = { journeys: 'chal', path: 'home', rew: 'prog' };
+// The challenge library and the old journeys are reached from "My journey", so that tab stays lit.
+export const TAB_OF: Partial<Record<ViewId, ViewId>> = { journeys: 'path', chal: 'path', dhikr: 'path', rew: 'prog' };
 
 export function NavBar({ view, onNavigate }: { view: ViewId; onNavigate(v: ViewId): void }) {
   const { t } = useTranslation();

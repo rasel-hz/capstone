@@ -59,6 +59,18 @@ Each chapter ends with a reflection and a milestone. Only challenges that exist 
 
 Existing users keep everything. No journey is created for them until they choose to answer the questions from Home.
 
+## My journey (the tab)
+
+"My journey" («رحلتي») replaced "My challenges" in the bottom bar. The page is only the map. **Want something specific?** (the challenge library, `chal`, which keeps the tab lit) and **Dhikr** (the library on the dhikr group, since dhikr is never picked on its own) sit on the map itself and scroll with it. Answers are edited from the pencil in the header.
+
+**Choosing a step as it's reached.** A step's sheet has **Swap it** («غيّره»): the next best fit from the recommendation engine for that chapter's goals, never one already on the journey, never dhikr, at most `SWAPS` (2) times (`swapCurrent`). As a step is reached, `freshenCurrent` replaces it if the user has since said it didn't suit them, unless they chose it with a swap, and `replaceRetired` replaces any step not done yet whose challenge was retired. Finished steps never change.
+
+**It never ends.** While the user is in the last chapter, `ensureAhead` adds the next one. The map stops partway into the chapter after the current one: its first part shows, locked, then it fades into a blur with "Opens after chapter N", and there is nothing to scroll to past it. Steps past that point aren't drawn.
+
+Starting a step from the map opens the game itself (`missions.start(items, { direct: true })`), with no intro or countdown. From the library, the intro page has one button that starts the game.
+
+The older 7-day journeys can no longer be started or picked. Their results stay in Achievements.
+
 ## The map
 
 | Part | File |

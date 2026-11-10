@@ -8,10 +8,10 @@ import { Ring } from './parts';
 // It rests the eyes for a moment. It isn't a treatment and says nothing about anyone's eyesight.
 export const LOOK_SEC = 20;
 
-/** "Rest your eyes" (eye_rest). One round completes it; another is optional. Also the eyes option in "A break your way". */
+/** "Rest your eyes" (eye_rest). The timer starts at once: the intro already said what to do. One round completes it; another is optional. Also the eyes option in "A break your way". */
 export function EyeRestGame({ env, onDone }: GameProps) {
   const { t } = useTranslation();
-  const [phase, setPhase] = useState<'ready' | 'look' | 'blink'>('ready');
+  const [phase, setPhase] = useState<'look' | 'blink'>('look');
   const [left, setLeft] = useState(LOOK_SEC);
   const [stopped, setStopped] = useState(false);
   const [rounds, setRounds] = useState(0);
@@ -40,15 +40,6 @@ export function EyeRestGame({ env, onDone }: GameProps) {
     setLeft(LOOK_SEC);
     setStopped(false);
     setPhase('look');
-  }
-
-  if (phase === 'ready') {
-    return (
-      <div className="scene q">
-        <h2 className="q__t">{t('games.eye_rest.readyQ')}</h2>
-        <div className="row row--c"><button type="button" className="btn btn--lg" onClick={look}>{t('games.eye_rest.go')}</button></div>
-      </div>
-    );
   }
 
   if (phase === 'look') {

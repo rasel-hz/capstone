@@ -103,15 +103,16 @@ export function Companion() {
     });
     // A single challenge was asked for but no card could be shown: say so, so the reply isn't left unbacked.
     if (reply.proposal?.single && !sug && reply.tone !== 'crisis') store.update((d) => { d.chat.push({ b: 1, t: tr('companion.journey.singleUnavailable') }); });
-    if (reply.journey) await changeJourney(reply.journey.focus, reply.journey.dhikr);
+    if (reply.journey) await changeJourney(reply.journey.focus);
     setSupportive(reply.tone === 'crisis' ? 'concerned' : reply.tone === 'support' ? 'calm' : null);
     if (reply.tone === 'friendly') mascot.play('happy');
   }
 
   // A journey change from the chat: made on the device, saved to the account, read back, and only then
   // confirmed. If saving fails the journey goes back to how it was and the user is told plainly.
-  async function changeJourney(focus: Goal, dhikr: boolean) {
-    const res = adaptJourney(store.getState(), focus, { dhikr });
+  // Dhikr has its own page and is never added to the journey, even when asked; it's offered as one activity instead.
+  async function changeJourney(focus: Goal) {
+    const res = adaptJourney(store.getState(), focus);
     if (!res) return;
     const before = store.getState().path;
     store.update((d) => { d.path = res.plan; });

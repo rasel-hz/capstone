@@ -4,12 +4,11 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Dialog, IconBadge, PageHeader, Segmented, SettingRow, Toggle } from '../../components/ui/kit';
 import { useAppState, useStore } from '../../context/AppStateContext';
-import { JOURNEYS } from '../../features/challenges/catalog';
 import { TodayPrayers } from '../../features/prayer/PrayerCity';
 import { placeOf, settingsOf, turnOff } from '../../features/prayer/gate';
 import { PrayerSetup } from '../../features/prayer/PrayerSetup';
 import { METHODS, type MethodId } from '../../features/prayer/times';
-import { formatList, type Lang, type Msg, msg } from '../../i18n';
+import { type Lang, type Msg, msg } from '../../i18n';
 import { useLanguage } from '../../i18n/useLanguage';
 import { today } from '../../utils';
 import type { Gender, ViewId } from '../../types';
@@ -48,7 +47,6 @@ export function Settings({ onNavigate }: { onNavigate(v: ViewId): void }) {
     location.reload();
   }
 
-  const journeyNames = formatList(JOURNEYS.filter((j) => s.needs.includes(j.id)).map((j) => t(`journeys.items.${j.id}.name`))) || t('settings.noJourneys');
   const genders: { value: Gender; label: string }[] = [{ value: 'm', label: t('common.masculine') }, { value: 'f', label: t('common.feminine') }];
   const langs: { value: Lang; label: string }[] = [{ value: 'ar-SA', label: 'العربية' }, { value: 'en', label: 'English' }];
 
@@ -65,7 +63,6 @@ export function Settings({ onNavigate }: { onNavigate(v: ViewId): void }) {
           </div>
         </SettingRow>
         <SettingRow title={t('settings.address')} note={t('settings.addressNote')}><Segmented<Gender> label={t('settings.address')} value={s.g} options={genders} onChange={(g) => set((d) => { d.g = g; })} /></SettingRow>
-        <SettingRow title={t('settings.journeys')} note={journeyNames}><button type="button" className="btn sm alt" onClick={() => onNavigate('journeys')}>{t('settings.edit')}</button></SettingRow>
         <SettingRow title={t('settings.missionLength')} note={t('settings.missionLengthNote')}>
           <Segmented<string> label={t('settings.missionLength')} value={s.pref === 'short' ? 'short' : 'normal'} options={[{ value: 'normal', label: t('settings.lengthNormal') }, { value: 'short', label: t('settings.lengthShort') }]} onChange={(v) => set((d) => { d.pref = v === 'short' ? 'short' : null; })} />
         </SettingRow>

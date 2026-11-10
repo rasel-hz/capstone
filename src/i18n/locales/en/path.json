@@ -74,5 +74,9 @@
   "sheet": {
     "step": "Step {{n}} of {{total}}",
     "hasEasy": "Has an easier version"
-  }
+  },
+  "swap": "Swap it",
+  "something": "Want something specific?",
+  "dhikr": "Dhikr",
+  "lockedChapter": "Opens after chapter {{n}}"
 }

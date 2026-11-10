@@ -15,7 +15,8 @@ import { generateMission } from './planner';
 export type ResumeChoice = 'continue' | 'restart' | 'easier' | 'skip';
 
 interface MissionApi {
-  start(items?: PlannedItem[]): void;
+  /** `direct` opens the game itself, for a step the user already started from its own card (the journey map). */
+  start(items?: PlannedItem[], o?: { direct?: boolean }): void;
   resume(c: ResumeChoice): void;
   /** Opens the optional prayer break, for this window if there is one. */
   openBreak(w: PrayerWindow | null): void;
@@ -30,7 +31,7 @@ export const useMissions = () => {
   return m;
 };
 
-type Blocker = 'driving' | { checkIn: PrayerWindow; then(): void } | { conflict: PlannedItem[] } | null;
+type Blocker = 'driving' | { checkIn: PrayerWindow; then(): void } | { conflict: PlannedItem[]; direct?: boolean } | null;
 
 export function MissionProvider({ children, onNavigate }: { children: ReactNode; onNavigate(v: ViewId): void }) {
   const { t } = useTranslation();
@@ -73,20 +74,20 @@ export function MissionProvider({ children, onNavigate }: { children: ReactNode;
 
   const resume = useCallback((c: ResumeChoice) => guarded(() => resumeNow(c)), [guarded, resumeNow]);
 
-  const begin = useCallback((items?: PlannedItem[]) => {
+  const begin = useCallback((items?: PlannedItem[], direct = false) => {
     store.update((d) => createMission(d, items || generateMission(d), !!items));
-    open('intro');
+    open(direct && items?.length === 1 ? 'play' : 'intro');
   }, [store, open]);
 
-  const start = useCallback((items?: PlannedItem[]) => guarded(() => {
+  const start = useCallback((items?: PlannedItem[], o: { direct?: boolean } = {}) => guarded(() => {
     const s = store.getState();
     if (hasOpenMission(s)) {
       // An open mission is always resumed, never replaced silently.
       if (!items) return resumeNow('continue');
-      setBlocker({ conflict: items });
+      setBlocker({ conflict: items, direct: o.direct });
       return;
     }
-    begin(items);
+    begin(items, o.direct);
   }), [store, guarded, resumeNow, begin]);
 
   const openBreak = useCallback((w: PrayerWindow | null) => setBreakFor({ w }), []);
@@ -132,7 +133,7 @@ export function MissionProvider({ children, onNavigate }: { children: ReactNode;
           <p>{t('player.block.conflictText')}</p>
           <div className="row row--c">
             <button type="button" className="btn" onClick={() => { setBlocker(null); resumeNow('continue'); }}>{t('player.block.finishIt')}</button>
-            <button type="button" className="btn alt" onClick={() => { const { conflict } = blocker; setBlocker(null); begin(conflict); }}>{t('player.block.startNew')}</button>
+            <button type="button" className="btn alt" onClick={() => { const { conflict, direct } = blocker; setBlocker(null); begin(conflict, direct); }}>{t('player.block.startNew')}</button>
           </div>
         </Overlay>
       )}

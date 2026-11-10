@@ -20,6 +20,8 @@ export interface PathNode {
   /** When it was really done, and the XP actually earned. Absent means not done. */
   done?: { at: number; xp: number };
   cfg?: PlanConfig;
+  /** How many times the user swapped this step for another. */
+  sw?: number;
 }
 export type ThemeId = GoalId | 'study' | 'work' | 'gentle';
 export interface PathPlan {
@@ -161,8 +163,24 @@ export function replan(old: PathPlan | null, p: LifeProfile, now = Date.now(), a
 
 /** Adds one more chapter when the journey is finished. */
 export function extendPlan(s: AppState, p: LifeProfile | null, now = Date.now()) {
+  if (!s.path || currentNode(s.path)) return;
+  addChapter(s, p, now);
+}
+
+/**
+ * The journey never runs out: while the user is in the last chapter, the next one is already there, shown
+ * locked and blurred on the map until they reach it.
+ */
+export function ensureAhead(s: AppState, p: LifeProfile | null, now = Date.now()): boolean {
   const plan = s.path;
-  if (!plan || currentNode(plan)) return;
+  const cur = currentNode(plan);
+  if (!plan || !cur || cur.ch < Math.max(...plan.nodes.map((n) => n.ch))) return false;
+  addChapter(s, p, now);
+  return true;
+}
+
+function addChapter(s: AppState, p: LifeProfile | null, now: number) {
+  const plan = s.path!;
   const ch = Math.max(...plan.nodes.map((n) => n.ch)) + 1;
   const recent = plan.nodes.slice(-8).flatMap((n) => (n.id ? [n.id] : []));
   const goal = p ? mainGoal(p) : null;
@@ -173,6 +191,83 @@ export function extendPlan(s: AppState, p: LifeProfile | null, now = Date.now())
   plan.themes = [...plan.themes, plan.themes[0]];
   plan.nodes.push(...chapterNodes(acts, ch, false).map((n) => ({ ...n, key: `x${now.toString(36)}-${n.key}` })));
   plan.updated = now;
+}
+
+// What a chapter's theme is about, as goals the recommendation engine understands.
+const GOALS_OF: Record<ThemeId, Goal[]> = {
+  organize: ['prioritize', 'start'], study: ['start', 'focus'], work: ['prioritize', 'start'], focus: ['focus'], start: ['start'],
+  stress: ['stress', 'worry'], sleep: ['sleep', 'rest'], social: ['social', 'worry'], habits: ['start'], other: ['rest', 'stress'], gentle: ['rest', 'stress'],
+};
+/** A step can be swapped this many times. */
+export const SWAPS = 2;
+
+/** Other challenges that fit the current step's chapter, best first, approved by the engine and not already on the journey. */
+export function swapOptions(s: AppState, now = Date.now()): ChallengeId[] {
+  const plan = s.path;
+  const cur = currentNode(plan);
+  if (!plan || !cur || cur.kind !== 'play' || !cur.id) return [];
+  const present = new Set(plan.nodes.filter((n) => !n.done && n.id).map((n) => n.id!));
+  const goals = GOALS_OF[plan.themes[cur.ch] ?? 'gentle'];
+  // What fits the chapter's aim first, then anything else the engine approves, so there's always something to swap to.
+  const ids = [...recommend(s, { goals, now }), ...recommend(s, { now })].map((r) => r.id);
+  return [...new Set(ids)].filter((id) => !isDhikr(id) && !present.has(id));
+}
+
+function replaceCurrent(plan: PathPlan, to: ChallengeId, now: number, counted: boolean) {
+  const cur = currentNode(plan)!;
+  cur.id = to;
+  cur.key = `${cur.key}~s${now.toString(36)}`;
+  delete cur.cfg;
+  if (counted) cur.sw = (cur.sw ?? 0) + 1;
+  plan.updated = now;
+}
+
+/**
+ * A journey saved before a challenge was retired still has it. Every step not done yet that uses a retired
+ * challenge gets the best fit for its chapter instead. Done steps keep what they were.
+ */
+export function replaceRetired(s: AppState, now = Date.now()): boolean {
+  const plan = s.path;
+  if (!plan) return false;
+  let changed = false;
+  for (const n of plan.nodes) {
+    // Dhikr has its own page now and is never a journey step, so it's replaced the same way.
+    if (n.done || n.kind !== 'play' || !n.id || !(CHALLENGES[n.id].retired || isDhikr(n.id))) continue;
+    const present = new Set(plan.nodes.filter((x) => !x.done && x.id).map((x) => x.id!));
+    const goals = GOALS_OF[plan.themes[n.ch] ?? 'gentle'];
+    const to = [...recommend(s, { goals, now }), ...recommend(s, { now })].map((r) => r.id).find((id) => !isDhikr(id) && !present.has(id));
+    if (!to) continue;
+    n.id = to;
+    n.key = `${n.key}~r${now.toString(36)}`;
+    delete n.cfg;
+    changed = true;
+  }
+  if (changed) plan.updated = now;
+  return changed;
+}
+
+/** "Swap it": the current step becomes the next best fit, at most SWAPS times. Returns the new challenge, or null. */
+export function swapCurrent(s: AppState, now = Date.now()): ChallengeId | null {
+  const cur = currentNode(s.path);
+  if (!s.path || !cur || (cur.sw ?? 0) >= SWAPS) return null;
+  const to = swapOptions(s, now)[0];
+  if (!to) return null;
+  replaceCurrent(s.path, to, now, true);
+  return to;
+}
+
+/**
+ * Checked as a step is reached: a step the user has since said didn't suit them, or one that was retired,
+ * is replaced by the best fit now. Steps chosen by the user (swapped) are left alone.
+ */
+export function freshenCurrent(s: AppState, now = Date.now()): boolean {
+  const cur = currentNode(s.path);
+  if (!s.path || !cur || cur.kind !== 'play' || !cur.id || cur.sw) return false;
+  if (!avoidOf(s).includes(cur.id) && !CHALLENGES[cur.id].retired) return false;
+  const to = swapOptions(s, now)[0];
+  if (!to) return false;
+  replaceCurrent(s.path, to, now, false);
+  return true;
 }
 
 /** The journey as shown now: upcoming timed dhikr steps show the one that fits the current time. */

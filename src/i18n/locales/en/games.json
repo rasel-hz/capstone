@@ -849,8 +849,6 @@
     "finish": "Done"
   },
   "eye_rest": {
-    "readyQ": "Look at something far away, a window or the far end of the room.",
-    "go": "Let's go",
     "lookTitle": "Look far away",
     "left_one": "{{count}} second left",
     "left_other": "{{count}} seconds left",
@@ -861,7 +859,6 @@
     "again": "Once more?",
     "said": "Your eyes got a rest.",
     "say": {
-      "ready": "Let your eyes rest from the screen for a moment.",
       "look": "Just look far away, at your ease.",
       "blink": "That's it."
     }

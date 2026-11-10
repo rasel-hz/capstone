@@ -1,10 +1,10 @@
-import { Check, Clock, Compass, Play } from 'lucide-react';
+import { Check, Clock, Play } from 'lucide-react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Segmented } from '../../components/ui/kit';
 import { Mascot } from '../../components/mascot/Mascot';
 import { useAppState, useStore } from '../../context/AppStateContext';
-import type { JourneyId, ProgramResult, ViewId } from '../../types';
+import type { JourneyId, ProgramResult } from '../../types';
 import { CHALLENGES } from '../challenges/catalog';
 import { ChallengeArt } from '../challenges/ChallengeArt';
 import { useMissions } from '../mission/MissionProvider';
@@ -38,8 +38,8 @@ export function ProgramResultView({ r }: { r: ProgramResult }) {
   );
 }
 
-// The top of the challenges page: the journey in progress and today's single step, or an invitation to pick one.
-export function ProgramCard({ onNavigate }: { onNavigate(v: ViewId): void }) {
+// A 7-day journey already under way, with today's single step. New ones can't be started: "My journey" replaces them.
+export function ProgramCard() {
   const { t } = useTranslation();
   const s = useAppState();
   const store = useStore();
@@ -54,24 +54,14 @@ export function ProgramCard({ onNavigate }: { onNavigate(v: ViewId): void }) {
       <section className="next prog-card" aria-label={t('journeys.program.eyebrow')}>
         <ProgramResultView r={result} />
         <div className="next__act">
-          <button type="button" className="btn sm" onClick={() => { setResult(null); onNavigate('journeys'); }}><Compass size={15} aria-hidden="true" /> {t('journeys.program.again')}</button>
+          <button type="button" className="btn sm" onClick={() => setResult(null)}>{t('common.ok')}</button>
         </div>
       </section>
     );
   }
 
-  if (!p) {
-    return (
-      <section className="next prog-card prog-card--empty" aria-labelledby="prog-t">
-        <p className="eyebrow">{t('journeys.program.eyebrow')}</p>
-        <h2 id="prog-t">{t('journeys.program.emptyTitle')}</h2>
-        <p className="note flush">{t('journeys.program.emptyText')}</p>
-        <div className="next__act">
-          <button type="button" className="btn" onClick={() => onNavigate('journeys')}><Compass size={16} aria-hidden="true" /> {t('journeys.program.choose')}</button>
-        </div>
-      </section>
-    );
-  }
+  // The 7-day journeys are retired: only one already under way is shown, until it's finished.
+  if (!p) return null;
 
   const name = t(`journeys.items.${p.id}.name`);
   const dots = (
@@ -139,7 +129,6 @@ export function ProgramCard({ onNavigate }: { onNavigate(v: ViewId): void }) {
         </div>
       ) : (
         <div className="row prog-card__links">
-          <button type="button" className="btn-link" onClick={() => onNavigate('journeys')}>{t('journeys.program.change')}</button>
           <button type="button" className="btn-link" onClick={() => setLeaving(true)}>{t('journeys.program.leave')}</button>
         </div>
       )}

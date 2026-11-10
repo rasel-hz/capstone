@@ -1,11 +1,10 @@
-import { Check, ChevronLeft, Clock, FastForward, Flag, Pause, Play, Sparkles, Target, Volume2, VolumeX, X } from 'lucide-react';
+import { Check, ChevronLeft, FastForward, Flag, Pause, Play, Sparkles, Target, Volume2, VolumeX, X } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { fireConfetti, playSound, prefersReduced } from '../../animations/effects';
 import { Mascot } from '../../components/mascot/Mascot';
 import { isOneShot, type MascotState } from '../../components/mascot/manifest';
 import { useMascot } from '../../components/mascot/useMascot';
-import { Segmented } from '../../components/ui/kit';
 import { LanguageSwitcher } from '../../components/ui/LanguageSwitcher';
 import { Overlay } from '../../components/ui/Overlay';
 import { useAppState, useStore } from '../../context/AppStateContext';
@@ -31,9 +30,11 @@ import {
 import { reportStart } from '../../services/points';
 import { claimDailyBonusAfterSync } from '../../services/progressSync';
 import { MissionTimeline } from './MissionTimeline';
+import { ChallengeIntro } from './ChallengeIntro';
 
 type Phase = 'intro' | 'preroll' | 'game' | 'result' | 'easier' | 'finish';
-export type PlayerStart = 'intro' | 'run' | 'finish';
+/** 'play' skips the intro and the countdown: the user already chose and started this step (from the map). */
+export type PlayerStart = 'intro' | 'run' | 'play' | 'finish';
 
 interface ResultView {
   xp: number;
@@ -118,7 +119,8 @@ export function MissionPlayer({ start, onClose, onNavigate }: { start: PlayerSta
     setPhase('game');
   }, [timers]);
 
-  const run = useCallback(() => {
+  // Direct: the user just pressed start on the intro or on the map, so the game opens at once, with no countdown.
+  const run = useCallback((direct = false) => {
     timers.clear();
     store.update(beginItem);
     const st = store.getState();
@@ -128,10 +130,14 @@ export function MissionPlayer({ start, onClose, onNavigate }: { start: PlayerSta
     setResult(null);
     setRound(null);
     setRunKey((k) => k + 1);
-    setPhase('preroll');
     setMood('listening');
     const isResume = resumed && !advanced.current;
     setSpeech(isResume ? 'player.resumeNote' : `challenges.items.${id}.instructions`);
+    if (direct) {
+      setPhase('game');
+      return;
+    }
+    setPhase('preroll');
     timers.after(() => setPhase('game'), isResume ? PREROLL_MS + 1600 : PREROLL_MS);
   }, [store, timers, resumed, setSpeech]);
 
@@ -150,6 +156,8 @@ export function MissionPlayer({ start, onClose, onNavigate }: { start: PlayerSta
       finish();
     } else if (start === 'run') {
       run();
+    } else if (start === 'play') {
+      run(true);
     } else {
       setSpeech(M.solo ? `challenges.items.${M.items[0].id}.instructions` : (s.g === 'f' ? 'player.go_f' : 'player.go_m'));
       mascot.play('greeting');
@@ -287,27 +295,13 @@ export function MissionPlayer({ start, onClose, onNavigate }: { start: PlayerSta
           <div className="bub" aria-live="polite">{msg(bubble)}</div>
         </div>
 
-        <div className="stage">
-          {phase === 'intro' && M.solo && (
-            <div className="scene intro">
-              <div className="intro__art"><ChallengeArt id={it.id} /></div>
-              <h1>{name}</h1>
-              <p>{instructions}</p>
-              <div className="meta meta--c">
-                <span><Clock size={14} aria-hidden="true" /> {t('player.about', { time: t('common.minutes', { count: c.min }) })}</span>
-                <span><Sparkles size={14} aria-hidden="true" /> {c.xp ? t('common.points', { count: c.xp }) : t('common.noPoints')}</span>
-              </div>
-              {c.hasEasy && (
-                <Segmented<Difficulty> className="seg--c" label={t('player.difficulty')} value={it.diff} options={[{ value: 'normal', label: t('player.normal') }, { value: 'easy', label: t('player.easier') }]} onChange={setDiff} />
-              )}
-              <button type="button" className="btn btn--lg" onClick={run}><Play size={17} aria-hidden="true" /> {t('common.start')}</button>
-            </div>
-          )}
+        <div className={`stage ${it.id.startsWith('dhikr_') && phase === 'game' ? 'stage--open' : ''}`}>
+          {phase === 'intro' && M.solo && <ChallengeIntro id={it.id} name={name} diff={it.diff} onDiff={setDiff} onStart={() => run(true)} />}
           {phase === 'intro' && !M.solo && (
             <div className="scene intro">
               <h1>{t('player.dailyTitle')}</h1>
               <MissionTimeline items={M.items} />
-              <button type="button" className="btn btn--lg" onClick={run}><Play size={17} aria-hidden="true" /> {t('player.letsGo')}</button>
+              <button type="button" className="btn btn--lg" onClick={() => run()}><Play size={17} aria-hidden="true" /> {t('player.letsGo')}</button>
             </div>
           )}
           {phase === 'preroll' && (

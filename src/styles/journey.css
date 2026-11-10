@@ -89,5 +89,19 @@
 
 /* On a phone the world runs edge to edge, so it isn't a shrunken box. */
 @media (max-width: 860px) {
-  .jw { width: auto; margin-inline: -16px; border-radius: 0; box-shadow: none; }
+  /* Edge to edge on a phone: the clip bleeds out, and the map fills it. */
+  .jw-clip { width: calc(100% + 32px); margin-inline: -16px; border-radius: 0; }
+  .jw { border-radius: 0; box-shadow: none; }
 }
+
+/* My journey is only the map. It stops partway into the next chapter, which fades into a blur, locked. */
+.jw-clip { position: relative; overflow: hidden; border-radius: var(--r-lg); }
+.jw-veil { position: absolute; inset-inline: 0; bottom: 0; z-index: 6; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 28px;
+  backdrop-filter: blur(7px); -webkit-backdrop-filter: blur(7px);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 45%); mask-image: linear-gradient(to bottom, transparent, #000 45%);
+  background: linear-gradient(to bottom, rgba(255, 253, 248, 0), rgba(255, 253, 248, .55) 60%, rgba(255, 253, 248, .85)); }
+.jw-veil__t { display: inline-flex; gap: 6px; align-items: center; background: var(--iv); border-radius: 999px; padding: 7px 14px; font-weight: 700; font-size: 14px; box-shadow: var(--shadow-card); }
+/* "Want something specific?" and "Dhikr" sit on the map itself and scroll with it. */
+.jw__more { position: absolute; top: 10px; inset-inline: 10px; z-index: 5; display: flex; justify-content: space-between; gap: 8px; pointer-events: none; }
+.jw__pill { pointer-events: auto; display: inline-flex; gap: 6px; align-items: center; border: 0; border-radius: 999px; padding: 7px 13px; font: inherit; font-size: 13.5px; font-weight: 600; color: var(--ink); background: rgba(255, 253, 248, .94); box-shadow: var(--shadow-card); cursor: pointer; }
+.jw__pill:hover { background: #fff; }

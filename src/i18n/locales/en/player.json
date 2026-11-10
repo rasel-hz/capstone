@@ -97,5 +97,12 @@
   },
   "go": {
     "chat": "Talk to Zaho"
+  },
+  "intro": {
+    "how": "How to play",
+    "length": "About",
+    "points": "Points",
+    "go": "Let's go!",
+    "goQuiet": "Start"
   }
 }
