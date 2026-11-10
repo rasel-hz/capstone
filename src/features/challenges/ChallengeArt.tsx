@@ -137,6 +137,22 @@ const ART: Record<ChallengeId, ReactNode> = {
       <path d="M20 88h120" stroke={C.ink} strokeOpacity=".25" strokeWidth="3" strokeLinecap="round" /><circle cx="94" cy="88" r="5" fill={C.em} />
     </Frame>
   ),
+  eye_rest: (
+    <Frame bg="#DDEFFB">
+      <path d="M0 58h160" stroke={C.sky} strokeWidth="3" />
+      <path d="M0 58q40-10 80-4t80 0v42H0z" fill={C.sand} />
+      <circle cx="132" cy="26" r="10" fill={C.sun} />
+      <path d="M44 40q36-26 72 0q-36 26-72 0z" fill={C.iv} stroke={C.ink} strokeOpacity=".3" strokeWidth="2" />
+      <circle cx="80" cy="40" r="10" fill={C.em} /><circle cx="80" cy="40" r="4" fill={C.ink} /><circle cx="83" cy="37" r="2" fill={C.iv} />
+    </Frame>
+  ),
+  grounding: (
+    <Frame bg="#E8F3EC">
+      <path d="M0 80q40-10 80-4t80-4v28H0z" fill={C.sage} />
+      <circle cx="28" cy="46" r="11" fill={C.em} /><circle cx="58" cy="46" r="10" fill={C.sky} /><circle cx="86" cy="46" r="9" fill={C.lav} />
+      <circle cx="111" cy="46" r="8" fill={C.pe} /><circle cx="133" cy="46" r="7" fill={C.sun} />
+    </Frame>
+  ),
   calm_landscape: (
     <Frame bg="#C9B8F2">
       <circle cx="118" cy="34" r="15" fill={C.sun} />
@@ -211,13 +227,6 @@ const ART: Record<ChallengeId, ReactNode> = {
     </Frame>
   ),
   // Five small marks for the senses around a leaf.
-  grounding: (
-    <Frame bg="#EAF5EC">
-      {[[30, 30, C.sky], [56, 22, C.sun], [104, 22, C.pe], [130, 30, C.lav], [80, 82, C.cor]].map(([x, y, f]) => <circle key={`${x}${y}`} cx={x as number} cy={y as number} r="7" fill={f as string} />)}
-      <path d="M60 70C60 46 80 36 104 34c0 24-14 36-44 36z" fill={C.sage} />
-      <path d="M62 68q18-12 40-30" stroke={C.em} strokeWidth="2" fill="none" strokeLinecap="round" />
-    </Frame>
-  ),
   // A crescent and a few stars over a calm night.
   dhikr_sleep: (
     <Frame bg="#26264A">

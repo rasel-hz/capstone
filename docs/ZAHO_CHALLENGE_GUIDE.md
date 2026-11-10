@@ -15,7 +15,7 @@ The source of truth for IDs, lengths and points is `src/features/challenges/cata
 5. **Low energy means gentle and short** **(enforced)**. The gentle ones are marked below.
 6. **Respect feedback.** Anything they marked "didn't suit me" twice isn't suggested unless they ask for it by name **(enforced)**.
 7. **Suggest, don't start.** The user starts with a button. Zaho can't start, change or save anything by itself.
-8. **Only active IDs.** `priority_board`, `time` and `start2` are retired: never suggest them **(enforced)**.
+8. **Only active IDs.** `priority_board`, `time`, `start2` and `eye_break` are retired: never suggest them **(enforced)**.
 
 ## Quick lookup
 
@@ -32,8 +32,8 @@ The source of truth for IDs, lengths and points is `src/features/challenges/cata
 | «متوتر» / «مضغوط بعد يوم طويل» / stressed after a long day | `calm` | `calm_landscape`, `grounding` |
 | «بالي مشغول بأشياء» / going over worries or decisions | Advice first, then `thought_sort` | `calm` |
 | «ودي أفضفض عن شعوري» / wants to reflect on feelings | `emotion_map` | `thought_sort` |
-| «عيوني تعبت» / «لي ساعات على الشاشة» | `eye_break` | `calm_landscape` |
-| «أبي بريك» / "I need a break" | `calm_landscape` | `eye_break` |
+| «عيوني تعبت» / «لي ساعات على الشاشة» | `eye_rest` | `calm_landscape` |
+| «أبي بريك» / "I need a break" | `calm_landscape` | `eye_rest` |
 | «ما يجيني نوم» / winding down for bed | `calm` | `calm_landscape`. Persistent sleep trouble: suggest seeing a doctor |
 | «عندي عزيمة وأبي أرتب لها» / planning a gathering | `seq` with their tasks | `breakdown` |
 | «تعبان وما أبي شي» / exhausted | Rest, or nothing | at most `calm_landscape` |
@@ -104,23 +104,23 @@ These are short practice games with a first-try score for personal tracking only
 - **Helps with:** stress, tension, winding down before sleep.
 - **Offer when:** stressed, tense, can't relax, before bed.
 
-### `grounding` · «بالي مشغول» · Noticing the senses
-- **2 min · gentle**
-- **What it does:** one sense at a time, tapping a counter for each thing noticed: 5 things seen, 3 heard, 3 touched, 2 smelled, 1 tasted. Any sense can be skipped.
+### `grounding` · «وش حولك؟» · What's Around You?
+- **3 min · gentle**
+- **What it does:** 5 things you see, 4 you touch, 3 you hear, 2 you smell, 1 you taste. They tap once for each thing found, with Saudi examples, and "didn't find one" is fine. A rating before and after.
 - **Helps with:** feeling anxious or overwhelmed right now, a racing mind, coming back to the moment.
 - **Offer when:** "I'm anxious", "it's all too much", "my head is everywhere".
-- **Note:** it has no support step of its own. If what they wrote sounds heavy, the chat's crisis check comes first, and offering to talk is better than a game.
+- **Note:** if the rating after is still 4 or 5, it offers to talk to Zaho or call 937 **(enforced)**.
 
-### `eye_break` · «عيوني تعبت» · Eye break
+### `eye_rest` · «ريّح عيونك» · Rest Your Eyes
 - **1 min · gentle**
-- **What it does:** the 20-20-20 habit. Look at something about 6 metres away for 20 seconds; the timer can be paused.
+- **What it does:** the 20-20-20 habit. Look at something about 6 metres away for 20 seconds, then blink.
 - **Helps with:** tired eyes after a long time at a screen.
 - **Offer when:** they mention hours on the screen, studying or working at a laptop, or tired eyes. A good pick after `study_sprint`.
 - **Say:** it rests the eyes. **Never say** it protects or improves eyesight.
 
 ### `calm_landscape` · «بريك على حاجتك» · A Break Your Way
 - **2 min · gentle**
-- **What it does:** asks "what do you need right now?" and gives that kind of break: rest my eyes (`eye_break`), move a little (four gentle moves), my mind is busy (the breathing from `calm`), or just quiet (an oasis to look at).
+- **What it does:** asks "what do you need right now?" and gives that kind of break: rest my eyes (`eye_rest`), move a little (four gentle moves), my mind is busy (the breathing from `calm`), or just quiet (an oasis to look at).
 - **Helps with:** a break between tasks, when they're not sure what they need.
 - **Offer when:** "I need a break", after a long session, after work.
 
@@ -159,7 +159,7 @@ breakdown ──"start the first step now?"──▶ micro_start
 micro_start ──"not yet" → "plan it for later?"──▶ breakdown
 thought_sort ──small step──▶ goals | micro_start | breakdown
 study_sprint ──"a 5-minute break?"──▶ calm_landscape ──"another session?"──▶ study_sprint
-calm_landscape ──"rest my eyes"──▶ eye_break   ──"my mind is busy"──▶ calm
+calm_landscape ──"rest my eyes"──▶ eye_rest   ──"my mind is busy"──▶ calm
 emotion_map ──what might help──▶ calm_landscape | micro_start | calm | chat
 ```
 
@@ -172,6 +172,7 @@ So Zaho usually only needs to offer the **first** step. For example, for "I have
 | `priority_board` | «وش أول شيء؟» | `seq` with their tasks, or `breakdown` |
 | `time` | «وين راح الوقت؟» | `breakdown` or `micro_start` for now (`estimate_compare` «قدّرها» is planned) |
 | `start2` | «دقيقتين ونبدأ» | `micro_start` (its timer is 2 minutes by default) |
+| `eye_break` | «عيوني تعبت» | `eye_rest` |
 
 They stay in the catalog only so old history reads.
 

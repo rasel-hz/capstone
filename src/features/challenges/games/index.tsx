@@ -17,6 +17,7 @@ import { StudySprintGame } from './StudySprintGame';
 import { TimeGame } from './TimeGame';
 import { VideoGame } from './VideoGame';
 import { EyeBreakGame } from './EyeBreakGame';
+import { EyeRestGame } from './EyeRestGame';
 import { DhikrGame } from '../../dhikr/DhikrGame';
 import type { DhikrId } from '../../dhikr/content';
 
@@ -43,6 +44,7 @@ export const GAMES: Record<ChallengeId, ComponentType<GameProps>> = {
   dhikr_moment: dhikr('dhikr_moment'),
   dhikr_sleep: dhikr('dhikr_sleep'),
   eye_break: EyeBreakGame,
+  eye_rest: EyeRestGame,
   grounding: GroundingGame,
 };
 

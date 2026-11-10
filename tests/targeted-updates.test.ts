@@ -4,7 +4,6 @@ import { passwordLogin } from '../server/auth';
 import { CHALLENGES, GROUPS } from '../src/features/challenges/catalog';
 import { GAMES } from '../src/features/challenges/games';
 import { EYE_SECONDS, secondsLeft } from '../src/features/challenges/games/EyeBreakGame';
-import { groundingDone, STAGES } from '../src/features/challenges/games/GroundingGame';
 import { fillName } from '../src/features/companion/name';
 import { TAB_OF } from '../src/components/navigation/NavBar';
 import { AuthError, login } from '../src/services/auth';
@@ -60,11 +59,12 @@ describe('2. completion screen', () => {
 });
 
 describe('3. my eyes are tired', () => {
-  it('is a registered challenge in the calm group', () => {
-    expect(CHALLENGES.eye_break).toBeDefined();
+  it('the first eye break is retired, replaced by "Rest your eyes", and still reads in old history', () => {
+    expect(CHALLENGES.eye_break.retired).toBe(true);
     expect(GAMES.eye_break).toBeDefined();
-    expect(GROUPS.find((g) => g.id === 'calm')?.ids).toContain('eye_break');
-    expect(CHALLENGES.eye_break.selfReport).toBeFalsy();
+    expect(GROUPS.find((g) => g.id === 'calm')?.ids).not.toContain('eye_break');
+    expect(GROUPS.find((g) => g.id === 'calm')?.ids).toContain('eye_rest');
+    expect(CHALLENGES.eye_rest.selfReport).toBeFalsy();
   });
   it('counts 20 seconds of running time', () => {
     expect(EYE_SECONDS).toBe(20);
@@ -75,27 +75,18 @@ describe('3. my eyes are tired', () => {
     expect(secondsLeft(25_000)).toBe(0);
   });
   it('asks for no camera, notification or schedule', () => {
-    const src = read('src/features/challenges/games/EyeBreakGame.tsx');
-    expect(src).not.toMatch(/getUserMedia|Notification|setInterval\([^)]*1200000|serviceWorker/);
+    for (const f of ['EyeBreakGame', 'EyeRestGame']) {
+      expect(read(`src/features/challenges/games/${f}.tsx`)).not.toMatch(/getUserMedia|Notification|setInterval\([^)]*1200000|serviceWorker/);
+    }
   });
 });
 
-describe('4. my mind is busy', () => {
-  it('uses exactly 5, 3, 3, 2, 1 for sight, hearing, touch, smell and taste', () => {
-    expect(STAGES.map((s) => [s.id, s.n])).toEqual([['see', 5], ['hear', 3], ['touch', 3], ['smell', 2], ['taste', 1]]);
-  });
-  it('can skip any sense, but skipping everything is not a completion', () => {
-    const all = (skipped: boolean, count = 0) => STAGES.map((s) => ({ id: s.id, count, skipped }));
-    expect(groundingDone(all(true))).toBe(false);
-    expect(groundingDone(all(false))).toBe(false);
-    expect(groundingDone([{ id: 'see', count: 5, skipped: false }, ...all(true).slice(1)])).toBe(true);
-    expect(groundingDone([{ id: 'see', count: 4, skipped: false }, ...all(true).slice(1)])).toBe(false);
-  });
-  it('is registered, with text in both languages', () => {
+describe('4. noticing the senses', () => {
+  it('is "What\'s around you?", registered, with text in both languages', () => {
     expect(GAMES.grounding).toBeDefined();
     for (const l of locales) {
-      const g = json(`src/i18n/locales/${l}/games.json`).ground;
-      for (const s of STAGES) expect(g.stages[s.id].title).toContain(String(s.n === 2 && l === 'ar-SA' ? '' : s.n === 1 && l === 'ar-SA' ? '' : s.n));
+      const g = json(`src/i18n/locales/${l}/games.json`).grounding;
+      for (const s of ['see', 'touch', 'hear', 'smell', 'taste']) expect(g.senses[s].q).toBeTruthy();
     }
   });
 });

@@ -328,9 +328,9 @@
 .support { background: var(--cr); border-radius: var(--r-md); padding: 12px 14px; margin-bottom: 14px; text-align: center; }
 .support p { margin: 0 0 10px; line-height: 1.6; }
 /* Eye break: one large ring that empties slowly; it breathes gently while it runs. */
-.eye, .gr { display: flex; flex-direction: column; align-items: center; gap: 12px; max-width: 560px; margin: 0 auto; width: 100%; text-align: center; }
-.eye__icon, .gr__icon { display: grid; place-items: center; width: 64px; height: 64px; border-radius: 50%; background: var(--em-l); color: var(--em-d); }
-.eye__icon--done, .gr__icon--done { background: var(--em); color: #fff; }
+.eye { display: flex; flex-direction: column; align-items: center; gap: 12px; max-width: 560px; margin: 0 auto; width: 100%; text-align: center; }
+.eye__icon { display: grid; place-items: center; width: 64px; height: 64px; border-radius: 50%; background: var(--em-l); color: var(--em-d); }
+.eye__icon--done { background: var(--em); color: #fff; }
 .eye__away { font-size: 17px; font-weight: 600; color: var(--em-d); margin: 0; }
 .eye-timer { position: relative; width: 200px; height: 200px; display: grid; place-items: center; }
 .eye-timer svg { position: absolute; inset: 0; width: 100%; height: 100%; }
@@ -342,13 +342,9 @@
 @media (prefers-reduced-motion: reduce) { .eye-timer.is-breathing { animation: none; } }
 .rm .eye-timer.is-breathing { animation: none; }
 
-/* Noticing the senses: one stage at a time, with dots for the whole path. */
-.gr { animation: gr-in .32s ease-out; }
-@keyframes gr-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-@media (prefers-reduced-motion: reduce) { .gr { animation: none; } }
-.rm .gr { animation: none; }
-.gr-dots { display: flex; gap: 8px; }
-.gr-dots i { width: 10px; height: 10px; border-radius: 50%; background: var(--line); }
-.gr-dots i.is-now { background: var(--em); transform: scale(1.25); }
-.gr-dots i.is-done { background: var(--sage, #8DBFA3); }
-.gr-dots i.is-skip { background: transparent; box-shadow: inset 0 0 0 2px var(--line); }
+/* Reduced motion: the eye-rest ring steps once a second instead of gliding. */
+.ring--still .ring__v { transition: none; }
+/* "What's around you?": one dot per thing noticed. */
+.gr__dots { display: flex; justify-content: center; gap: 12px; margin: 14px 0 12px; }
+.gr__dots i { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--em); background: transparent; transition: background var(--t-micro) var(--ease); }
+.gr__dots i.on { background: var(--em); }
