@@ -67,7 +67,7 @@ Still images work the same way, through `EXPRESSIONS` and `public/mascot/express
 |---|---|
 | Reduced motion, or `still` | Still image |
 | Safari | Still image with CSS movement, because WebM transparency isn't reliable there (not yet tested on a real device) |
-| Level 4 hat unlocked | Still image with the hat overlay, because a hat can't follow a clip's movement |
+| Hat | Removed. The mascot always shows its clip or still art, with no overlay |
 | Image fails to load | The prototype's drawn mascot |
 
 ## Open artwork questions

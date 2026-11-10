@@ -1,5 +1,6 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import { checkUsername, passwordLogin, type AuthDeps } from './auth.ts';
+import { handleBrief } from './brief.ts';
 import { ChatError, handleChat, type ChatDeps } from './chat.ts';
 
 const MAX_BODY = 32 * 1024;
@@ -94,13 +95,15 @@ export function createApi(deps: ChatDeps & AuthDeps) {
         return send(res, 500, { error: 'server_error' });
       }
     }
-    if (path !== '/v1/chat/messages') return next();
+    // The chat and the progress brief share the same checks and rate limit.
+    const handler = path === '/v1/chat/messages' ? handleChat : path === '/v1/progress/brief' ? handleBrief : null;
+    if (!handler) return next();
     if (req.method !== 'POST') return send(res, 405, { error: 'method_not_allowed' });
     if (!sameOrigin(req)) return send(res, 403, { error: 'forbidden' });
     if (!(req.headers['content-type'] ?? '').includes('application/json')) return send(res, 415, { error: 'json_required' });
     if (limited(req)) return send(res, 429, { error: 'slow_down' });
     try {
-      send(res, 200, await handleChat(JSON.parse(await readBody(req)), deps));
+      send(res, 200, await handler(JSON.parse(await readBody(req)), deps));
     } catch (e) {
       if (e instanceof ChatError) return send(res, e.status, { error: e.code });
       if (e instanceof SyntaxError) return send(res, 400, { error: 'invalid_json' });

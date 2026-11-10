@@ -4,8 +4,8 @@
   "journeys": "My Journeys",
   "chal": "Challenges",
   "chat": "Your Buddy",
-  "achieve": "Achievements",
   "prog": "My Progress",
   "rew": "My Rewards",
-  "set": "My Profile"
+  "set": "My Profile",
+  "achievements": "Achievements"
 }

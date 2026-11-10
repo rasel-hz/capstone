@@ -5,10 +5,10 @@ import { CHALLENGES, GROUPS } from '../src/features/challenges/catalog';
 import { GAMES } from '../src/features/challenges/games';
 import { EYE_SECONDS, secondsLeft } from '../src/features/challenges/games/EyeBreakGame';
 import { groundingDone, STAGES } from '../src/features/challenges/games/GroundingGame';
-import { fillName, named } from '../src/features/companion/name';
+import { fillName } from '../src/features/companion/name';
 import { TAB_OF } from '../src/components/navigation/NavBar';
 import { AuthError, login } from '../src/services/auth';
-import { canRedeemOnServer, newRequestKey, spendable } from '../src/services/points';
+import { balanceOf } from '../src/services/points';
 
 const read = (p: string) => readFileSync(p, 'utf8');
 const json = (p: string) => JSON.parse(read(p));
@@ -100,30 +100,24 @@ describe('4. my mind is busy', () => {
   });
 });
 
-describe('5. redeeming rewards', () => {
-  it('spends the balance, falling back to points earned before the server supports it', () => {
-    expect(spendable({ lifetime: 500, today: 0, unlocks: [], balance: 300 })).toBe(300);
-    expect(spendable({ lifetime: 500, today: 0, unlocks: [] })).toBe(500);
-    expect(canRedeemOnServer({ lifetime: 500, today: 0, unlocks: [] })).toBe(false);
-    expect(canRedeemOnServer({ lifetime: 500, today: 0, unlocks: [], balance: 0 })).toBe(true);
+describe('5. redeeming rewards (the redemption system on main)', () => {
+  it('spends from the balance the server reports', () => {
+    expect(balanceOf({ lifetime: 500, today: 0, unlocks: [], balance: 300 } as never)).toBe(300);
   });
-  it('makes keys the server accepts, a new one each time', () => {
-    const a = newRequestKey();
-    expect(a).toMatch(/^[A-Za-z0-9_-]{8,64}$/);
-    expect(newRequestKey()).not.toBe(a);
-  });
-  it('checks and deducts in the database, under a lock, and never below zero', () => {
-    const sql = read('supabase/migrations/20261109180000_reward_redemptions.sql');
+  it('checks and deducts in the database, under a per-user lock, never below zero', () => {
+    const sql = read('supabase/migrations/20261110090000_reward_redemptions.sql');
     expect(sql).toMatch(/pg_advisory_xact_lock/);
-    expect(sql).toMatch(/if bal < r\.required_points then/);
-    expect(sql).toMatch(/unique \(user_id, request_key\)/);
-    expect(sql).not.toMatch(/update public\.point_transactions|delete from public\.point_transactions/);
+    expect(sql).toMatch(/if bal < cost then raise exception 'not_enough_points'/);
   });
-  it('asks before deducting, and offers to reopen without charging', () => {
+  it('asks before deducting, blocks a second tap while working, and reopens used rewards without charging', () => {
     const page = read('src/pages/Rewards/index.tsx');
     expect(page).toContain("setStep('confirm')");
-    expect(page).toContain('rewards.my.reopen');
     expect(page).toContain("disabled={step === 'busy'}");
+    expect(page).toContain("t('rewards.my.reopen')");
+    for (const l of locales) expect(json(`src/i18n/locales/${l}/rewards.json`).my.reopen).toBeTruthy();
+  });
+  it('keeps only one redemption migration', () => {
+    expect(() => read('supabase/migrations/20261109180000_reward_redemptions.sql')).toThrow();
   });
 });
 
@@ -160,30 +154,18 @@ describe('7 and 8. chat page', () => {
 });
 
 describe('9. calling the user by name', () => {
-  it('puts the user\'s own name in replies, and never the old generic address', () => {
-    const old = 'يا بعدي';
-    expect(fillName('يا {NAME}، هلا', 'Razan')).toBe('يا Razan، هلا');
-    expect(fillName(`${old}، هلا`, 'Sara')).toBe('يا Sara، هلا');
-    expect(fillName('يا {NAME}، هلا', '')).toBe('هلا');
-    expect(fillName('Hey {NAME}, good to see you', null)).toBe('good to see you');
+  it('fills the {name} placeholder on the device, or drops the address when there is no name', () => {
+    expect(fillName('\u064a\u0627 {name}\u060c \u0647\u0644\u0627', 'Razan')).toBe(`\u064a\u0627 ${'\u2068'}Razan${'\u2069'}\u060c \u0647\u0644\u0627`);
+    expect(fillName('\u064a\u0627 {name}\u060c \u0647\u0644\u0627', '')).toBe('\u0647\u0644\u0627');
     expect(fillName('No placeholder here', 'Razan')).toBe('No placeholder here');
   });
-  it('has a named and a neutral version of each static greeting', () => {
-    expect(named('Razan')).toEqual({ context: 'named', name: 'Razan' });
-    expect(named('  ')).toEqual({});
-    for (const l of locales) {
-      const c = json(`src/i18n/locales/${l}/companion.json`);
-      expect(c.rules.understood_named).toContain('{{name}}');
-      expect(c.card.savedLighter_named).toContain('{{name}}');
-      expect(json(`src/i18n/locales/${l}/dashboard.json`).energyLine.low_named).toContain('{{name}}');
-    }
-    const all = ['companion', 'dashboard'].map((f) => read(`src/i18n/locales/ar-SA/${f}.json`)).join('');
-    expect(all).not.toContain('يا بعدي');
+  it('never uses the old generic address in the app texts or the model instructions', () => {
+    const old = '\u064a\u0627 \u0628\u0639\u062f\u064a';
+    for (const f of ['companion', 'dashboard']) expect(read(`src/i18n/locales/ar-SA/${f}.json`)).not.toContain(old);
+    expect(read('server/prompt.ts')).toMatch(/Never write .*\{name\}/s);
+    expect(read('server/chat.ts')).toContain("'\u064a\u0627 {name}'".replace(/\\u([0-9a-f]{4})/g, (_, h) => String.fromCharCode(parseInt(h, 16))));
   });
-  it('tells the model to use the placeholder and never sends it the name', () => {
-    const prompt = read('server/prompt.ts');
-    expect(prompt).toMatch(/write exactly .*\{NAME\}/);
-    expect(prompt).toMatch(/which you are not given/);
+  it('never sends the name to the model', () => {
     expect(read('src/features/companion/request.ts')).not.toMatch(/\bname: s\.name|firstName/);
   });
 });
@@ -192,11 +174,11 @@ describe('10. Achievements', () => {
   const nav = read('src/components/navigation/NavBar.tsx');
   it('is one tab in the main navigation, with Progress and Rewards as tabs inside it', () => {
     expect(nav).not.toMatch(/\['rew', /);
-    expect(nav).toContain("prog: 'nav.achieve'");
+    expect(nav).toContain("prog: 'nav.achievements'");
     expect(TAB_OF.rew).toBe('prog');
     expect(nav).toContain("{ prog: ['prog', 'rew'], rew: ['prog', 'rew'] }");
-    for (const l of locales) expect(json(`src/i18n/locales/${l}/nav.json`).achieve).toBeTruthy();
-    expect(json('src/i18n/locales/ar-SA/nav.json').achieve).toBe('إنجازاتي');
+    for (const l of locales) expect(json(`src/i18n/locales/${l}/nav.json`).achievements).toBeTruthy();
+    expect(json('src/i18n/locales/ar-SA/nav.json').achievements).toBe('إنجازاتي');
   });
   it('keeps both pages reachable at their old addresses', () => {
     expect(read('src/components/layout/AppShell.tsx')).toMatch(/prog: Progress, rew: Rewards/);

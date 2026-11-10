@@ -21,7 +21,7 @@ export const defaultState = (): AppState => ({
   snd: 1, rm: 0, notif: 0, ctx: [], pend: null, hist: [], en: [], xp: 0, view: 'home', chat: [], mission: null,
   pref: null, drive: 0, driving: 0, last: Date.now(), theme: '', comeback: 0, lastDaily: null, aiConsent: null, prayerDay: '', city: '', largeText: 0, lang: 'ar-SA', fb: [],
   prayerOn: 1, prayerAsk: 1, prayerMethod: 'umm_al_qura', prayerAsr: 0, loc: null, prayerAck: null, prayerBreak: null,
-  prog: null, progDone: [], goals: null, nrg: 0, nrgD: '', fullDays: [], missed: 0,
+  prog: null, progDone: [], goals: null, nrg: 0, nrgD: '', fullDays: [], missed: 0, brief: null,
   prof: null, path: null, rest: [], streakDays: [], streakOn: 1, streakGrace: 1, streakSeen: 0,
 });
 
@@ -77,6 +77,8 @@ export function hydrate(saved: Partial<AppState> | null, now = Date.now()): AppS
   s.progDone = Array.isArray(s.progDone) ? s.progDone.filter((r) => r && typeof r.before === 'number' && typeof r.after === 'number') : [];
   validBuddy(s);
   s.missed = s.missed ? 1 : 0;
+  const br = s.brief;
+  s.brief = br && typeof br.d === 'string' && typeof br.lang === 'string' && typeof br.text === 'string' && br.text.length <= 700 ? { d: br.d, lang: br.lang, text: br.text, ...(typeof br.nudge === 'string' ? { nudge: br.nudge.slice(0, 200) } : {}) } : null;
   s.prof = validProfile(s.prof);
   s.path = validPlan(s.path);
   s.rest = Array.isArray(s.rest) ? s.rest.filter((d) => /^\d{4}-\d{2}-\d{2}$/.test(d)).slice(-60) : [];

@@ -406,7 +406,7 @@ main.page--chat .chatp { max-width: none; height: calc(100dvh - 22px - var(--sat
   main.page--chat { padding: calc(8px + var(--sat)) 8px 0; }
   main.page--chat .chatp { height: calc(100dvh - 96px - var(--sat) - var(--sab)); min-height: 0; }
   .chat-bg .mascot { width: 200px !important; height: 200px !important; }
-  .chat-head .mascot { width: 52px !important; height: 52px !important; }
+  /* The header buddy keeps its size on phones; the chat header is laid out for it. */
   .chat-in .btn span { display: none; }
   .chat-in .btn { padding: 10px 14px; }
 }
@@ -557,3 +557,24 @@ html[lang='en'] h1, html[lang='en'] h2 { letter-spacing: -.01em; }
 .missed { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; background: var(--surface); border-radius: var(--r-lg); padding: 14px 16px; box-shadow: var(--shadow-card); border-inline-start: 4px solid var(--sun); }
 .missed h2 { font-size: 18px; margin: 0 0 2px; }
 .sugc__goals { display: inline-flex; gap: 5px; align-items: center; margin-top: 6px; }
+
+/* Chat, full screen: a small scene up top with the buddy on its hill, and the conversation below. */
+.chatp { max-width: 900px; height: calc(100vh - 52px); }
+.chat-head { position: relative; isolation: isolate; overflow: hidden; display: flex; align-items: flex-end; gap: 12px; padding: 10px 18px 0; min-height: 118px; border-radius: var(--r-lg) var(--r-lg) 0 0; background: linear-gradient(180deg, #EFE8FF 0%, #F4F0FF 60%, #EAF6EF 100%); }
+.chat-head .grow { padding-bottom: 14px; }
+.chat-head h1 { font-size: 22px; margin: 0 0 4px; color: var(--em-d); }
+.chat-head__buddy { order: 2; position: relative; z-index: 1; flex: none; margin-bottom: -6px; }
+.chat-head__hill { position: absolute; z-index: 0; bottom: -46px; inset-inline-end: -30px; width: 210px; height: 80px; border-radius: 50%; background: #DDF0E4; }
+.chat-box { border-radius: 0 0 var(--r-lg) var(--r-lg); background: linear-gradient(180deg, #EAF6EF 0%, #FAF8FF 30%, #FAF8FF 100%); }
+.chat-box .m.b { background: #fff; box-shadow: 0 4px 14px -8px rgba(38, 61, 55, .35); }
+.chat-box .chat-in { background: #fff; }
+@media (max-width: 860px) {
+  .chatp { margin: calc(-16px - var(--sat)) -16px 0; height: calc(100dvh - 64px - var(--sab)); }
+  .chat-head { padding-top: calc(8px + var(--sat)); border-radius: 0; }
+  .chat-box { border-radius: 0; box-shadow: none; }
+}
+
+/* The AI's progress brief at the top of Progress. */
+.brief { display: flex; gap: 14px; align-items: flex-start; background: linear-gradient(160deg, #F4EFFF, #EEF7F1); box-shadow: none; }
+.brief h2 { font-size: 17px; margin: 0 0 4px; }
+.brief__t { margin: 0 0 6px; line-height: 1.75; white-space: pre-wrap; }

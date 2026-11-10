@@ -7,12 +7,12 @@ import { LanguageSwitcher } from '../ui/LanguageSwitcher';
 import { LogoutButton } from '../../features/auth/AuthViews';
 
 // Five tabs, with the buddy raised. Journeys open from the Challenges page. Progress and Rewards share one
-// tab, Achievements, and switch with the tabs at the top of the page (see SubTabs).
+// "Achievements" tab and switch with the sub-tabs at the top of the page (see SubTabs).
 const TABS: [ViewId, LucideIcon][] = [
   ['home', House], ['chal', Gamepad2], ['chat', MessageCircle], ['prog', Trophy], ['set', UserRound],
 ];
-// A tab whose name differs from its first page's name.
-const TAB_LABEL: Partial<Record<ViewId, string>> = { prog: 'nav.achieve' };
+// A tab whose label differs from its first page's name.
+const TAB_LABEL: Partial<Record<ViewId, string>> = { prog: 'nav.achievements' };
 
 // The tab that stays lit for a view reached through a sub-tab.
 export const TAB_OF: Partial<Record<ViewId, ViewId>> = { journeys: 'chal', path: 'home', rew: 'prog' };
@@ -45,7 +45,7 @@ export function SubTabs({ view, onNavigate }: { view: ViewId; onNavigate(v: View
   const pair = SUB[view];
   if (!pair) return null;
   return (
-    <div className="seg subtabs" role="group" aria-label={t('nav.achieve')}>
+    <div className="seg subtabs" role="group" aria-label={t(`nav.${pair[0]}`)}>
       {pair.map((id) => (
         <button key={id} type="button" className={`seg__b ${view === id ? 'on' : ''}`} aria-current={view === id ? 'page' : undefined} onClick={() => onNavigate(id)}>
           <span>{t(`nav.${id}`)}</span>

@@ -121,6 +121,8 @@ export interface ChatSuggestion {
 
 export interface ChatMessage {
   t: string;
+  /** When the user sent it, for their own messages. Older messages have none. */
+  at?: number;
   b?: 1;
   card?: 1;
   sug?: ChatSuggestion;
@@ -209,6 +211,8 @@ export interface AppState {
   fullDays: string[];
   /** Show a warm welcome back once after a long gap. */
   missed: number;
+  /** Today's progress brief from the AI (headline in text, plus a nudge), written at most once a day unless refreshed. */
+  brief: { d: string; lang: string; text: string; nudge?: string } | null;
   /** What the user told us during onboarding. Self-reported, optional, and never a diagnosis. */
   prof: import('../features/profile/questions').LifeProfile | null;
   /** The personal journey. Only real completions mark its steps done. */

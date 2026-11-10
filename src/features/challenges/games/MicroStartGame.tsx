@@ -1,4 +1,4 @@
-import { ChevronsDown, Lock, Pencil, Play, Timer, TimerOff } from 'lucide-react';
+import { ChevronsDown, Pencil, Play, Timer, TimerOff } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { clock } from '../../../utils';
@@ -79,7 +79,6 @@ export function MicroStartGame({ diff, env, onDone, cfg }: GameProps) {
           </div>
         )}
         <input id="ms-task" dir="auto" maxLength={80} placeholder={t('games.micro.taskPh')} value={task} onChange={(e) => setTask(e.target.value)} />
-        <p className="note"><Lock size={13} aria-hidden="true" /> {t('games.common.staysOnDevice')}</p>
         <div className="row row--c"><button type="button" className="btn" disabled={!task.trim()} onClick={() => setPhase('shrink')}>{t('common.next')}</button></div>
       </div>
     );
@@ -114,7 +113,6 @@ export function MicroStartGame({ diff, env, onDone, cfg }: GameProps) {
         <div className="row row--c">
           <button type="button" className="btn-link" onClick={() => setEditing(true)}><Pencil size={14} aria-hidden="true" /> {t('games.micro.writeOwn')}</button>
         </div>
-        {smallest && !own.trim() && <p className="note center">{t('games.micro.smallest')}</p>}
       </div>
     );
   }
@@ -146,7 +144,7 @@ export function MicroStartGame({ diff, env, onDone, cfg }: GameProps) {
           <Ring value={Math.max(0, left) / mode} size={190}>
             <span className="timer-big" role="timer" aria-label={t('games.start.timeLeft', { time: clock(Math.max(0, left)) })}>{clock(Math.max(0, left))}</span>
           </Ring>
-        ) : <p className="note center">{t('games.micro.noTimer')}</p>}
+        ) : null}
         <p className="note center">{t(env.paused ? 'games.start.paused' : 'games.micro.goNow')}</p>
         <div className="row row--c"><button type="button" className="btn" onClick={() => setPhase('ask')}><Play size={16} aria-hidden="true" /> {t(mode ? 'games.micro.doneEarly' : 'games.micro.back')}</button></div>
       </div>
@@ -160,7 +158,6 @@ export function MicroStartGame({ diff, env, onDone, cfg }: GameProps) {
       <div className="choices choices--3">
         {(['started', 'bit', 'not'] as const).map((k) => <button key={k} type="button" className="opt" onClick={() => answer(k)}>{t(`games.micro.outcomes.${k}`)}</button>)}
       </div>
-      <p className="note center">{t('games.micro.honest')}</p>
     </div>
   );
 }

@@ -27,8 +27,7 @@
       "rest": "Then rest is a perfectly good plan. You don't have to do anything else today. If you want something light later, there's a short break you can try.",
       "memory": "Here's a light memory round you can try if you like.",
       "time": "If time keeps slipping away, try a timer for each task and notice how long things really take. It makes planning your evening more realistic."
-    },
-    "understood_named": "{{name}}, sounds like you've got a lot going on today. Here's what I understood: {{facts}}. Should I save that to shape today's mission? That's only from what you said, and I'm not guessing beyond it."
+    }
   },
   "statusAi": "Replies come from an AI model (OpenAI) and can be wrong",
   "statusRules": "Limited mode: simple rules in the app, not AI. I may miss what you mean.",
@@ -47,8 +46,7 @@
     "no": "No",
     "savedLighter": "Done. I saved that and lightened today's mission. You can see it on Home.",
     "saved": "Done. I saved it, and your plan hasn't changed.",
-    "declined": "No problem, I didn't save anything.",
-    "savedLighter_named": "Done, {{name}}. I saved that and lightened today's mission. You can see it on Home."
+    "declined": "No problem, I didn't save anything."
   },
   "typing": "Your buddy is typing",
   "fallback": "I couldn't reach smart replies right now, so I answered with simple rules and may have misunderstood. If you're going through a hard time or you're in danger, talk to someone you trust or call an ambulance on 997.",

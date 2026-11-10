@@ -1,0 +1,68 @@
+/* Progress answers one question: what did I do this week? Zaho tells it in a speech bubble, the week is the
+   centre with one large number, everything else is a quiet line. No boxes, few hairlines, one warm accent. */
+.pv { max-width: 640px; margin: 0 auto; padding-bottom: 32px; --warm: #FFD36E; --warm-l: #FFF4D6; --deep: #1F5E48; }
+.pv .page-head { margin-bottom: 0; }
+.pv .page-head h1 { font-size: 20px; color: var(--mut); font-weight: 500; }
+
+/* Zaho and the brief bubble. */
+.pv-hero { display: flex; align-items: flex-end; gap: 6px; margin: 6px 0 4px; }
+.pv-hero__buddy { flex: none; margin-bottom: -4px; }
+.pv-bubble { position: relative; flex: 1; min-width: 0; background: #fff; border-radius: 26px 26px 26px 26px; padding: 16px 18px 16px 44px; box-shadow: 0 10px 30px -18px rgba(31, 94, 72, .45); }
+[dir='rtl'] .pv-bubble { padding: 16px 18px 16px 44px; border-end-start-radius: 6px; }
+[dir='ltr'] .pv-bubble { padding: 16px 44px 16px 18px; border-end-start-radius: 6px; }
+.pv-headline { margin: 0; font-size: 19px; line-height: 1.45; font-weight: 700; color: var(--deep); }
+.pv-nudge { margin: 6px 0 0; font-size: 14px; color: var(--ink); opacity: .72; }
+.pv-refresh { position: absolute; top: 10px; inset-inline-end: 10px; width: 30px; height: 30px; border-radius: 50%; border: 0; background: transparent; color: var(--mut); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }
+.pv-refresh:hover:not(:disabled) { background: #F2EEFB; color: var(--deep); }
+.pv-refresh:disabled { opacity: .4; animation: pv-spin 1s linear infinite; }
+@keyframes pv-spin { to { transform: rotate(360deg); } }
+
+/* The week. */
+.pv-week { margin-top: 26px; }
+.pv-week__head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; }
+.pv-big { display: flex; align-items: baseline; gap: 10px; }
+.pv-big b { font-size: 84px; line-height: .85; color: var(--deep); font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+.pv-big span { font-size: 15px; color: var(--mut); }
+.pv-next { flex: 0 1 190px; display: flex; flex-direction: column; gap: 6px; padding-bottom: 6px; }
+.pv-next__l { font-size: 12.5px; color: var(--mut); display: inline-flex; align-items: center; gap: 4px; }
+.pv-next__bar { height: 6px; border-radius: 99px; background: #ECE6F7; overflow: hidden; }
+.pv-next__bar i { display: block; height: 100%; border-radius: inherit; background: var(--warm); transition: width var(--t-scene) var(--ease); }
+.pv-facts { display: flex; flex-wrap: wrap; gap: 4px 18px; margin: 14px 0 0; font-size: 14px; color: var(--mut); }
+.pv-facts b { color: var(--ink); font-weight: 700; }
+
+.pv-days { list-style: none; padding: 0; margin: 22px 0 0; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
+.pv-day { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.pv-day__w { font-size: 12.5px; color: var(--mut); }
+.pv-day__o { width: 42px; height: 42px; border-radius: 14px; display: inline-flex; align-items: center; justify-content: center; font-size: 14px; color: #A79CC2; background: #F3EFFA; }
+.pv-day--done .pv-day__o { background: var(--deep); color: #fff; }
+.pv-day--rest .pv-day__o { background: #E9DFFF; color: var(--lav-d); }
+.pv-day--protected .pv-day__o { background: var(--sky-l); color: var(--ink); }
+.pv-day.is-today .pv-day__w { color: var(--deep); font-weight: 700; }
+.pv-day.is-today .pv-day__o { box-shadow: 0 0 0 2.5px var(--warm); }
+.pv-week__foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 14px; margin-top: 14px; }
+.pv-link { border: 0; background: none; padding: 4px 0; font: inherit; font-size: 13px; color: var(--deep); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.pv-legend { display: inline-flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12px; color: var(--mut); }
+.pv-legend svg { vertical-align: -2px; }
+
+.pv-rest { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 12px; margin-top: 18px; }
+.pv-chip { display: inline-flex; align-items: center; gap: 6px; border: 0; border-radius: 999px; padding: 8px 14px; font: inherit; font-size: 13.5px; font-weight: 700; color: var(--deep); background: var(--warm-l); cursor: pointer; }
+.pv-chip:hover { background: #FFEAB0; }
+.pv-rest__t { font-size: 12.5px; color: var(--mut); flex: 1 1 220px; }
+
+/* Journeys: two ratings and an arrow. */
+.pv-journeys { margin-top: 34px; }
+.pv-h { font-size: 15px; font-weight: 700; color: var(--deep); margin: 0 0 12px; }
+.pv-journeys ul { list-style: none; padding: 0; margin: 0; }
+.pv-journeys li { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-top: 1px solid var(--line); }
+.pv-j__name { flex: 1; font-size: 15px; font-weight: 500; }
+.pv-j__nums { display: inline-flex; align-items: baseline; gap: 8px; font-variant-numeric: tabular-nums; }
+.pv-j__nums span { font-size: 20px; color: var(--mut); }
+.pv-j__nums i { font-style: normal; color: var(--mut); }
+.pv-j__nums b { font-size: 28px; color: var(--deep); }
+.pv-j__tag { font-size: 12px; font-weight: 700; color: #7A5A00; background: var(--warm-l); border-radius: 999px; padding: 3px 10px; }
+
+@media (max-width: 400px) {
+  .pv-hero__buddy .mascot { width: 104px !important; height: 104px !important; }
+  .pv-big b { font-size: 72px; }
+  .pv-day__o { width: 38px; height: 38px; border-radius: 12px; }
+}

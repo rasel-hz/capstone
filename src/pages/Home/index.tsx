@@ -1,4 +1,3 @@
-import { named } from '../../features/companion/name';
 import { BatteryFull, BatteryLow, BatteryMedium, Check, ChevronDown, Clock, Compass, Flag, MessageCircle, Play, Shuffle, Sparkles, Timer, type LucideIcon } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -27,6 +26,7 @@ import { recommend } from '../../features/recommend/engine';
 import { currentLang, formatDate, iso } from '../../i18n';
 import type { ChallengeId, EnergyLevel, PlannedItem, ViewId } from '../../types';
 import { level, today } from '../../utils';
+import { usePointsTotal } from '../../hooks/usePointsTotal';
 
 const ENERGY: { value: EnergyLevel; icon: LucideIcon }[] = [
   { value: 'high', icon: BatteryFull },
@@ -42,6 +42,7 @@ export function Home({ onNavigate }: { onNavigate(v: ViewId): void }) {
   const s = useAppState();
   const store = useStore();
   const missions = useMissions();
+  const points = usePointsTotal();
   const low = isLowEnergy(s);
   // The buddy wakes up as today's energy comes in, and reacts to each new point.
   // Sad only for today's own low-energy answer, not for a "short missions" preference.
@@ -110,18 +111,18 @@ export function Home({ onNavigate }: { onNavigate(v: ViewId): void }) {
       <div className="world">
         <section className={`hero hero--${sky} hero--e${nrg}`} aria-label={t('dashboard.welcomeLabel')}>
           <span className="sky" aria-hidden="true"><i className="sky__orb" /><i className="sky__cloud" /><i className="sky__cloud sky__cloud--2" /><i className="sky__dots" /></span>
-          {/* Total points and the streak, small, at the top. Points open Rewards; the streak opens Progress, where its days are shown. */}
+          {/* Total points earned (from Supabase) and the streak, small, at the top. Points open Rewards; the streak opens Progress, where its days are shown. */}
           <div className="hero__top">
             <p className="eyebrow">{formatDate(new Date(), { weekday: 'long', day: 'numeric', month: 'long' })}</p>
             <span className="hero__chips">
-              <button type="button" className="sk-chip hero__pts" aria-label={t('path.xpLabel', { n: s.xp })} onClick={() => onNavigate('rew')}><Sparkles size={14} aria-hidden="true" /> <b>{s.xp}</b></button>
+              <button type="button" className="sk-chip hero__pts" aria-label={t('path.xpLabel', { n: points ?? 0 })} onClick={() => onNavigate('rew')}><Sparkles size={14} aria-hidden="true" />{points != null && <> <b>{points}</b></>}</button>
               {s.streakOn ? <button type="button" className="hero__streak" onClick={() => onNavigate('prog')}><StreakChip /></button> : null}
             </span>
           </div>
           <div className="hero__txt">
             <h1><SettleText text={t('dashboard.hello', { name: iso(s.name), greeting })} /></h1>
             {/* While the buddy's bubble asks about energy, the line would repeat it, so it waits for the answer. */}
-            {energyToday && !askEnergy && <p className="hero__line">{t(`dashboard.energyLine.${energyToday}`, named(s.name))}</p>}
+            {energyToday && !askEnergy && <p className="hero__line">{t(`dashboard.energyLine.${energyToday}`)}</p>}
           </div>
           <ClickSpark ref={energySpark} auto={false} className="hero__scene" disabled={!!s.rm} sparkColor={['#28785B', '#FFD36E', '#A78BFA']} sparkSize={9} sparkRadius={26} sparkCount={10} duration={500}>
             <div className="hw-stage">
@@ -205,7 +206,6 @@ export function Home({ onNavigate }: { onNavigate(v: ViewId): void }) {
           <span className="talk__icon"><MessageCircle size={20} aria-hidden="true" /></span>
           <span className="grow">
             <b>{t('dashboard.talkTitle')}</b>
-            <span className="note">{t('dashboard.talkSub')}</span>
           </span>
         </button>
         {!s.path && (
@@ -213,8 +213,7 @@ export function Home({ onNavigate }: { onNavigate(v: ViewId): void }) {
             <span className="talk__icon"><Compass size={20} aria-hidden="true" /></span>
             <span className="grow">
               <b>{t('path.homeSetup')}</b>
-              <span className="note">{t('path.homeSetupSub')}</span>
-            </span>
+              </span>
           </button>
         )}
       </div>
@@ -309,7 +308,6 @@ export function Home({ onNavigate }: { onNavigate(v: ViewId): void }) {
             {M.items.length > 1 && <p className="note flush">{t('dashboard.missionProgress', { n: done, total: M.items.length })}</p>}
           </div>
         </div>
-        <p className="note">{t('dashboard.resumeShort')}</p>
         <div className="next__act">
           <button type="button" className="btn btn--lg" disabled={blocked} onClick={() => missions.start()}><Play size={17} aria-hidden="true" /> {t('dashboard.continueMission')}</button>
           <button type="button" className="btn-link" aria-expanded={options} onClick={onOptions}>{t('dashboard.otherOptions')} <ChevronDown size={15} aria-hidden="true" /></button>
@@ -372,7 +370,6 @@ export function Home({ onNavigate }: { onNavigate(v: ViewId): void }) {
           <button type="button" className="btn btn--lg" onClick={() => missions.start([item])}><Play size={17} aria-hidden="true" /> {t('common.start')}</button>
           <button type="button" className="btn-link" onClick={() => onNavigate('chal')}><Shuffle size={15} aria-hidden="true" /> {t('dashboard.chooseAnother')}</button>
         </div>
-        <p className="note flush">{t('dashboard.restIsFine')}</p>
       </section>
     );
   }

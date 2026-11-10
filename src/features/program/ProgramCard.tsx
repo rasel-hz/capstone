@@ -129,7 +129,6 @@ export function ProgramCard({ onNavigate }: { onNavigate(v: ViewId): void }) {
           </button>
         </div>
       )}
-      <p className="note flush">{t('journeys.program.noRush')}</p>
       {leaving ? (
         <div className="prog-card__leave" role="group" aria-label={t('journeys.program.leave')}>
           <p className="flush">{t('journeys.program.leaveQ')}</p>

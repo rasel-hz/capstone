@@ -20,43 +20,17 @@ export interface Reward {
   sort_order: number;
 }
 
-export interface Redemption {
-  id: number;
-  reward_id: string;
-  points: number;
-  url: string;
-  redeemed_at: string;
-}
-
 export interface PointsSummary {
-  /** Points ever earned. Never goes down. */
+  /** Points ever earned. Spending doesn't lower it. */
   lifetime: number;
+  /** Points that can be spent now: earned minus spent. Older databases don't send it, so it falls back to lifetime. */
+  balance?: number;
   today: number;
   unlocks: { reward_id: string; unlocked_at: string; celebrated: boolean }[];
-  /** Points earned minus points redeemed. Missing until the redemption migration is applied. */
-  balance?: number;
-  redemptions?: Redemption[];
+  redemptions?: { reward_id: string; points: number; at: string }[];
 }
 
-/** What the user can spend now. Before redemption exists on the server, that is everything earned. */
-export const spendable = (s: PointsSummary) => (typeof s.balance === 'number' ? s.balance : s.lifetime);
-/** True once the server can record redemptions. */
-export const canRedeemOnServer = (s: PointsSummary) => typeof s.balance === 'number';
-
-export type RedeemResult =
-  | { status: 'redeemed' | 'already'; redemption_id: number; reward_id: string; points: number; url: string; redeemed_at: string; balance: number }
-  | { status: 'insufficient'; reward_id: string; required: number; balance: number };
-
-/** A key for one confirmation. The same key sent twice is charged once. */
-export const newRequestKey = () =>
-  (typeof crypto !== 'undefined' && 'randomUUID' in crypto ? crypto.randomUUID() : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 12)}`).replace(/[^A-Za-z0-9_-]/g, '');
-
-/** Spends a reward's points on the server, which checks the balance and records it in one step. */
-export async function redeemReward(rewardId: string, requestKey: string): Promise<RedeemResult> {
-  const { data, error } = await db().rpc('redeem_reward', { p_reward_id: rewardId, p_request_key: requestKey });
-  if (error) throw new PointsError(error.code === 'PGRST202' || error.code === '42883' ? 'notAvailable' : error.message);
-  return data as RedeemResult;
-}
+export const balanceOf = (s: PointsSummary) => s.balance ?? s.lifetime;
 
 export class PointsError extends Error {}
 
@@ -85,6 +59,14 @@ export async function fetchRewards(): Promise<Reward[]> {
 export async function fetchSummary(): Promise<PointsSummary> {
   const { data, error } = await db().rpc('my_points_summary');
   if (error) throw new PointsError(error.message);
+  return data as PointsSummary;
+}
+
+/** Spends a reward's points. The database checks the balance and refuses if it isn't enough. */
+export async function redeemReward(id: string): Promise<PointsSummary> {
+  const { data, error } = await db().rpc('redeem_reward', { p_reward: id });
+  if (error) throw new PointsError(/not_enough_points/.test(error.message) ? 'notEnough' : 'failed');
+  notifyPointsChanged();
   return data as PointsSummary;
 }
 

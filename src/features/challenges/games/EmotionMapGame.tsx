@@ -1,4 +1,3 @@
-import { Lock } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { formatList, tr } from '../../../i18n';
@@ -44,7 +43,6 @@ export function EmotionMapGame({ env, onDone }: GameProps) {
     return (
       <div className="scene form">
         <h2 className="q__t">{t('games.emotion.feelQ')}</h2>
-        <p className="note center">{t('games.emotion.feelNote')}</p>
         <div className="feel">
           {FEELINGS.map(([k, c]) => (
             <button key={k} type="button" className={`feel__b ${feel.includes(k) ? 'on' : ''}`} aria-pressed={feel.includes(k)} onClick={() => toggle(k, setFeel)}>
@@ -52,7 +50,6 @@ export function EmotionMapGame({ env, onDone }: GameProps) {
             </button>
           ))}
         </div>
-        <p className="note"><Lock size={13} aria-hidden="true" /> {t('games.emotion.privacy')}</p>
         <div className="row row--c"><button type="button" className="btn" disabled={!feel.length} onClick={() => setStep(2)}>{t('common.next')}</button></div>
       </div>
     );

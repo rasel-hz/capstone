@@ -77,7 +77,6 @@ export function TimeGame({ env, onDone }: GameProps) {
           <div className="cmp__r"><span>{t('games.time.estimate')}</span><div className="cmp__t"><i className="is-est" style={{ width: `${(res.est / max) * 100}%` }} /></div><b>{res.est} {t('common.secShort')}</b></div>
           <div className="cmp__r"><span>{t('games.time.actual')}</span><div className="cmp__t"><i className="is-act" style={{ width: `${(res.act / max) * 100}%` }} /></div><b>{res.act} {t('common.secShort')}</b></div>
         </div>
-        <p className="note center">{t('games.time.explain')}</p>
         <h3 className="center">{t('games.time.reflect')}</h3>
         <div className="row row--c">
           {REFLECT.map((k) => <button key={k} type="button" className="btn sm alt" onClick={() => finish(k)}>{t(`games.time.reflections.${k}`)}</button>)}

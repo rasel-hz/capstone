@@ -106,7 +106,6 @@ export function AccountStep({ firstName, addressForm, onCreated, onCelebrate }: 
     <>
       <h1>{t('auth.register.title', { firstName: iso(firstName) })}</h1>
       <p>{t('auth.register.text')}</p>
-      <p className="note">{t('auth.register.support')}</p>
       <form className="auth-form" onSubmit={submit} noValidate>
         <Field id="rg-user" label={t('auth.register.username')} hint={t('auth.register.usernameHint')} value={username} maxLength={20} autoComplete="username" autoCapitalize="none" spellCheck={false} onChange={(e) => setUsername(e.target.value)} />
         <Field id="rg-email" type="email" label={t('auth.register.email')} hint={t('auth.register.emailHint')} value={email} maxLength={254} autoComplete="email" onChange={(e) => setEmail(e.target.value)} />
@@ -197,7 +196,6 @@ export function WelcomeBack({ name, onContinue }: { name: string; onContinue(): 
         </div>
         <h2>{t('auth.welcome.title', { firstName: iso(name) })}</h2>
         <p>{t('auth.welcome.text')}</p>
-        <p className="note">{t('auth.welcome.support')}</p>
         <button type="button" className="btn btn--lg" onClick={onContinue}>{t('auth.welcome.button')}</button>
       </div>
     </Dialog>

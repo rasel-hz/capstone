@@ -162,7 +162,6 @@ export function AttentionSceneGame({ diff, env, onDone }: GameProps) {
       </div>
       <p className="hint" role="status">{t('games.attention.progress', { found: found.length, total: count })}{hintText ? ` ${hintText}` : ''}</p>
       <div className="row row--c"><HintButton onClick={askHint} used={!!hint} /></div>
-      <p className="note center">{t('games.attention.explain')}</p>
     </div>
   );
 }

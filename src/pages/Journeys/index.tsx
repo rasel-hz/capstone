@@ -34,7 +34,6 @@ function JourneyDetail({ j, onBack, onNavigate }: { j: Journey; onBack(): void; 
         <div className="jd__txt">
           <h1>{t(`journeys.items.${j.id}.name`)}</h1>
           <p>{t(`journeys.items.${j.id}.desc`)}</p>
-          <p className="note">{t('journeys.program.how')}</p>
           {mine ? (
             <>
               <span className="tag tag--ok"><Check size={13} aria-hidden="true" /> {t('journeys.program.activeHere')}</span>

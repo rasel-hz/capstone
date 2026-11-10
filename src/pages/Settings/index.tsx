@@ -11,9 +11,12 @@ import { PrayerSetup } from '../../features/prayer/PrayerSetup';
 import { METHODS, type MethodId } from '../../features/prayer/times';
 import { formatList, type Lang, type Msg, msg } from '../../i18n';
 import { useLanguage } from '../../i18n/useLanguage';
-import { level, today } from '../../utils';
+import { today } from '../../utils';
 import type { Gender, ViewId } from '../../types';
 import type { LucideIcon } from 'lucide-react';
+
+// App themes, open to everyone. An empty id is the base look; each other id is a body class in tokens.css.
+const THEMES = ['', 'lilac'];
 
 const Group = ({ id, title, icon, children }: { id: string; title: string; icon: LucideIcon; children: React.ReactNode }) => (
   <section className="panel set-g" id={id} aria-labelledby={`${id}-t`}>
@@ -98,7 +101,6 @@ export function Settings({ onNavigate }: { onNavigate(v: ViewId): void }) {
             {place ? (
               <>
                 <TodayPrayers place={place} settings={settingsOf(s)} />
-                <p className="note">{t('prayer.settings.calcNote', { method: t(`prayer.methods.${s.prayerMethod}`) })}</p>
                 <SettingRow title={t('prayer.settings.method')} note={t('prayer.settings.methodNote')}>
                   <select className="city-select" aria-label={t('prayer.settings.method')} value={s.prayerMethod} onChange={(e) => set((d) => { d.prayerMethod = e.target.value as MethodId; })}>
                     {METHODS.map((m) => <option key={m} value={m}>{t(`prayer.methods.${m}`)}</option>)}
@@ -128,10 +130,8 @@ export function Settings({ onNavigate }: { onNavigate(v: ViewId): void }) {
       </Group>
 
       <Group id="app-pref" title={t('settings.app')} icon={Palette}>
-        <SettingRow title={t('settings.theme')} note={t(level(s) >= 3 ? 'settings.themeOpen' : 'settings.themeLocked')}>
-          {level(s) >= 3
-            ? <Toggle label={t('settings.theme')} on={s.theme === 'lilac'} onChange={(v) => set((d) => { d.theme = v ? 'lilac' : ''; })} />
-            : <span className="tag tag--soft">{t('settings.locked')}</span>}
+        <SettingRow title={t('settings.theme')}>
+          <Segmented<string> label={t('settings.theme')} value={s.theme} options={THEMES.map((id) => ({ value: id, label: t(`settings.themes.${id || 'base'}`) }))} onChange={(v) => set((d) => { d.theme = v; })} />
         </SettingRow>
         <SettingRow title={t('settings.notifications')} note={t('settings.notificationsNote')}><span className="tag tag--soft">{t('settings.soon')}</span></SettingRow>
       </Group>

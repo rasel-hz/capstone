@@ -84,6 +84,10 @@
 body.rm .rw-hero, body.rm .rw-card, body.rm .rw-bar > i, body.rm .rw-toast { animation: none; }
 body.rm .rw-card:hover, body.rm .rw-card:active { transform: none; }
 
-/* Redeeming: a clear confirmation step before any points are taken. */
-.rw-confirm { width: 100%; padding: 12px 14px; border-radius: var(--r-md, 14px); background: var(--cr); text-align: center; }
-.rw-confirm p { margin: 0 0 6px; }
+/* Spending a reward: a confirm step, and a short list of what was used. */
+.rw-confirm { margin: 10px 0 4px; padding: 12px; border-radius: var(--r-md); background: var(--cr); }
+.rw-confirm p { margin: 0 0 10px; }
+.rw-used ul { list-style: none; padding: 0; margin: 8px 0 0; }
+.rw-used li { display: flex; justify-content: space-between; gap: 10px; padding: 8px 0; border-top: 1px solid var(--line); }
+.rw-used li { flex-wrap: wrap; align-items: center; }
+.rw-used__go { flex-basis: 100%; font-size: var(--fs-meta); color: var(--em-d); }

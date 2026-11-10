@@ -1,11 +1,11 @@
-import { named } from '../../features/companion/name';
 import { Bot, CarFront, Check, Pencil, Send, ShieldAlert, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Mascot } from '../../components/mascot/Mascot';
 import type { MascotState } from '../../components/mascot/manifest';
 import { useMascot } from '../../components/mascot/useMascot';
-import { useAppState, useStore } from '../../context/AppStateContext';
+import { fillName } from '../../features/companion/name';
+import { useAppSelector, useAppState, useStore } from '../../context/AppStateContext';
 import { tr } from '../../i18n';
 import { SuggestionCard } from '../../features/companion/SuggestionCard';
 import { completeTalk } from '../../features/path/planner';
@@ -19,8 +19,11 @@ const LONG = 280;
 
 // The user's long messages fold so the conversation stays readable; the full text is one tap away.
 // Replies never fold, because the advice is the point.
-function Bubble({ text, bot }: { text: string; bot: boolean }) {
+function Bubble({ text: raw, bot }: { text: string; bot: boolean }) {
   const { t } = useTranslation();
+  const name = useAppSelector((st) => st.name);
+  // The companion's {name} placeholder becomes the user's name, filled in on the device.
+  const text = bot ? fillName(raw, name) : raw;
   const [open, setOpen] = useState(false);
   const long = !bot && text.length > LONG;
   return (
@@ -72,7 +75,7 @@ export function Companion() {
     mascot.clear();
     // The history sent to the AI shouldn't repeat this message, so it is read before saving it.
     const before = store.getState();
-    store.update((d) => { d.chat.push({ t: v }); completeTalk(d); });
+    store.update((d) => { d.chat.push({ t: v, at: Date.now() }); completeTalk(d); });
     setWaiting(true);
     let reply;
     try {
@@ -113,7 +116,7 @@ export function Companion() {
         if (m === 1) d.pref = 'short';
       }
       d.pend = null;
-      d.chat.push({ b: 1, t: tr(m === 1 ? 'companion.card.savedLighter' : m === 2 ? 'companion.card.saved' : 'companion.card.declined', named(d.name)) });
+      d.chat.push({ b: 1, t: tr(m === 1 ? 'companion.card.savedLighter' : m === 2 ? 'companion.card.saved' : 'companion.card.declined') });
     });
   }
 
@@ -134,8 +137,10 @@ export function Companion() {
 
   return (
     <div className="chatp">
+      {/* The buddy stands on a little hill in the header, always in view, and reacts as you type, wait and read. */}
       <header className="chat-head">
-        <Mascot state={mascot.state} size={72} label={t('common.brand')} />
+        <span className="chat-head__hill" aria-hidden="true" />
+        <div className="chat-head__buddy"><Mascot state={mascot.state} size={104} label={t('common.brand')} /></div>
         <div className="grow">
           <h1>{t('nav.chat')}</h1>
           <span className={`status ${useAi ? 'status--ai' : 'status--limited'}`}><Bot size={14} aria-hidden="true" /> {t(useAi ? 'companion.statusAi' : 'companion.statusRules')}</span>
@@ -146,11 +151,9 @@ export function Companion() {
         {/* Zaho floats quietly behind the conversation. Decorative only: it never takes taps or covers text. */}
         <div className="chat-bg" aria-hidden="true"><Mascot state="idle" size={280} still={!!s.rm} /></div>
         <div className="chat" ref={list} role="log" aria-live="polite" tabIndex={0} aria-label={t('companion.logLabel')}>
-          {!s.chat.length && <p className="note center">{t('companion.empty')}</p>}
           {s.chat.map((m, i) => (m.card ? (
             <div key={i} className="ccard">
               <b>{t('companion.card.ask', { context: s.g })}</b>
-              <p className="note flush">{t('companion.card.note')}</p>
               {pend && (
                 <ul className="ccard__facts">
                   {pend.low ? <li><span>{lowFact}</span>{editing && <button type="button" aria-label={t('companion.card.drop', { fact: lowFact })} onClick={() => dropFact('low')}><X size={15} /></button>}</li> : null}

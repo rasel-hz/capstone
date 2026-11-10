@@ -21,8 +21,8 @@
   "needMore": "I need at least 4 attempts before mentioning any pattern.",
   "programs": {
     "title": "Your journey results",
-    "note": "Your own rating on the first and last day.",
-    "row": "From {{before}} to {{after}}"
+    "row": "From {{before}} to {{after}}",
+    "up": "Improved"
   },
   "fullDays": {
     "title": "Your full days",
@@ -35,5 +35,20 @@
     "loading": "One moment, getting your progress...",
     "error": "We couldn’t load your progress right now.",
     "retry": "Try again"
+  },
+  "brief": {
+    "title": "Your brief from Zaho",
+    "writing": "Zaho is writing...",
+    "refresh": "Refresh",
+    "fallback": "Steady steps forward",
+    "fallbackStart": "One small step to start",
+    "fallbackNudge": "One short challenge today is enough.",
+    "week": "challenges this week",
+    "active": "active days",
+    "activeOf": "{{n}} of 7 days"
+  },
+  "week": {
+    "before": "Week before",
+    "this": "This week"
   }
 }

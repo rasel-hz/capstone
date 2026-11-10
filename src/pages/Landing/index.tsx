@@ -106,7 +106,6 @@ export function Landing() {
             </div>
             <div className="lh__m">
               <Mascot state={hero.state} size={230} interactive onClick={poke} label={t('landing.mascotLabel')} />
-              <p className="note center">{t('landing.tapHint')}</p>
             </div>
           </div>
         </section>
@@ -137,7 +136,6 @@ export function Landing() {
 
         <section className="ls rv">
           <h2 className="ls__t">{t('landing.journeysTitle')}</h2>
-          <p className="note">{t('landing.journeysNote')}</p>
           <div className="lj">{JOURNEYS.map((j) => <div key={j.id} className="lj__c"><div className="lj__art"><JourneyArt id={j.id} /></div><b>{t(`journeys.items.${j.id}.name`)}</b></div>)}</div>
         </section>
 

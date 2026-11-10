@@ -1,4 +1,4 @@
-import { ArrowDown, ArrowUp, Lock, Plus, X } from 'lucide-react';
+import { ArrowDown, ArrowUp, Plus, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { tr } from '../../../i18n';
@@ -53,7 +53,6 @@ export function BreakdownGame({ diff, env, onDone }: GameProps) {
         <div className="tags" role="group" aria-label={t('games.common.examples')}>
           {Object.keys(SEEDS).map((x) => <button key={x} type="button" className="tag tag--btn" onClick={() => setTask(`seed:task/${x}`)}>{t(`games.breakdown.seeds.${x}.task`)}</button>)}
         </div>
-        <p className="note"><Lock size={13} aria-hidden="true" /> {t('games.common.staysOnDevice')}</p>
         <div className="row row--c"><button type="button" className="btn" disabled={!task.trim()} onClick={() => setStep(2)}>{t('common.next')}</button></div>
       </div>
     );
@@ -75,7 +74,6 @@ export function BreakdownGame({ diff, env, onDone }: GameProps) {
             </li>
           ))}
         </ol>
-        {!steps.length && <p className="note center">{t('games.breakdown.noSteps')}</p>}
         {steps.length < max ? (
           <>
             <form className="pb__add" onSubmit={(e) => { e.preventDefault(); add(draft); }}>

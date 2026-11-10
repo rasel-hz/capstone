@@ -305,7 +305,6 @@ export function MissionPlayer({ start, onClose, onNavigate }: { start: PlayerSta
             <div className="scene intro">
               <h1>{t('player.dailyTitle')}</h1>
               <MissionTimeline items={M.items} />
-              <p className="note">{t('player.dailyNote')}</p>
               <button type="button" className="btn btn--lg" onClick={run}><Play size={17} aria-hidden="true" /> {t('player.letsGo')}</button>
             </div>
           )}
@@ -323,8 +322,7 @@ export function MissionPlayer({ start, onClose, onNavigate }: { start: PlayerSta
           {phase === 'result' && result && (
             <div className="scene res">
               <span className="res__ok"><Check size={15} aria-hidden="true" /> {t('player.status.completed')}</span>
-              {result.base > 0 ? <XpLine xp={result.xp} /> : <p className="note">{t('player.noPointsFeelings')}</p>}
-              {result.base > 0 && result.xp < result.base && <p className="note">{t('player.halfPoints')}</p>}
+              {result.base > 0 && <XpLine xp={result.xp} />}
               {result.acc != null && (
                 <div className="res__m">
                   <div><Target size={16} aria-hidden="true" /><b>{result.acc}%</b><span>{t('player.accuracy')}</span></div>
@@ -360,7 +358,6 @@ export function MissionPlayer({ start, onClose, onNavigate }: { start: PlayerSta
           {phase === 'easier' && (
             <div className="scene res">
               <h2>{t('player.easierQ', { name: t(`challenges.items.${M.items[M.idx + 1].id}.name`) })}</h2>
-              <p className="note">{t('player.yourCall')}</p>
               <div className="row row--c">
                 <button type="button" className="btn" onClick={() => setNextDifficulty(true)}>{t('player.yesEasier')}</button>
                 <button type="button" className="btn alt" onClick={() => setNextDifficulty(false)}>{t('player.noNormal')}</button>

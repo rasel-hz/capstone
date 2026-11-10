@@ -36,9 +36,7 @@
   "privacy": "Privacy and your data",
   "wipe": "Delete all my data",
   "app": "App",
-  "theme": "Lavender theme",
-  "themeOpen": "Unlocked for you.",
-  "themeLocked": "Unlocks at level 3.",
+  "theme": "Theme",
   "locked": "Locked",
   "notifications": "Notifications",
   "notificationsNote": "Not active yet.",
@@ -49,5 +47,9 @@
   "confirmDelete": "Delete",
   "cityNote": "Choose your city to protect every prayer automatically, or enter the time yourself.",
   "flashCity": "City saved. Prayer times are calculated each day.",
-  "flashManual": "Back to entering the time yourself."
+  "flashManual": "Back to entering the time yourself.",
+  "themes": {
+    "base": "Classic",
+    "lilac": "Lavender"
+  }
 }

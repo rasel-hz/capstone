@@ -1,4 +1,4 @@
-import { Lock, Play, Plus } from 'lucide-react';
+import { Play, Plus } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { tr } from '../../../i18n';
@@ -69,7 +69,6 @@ export function StudySprintGame({ env, onDone }: GameProps) {
         <div className="row row--c" role="group" aria-label={t('games.study.length')}>
           {LENGTHS.map((v) => <button key={v} type="button" className={`pace ${mins === v ? 'on' : ''}`} aria-pressed={mins === v} onClick={() => setMins(v)}><b>{v ? t('common.minutes', { count: v }) : t('games.study.noTimer')}</b></button>)}
         </div>
-        <p className="note"><Lock size={13} aria-hidden="true" /> {t('games.common.staysOnDevice')}</p>
         <div className="row row--c"><button type="button" className="btn btn--lg" onClick={() => { setPhase('run'); env.say('calm', 'games.study.quiet'); }}><Play size={17} aria-hidden="true" /> {t('common.start')}</button></div>
       </div>
     );
@@ -85,7 +84,6 @@ export function StudySprintGame({ env, onDone }: GameProps) {
         {notes.length > 0 && (
           <div className="parked"><h3>{t('games.study.parked')}</h3><ul>{notes.map((n, i) => <li key={i} dir="auto">{n}</li>)}</ul></div>
         )}
-        <p className="note center">{t('games.common.trackingOnly')}</p>
       </div>
     );
   }
@@ -105,7 +103,6 @@ export function StudySprintGame({ env, onDone }: GameProps) {
       <div className="row row--c">
         <button type="button" className="btn alt" disabled={!canFinish} onClick={() => { setPhase('reflect'); env.say('curious', 'games.study.howShort'); }}>{t('games.study.finished')}</button>
       </div>
-      {!canFinish && <p className="note center">{t('games.study.minNote')}</p>}
     </div>
   );
 }
