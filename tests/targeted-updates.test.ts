@@ -141,8 +141,9 @@ describe('6. disclaimers', () => {
 describe('7 and 8. chat page', () => {
   const css = read('src/styles/components.css');
   it('uses nearly the whole screen', () => {
-    expect(read('src/components/layout/AppShell.tsx')).toContain("view === 'chat' ? 'page--chat' : ''");
-    expect(css).toMatch(/main\.page--chat \{ max-width: none;/);
+    // Main's full-screen chat: edge to edge on phones, wide on desktop.
+    expect(css).toMatch(/\.chatp \{ margin: calc\(-16px - var\(--sat\)\) -16px 0;/);
+    expect(css).not.toContain('page--chat');
     expect(read('index.html')).toContain('interactive-widget=resizes-content');
   });
   it('shows Zaho behind the messages without taking taps, and still with reduced motion', () => {

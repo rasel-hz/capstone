@@ -21,7 +21,7 @@ export function AppShell({ onNavigate }: { onNavigate(v: ViewId): void }) {
     <div id="app">
       <NavBar view={view} onNavigate={onNavigate} />
       {/* The new page appears straight away and fades in, so a tap is never held up by an exit animation. */}
-      <main key={view} className={`page ${view === 'chat' ? 'page--chat' : ''}`}>
+      <main key={view} className="page">
         <SubTabs view={view} onNavigate={onNavigate} />
         <Page onNavigate={onNavigate} />
       </main>

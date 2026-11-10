@@ -274,9 +274,6 @@ input[type='time'] { width: auto; }
 
 /* Chat */
 .chatp { max-width: 780px; margin: 0 auto; display: flex; flex-direction: column; height: calc(100vh - 66px); min-height: 480px; }
-/* The chat page uses nearly the whole screen: slim margins, full width, the input always in reach. */
-main.page--chat { max-width: none; padding: calc(10px + var(--sat)) 16px 12px; }
-main.page--chat .chatp { max-width: none; height: calc(100dvh - 22px - var(--sat) - var(--sab)); min-height: 420px; }
 .chat-box { position: relative; }
 .chat-bg { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; opacity: .09; z-index: 0; animation: chat-float 7s ease-in-out infinite; }
 .chat-box > :not(.chat-bg) { position: relative; z-index: 1; }
@@ -403,8 +400,6 @@ main.page--chat .chatp { max-width: none; height: calc(100dvh - 22px - var(--sat
 .chat-in input { flex: 1; min-width: 0; }
 @media (max-width: 860px) {
   .chatp { height: calc(100dvh - 92px - var(--sat) - var(--sab)); min-height: 0; }
-  main.page--chat { padding: calc(8px + var(--sat)) 8px 0; }
-  main.page--chat .chatp { height: calc(100dvh - 96px - var(--sat) - var(--sab)); min-height: 0; }
   .chat-bg .mascot { width: 200px !important; height: 200px !important; }
   /* The header buddy keeps its size on phones; the chat header is laid out for it. */
   .chat-in .btn span { display: none; }
