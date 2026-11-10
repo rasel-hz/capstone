@@ -75,12 +75,15 @@ export function fullDaysIn(s: AppState, n = 7, now = new Date()) {
 }
 
 /**
- * How the buddy looks on Home. On a low-energy day it looks sad with the user rather than cheerful;
- * otherwise it's sleepy before anything is done today and awake once energy comes in.
+ * How the buddy looks on Home. On a low-energy day it's calm and quiet with the user, rather than cheerful
+ * (the worried clip loops and looked anxious).
+ * Otherwise it's sleepy only at the very start of the day: once the user has said how they are (normal or
+ * full of energy) or done something, it's awake, so a good answer is never met with closed eyes.
  */
-export function buddyMood(s: AppState, low: boolean, d = today()): 'concerned' | 'resting' | 'idle' {
-  if (low) return 'concerned';
-  return energyToday(s, d) === 0 ? 'resting' : 'idle';
+export function buddyMood(s: AppState, low: boolean, d = today()): 'calm' | 'resting' | 'idle' {
+  if (low) return 'calm';
+  const answered = (s.en ?? []).some((e) => e.d === d);
+  return energyToday(s, d) === 0 && !answered ? 'resting' : 'idle';
 }
 
 /** Checks saved goals and energy, so a bad value can't break Home. */

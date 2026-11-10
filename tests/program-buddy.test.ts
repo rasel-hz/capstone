@@ -135,8 +135,8 @@ describe('goals and energy', () => {
     expect(buddyMood(s, false, D(1))).toBe('resting');
     addEnergy(s, D(1));
     expect(buddyMood(s, false, D(1))).toBe('idle');
-    expect(buddyMood(s, true, D(1))).toBe('concerned');
-    expect(buddyMood(s, true, D(2))).toBe('concerned');
+    expect(buddyMood(s, true, D(1))).toBe('calm');
+    expect(buddyMood(s, true, D(2))).toBe('calm');
     expect(buddyMood(s, false, D(2))).toBe('resting');
   });
 
@@ -179,5 +179,17 @@ describe('tapping Zaho', () => {
       for (const area of ['home', 'rewards']) for (const n of ['1', '2', '3', '4', '5']) expect(poke[area][n], `${l} ${area}.${n}`).toBeTruthy();
       expect(poke.home.wake).toBeTruthy();
     }
+  });
+});
+
+describe('the buddy after the energy question', () => {
+  it('is awake as soon as the user says they are fine or full of energy, even before doing anything', async () => {
+    const { buddyMood } = await import('../src/features/buddy/buddy');
+    const { defaultState } = await import('../src/services/storage');
+    const d = new Date().toDateString();
+    const s = { ...defaultState(), nrg: 0, nrgD: '' };
+    expect(buddyMood(s, false, d)).toBe('resting');
+    expect(buddyMood({ ...s, en: [{ d, e: 'high' as const, ts: 1 }] }, false, d)).toBe('idle');
+    expect(buddyMood({ ...s, en: [{ d, e: 'low' as const, ts: 1 }] }, true, d)).toBe('calm');
   });
 });

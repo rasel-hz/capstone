@@ -46,7 +46,7 @@ export function Home({ onNavigate }: { onNavigate(v: ViewId): void }) {
   const points = usePointsTotal();
   const low = isLowEnergy(s);
   // The buddy wakes up as today's energy comes in, and reacts to each new point.
-  // Sad only for today's own low-energy answer, not for a "short missions" preference.
+  // Calm and quiet only for today's own low-energy answer, not for a "short missions" preference.
   const lastCheckIn = s.en[s.en.length - 1];
   const mascot = useMascot(buddyMood(s, !!lastCheckIn && lastCheckIn.d === today() && lastCheckIn.e === 'low'));
   const nrg = buddyEnergy(s);
