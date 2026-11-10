@@ -1,5 +1,5 @@
 import {
-  BarChart3, Bell, BookOpen, Brain, CarFront, Check, Clock, CloudSun, Compass, Gamepad2, Gift, Landmark, Leaf, ListChecks, MessageCircle, Moon, Smile, Sun, Target, Users, Waves,
+  BarChart3, BedDouble, Bell, BookOpen, Brain, Check, Clock, Compass, Gamepad2, Gift, Landmark, Leaf, ListChecks, MessageCircle, Moon, Smile, Sun, Target, Users, Waves,
   type LucideIcon,
 } from 'lucide-react';
 import { gsap } from 'gsap';
@@ -23,9 +23,10 @@ const MOODS: [MascotState, string][] = [['listening', '#8ecbee'], ['thinking', '
 const J_ICON: LucideIcon[] = [Target, Waves, Compass, Smile, Moon, Users, Clock, Leaf];
 const J_COLOR = ['#7f6bd6', '#3f9fc9', '#d9825b', '#d8608a', '#3b4f8f', '#2f9a72', '#8a7a55', '#24785a'];
 const J_SHAPE = ['28px 40px 32px 44px', '44px 26px 40px 30px', '34px 44px 26px 38px', '40px 30px 44px 26px'];
-const DAY: [LucideIcon, string][] = [[Landmark, 'prayer'], [BookOpen, 'work'], [CarFront, 'driving'], [CloudSun, 'weather'], [Users, 'family'], [Moon, 'ramadan']];
-const TIMES = ['dawn', 'morning', 'noon', 'afternoon', 'sunset', 'night'];
-const TINT = ['#f6d7c3', '#dbeefa', '#fff0c7', '#f9e1b8', '#f3c3a8', '#2b3266'];
+const DAY: [LucideIcon, string][] = [[Landmark, 'prayer'], [BookOpen, 'work'], [MessageCircle, 'chat'], [BedDouble, 'sleep']];
+const TIMES = ['dawn', 'morning', 'sunset', 'night'];
+const TINT = ['#f6d7c3', '#dbeefa', '#f3c3a8', '#2b3266'];
+const LAST = DAY.length - 1;
 const NAV = ['how', 'meet', 'try', 'journeys', 'saudi'] as const;
 const TABS: [LucideIcon, string][] = [[Brain, 'memory'], [Target, 'focus'], [Waves, 'breathe']];
 const DIST: [LucideIcon, string, [number, number]][] = [[Bell, 'alert', [8, 12]], [MessageCircle, 'message', [62, 8]], [Gamepad2, 'video', [70, 66]], [Users, 'group', [10, 70]], [Gift, 'ad', [38, 78]]];
@@ -232,8 +233,8 @@ export function Landing() {
               <div className="zw-span"><span className="zw-kicker">{t('landing.k.saudi')}</span><h2 className="zw-title">{t('landing.saudiTitle')}</h2></div>
               <div className="zw-moments" data-zw="moments">
                 {DAY.map(([Ic, k], i) => (
-                  <article key={k} className={`zw-moment ${i === 5 ? 'is-night' : ''} ${i === 0 ? 'is-on' : ''}`} style={css({ '--tint': TINT[i] })}>
-                    <span className="zw-time">{i === 5 ? <Moon aria-hidden="true" /> : <Sun aria-hidden="true" />}{t(`landing.times.${TIMES[i]}`)}</span>
+                  <article key={k} className={`zw-moment ${i === LAST ? 'is-night' : ''} ${i === 0 ? 'is-on' : ''}`} style={css({ '--tint': TINT[i] })}>
+                    <span className="zw-time">{i === LAST ? <Moon aria-hidden="true" /> : <Sun aria-hidden="true" />}{t(`landing.times.${TIMES[i]}`)}</span>
                     <div className="zw-big"><Ic aria-hidden="true" /></div>
                     <h3>{t(`landing.saudi.${k}.title`)}</h3>
                     <p>{t(`landing.saudi.${k}.text`)}</p>

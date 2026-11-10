@@ -73,6 +73,14 @@
     "weather": {
       "title": "Weather",
       "text": "Not connected right now, and we won't pretend otherwise."
+    },
+    "sleep": {
+      "title": "Bedtime",
+      "text": "Before you sleep, bedtime dhikr and calm challenges help you wind down."
+    },
+    "chat": {
+      "title": "Chat with ZAHO",
+      "text": "Tell it about your day. It listens, and asks before saving anything."
     }
   },
   "honestTitle": "To be honest",

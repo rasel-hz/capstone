@@ -26,8 +26,10 @@ export interface World {
 const PAL = ['#ffd36b', '#a57ff0', '#7fd9a8', '#ff9fb0', '#8ecbee'];
 const lerp = (a: number, b: number, k: number) => a + (b - a) * k;
 const clamp = (v: number, a: number, b: number) => Math.max(a, Math.min(b, v));
-const SKY = [['#f6c9b6', '#e9b9c9', '#e5c9a2'], ['#bfe0f7', '#e3f2fb', '#ecd2a2'], ['#9fd2f5', '#d8eefb', '#efcf96'], ['#f7d9a4', '#f9e8c6', '#e7bf86'], ['#f1a07a', '#f6c49a', '#c99168'], ['#141a3d', '#2b3266', '#3a3550']];
-const DAY_STATE: MascotState[] = ['calm', 'thinking', 'concerned', 'curious', 'happy', 'calm'];
+// Dawn, morning, sunset and night: one sky for each moment of the day.
+const SKY = [['#f6c9b6', '#e9b9c9', '#e5c9a2'], ['#bfe0f7', '#e3f2fb', '#ecd2a2'], ['#f1a07a', '#f6c49a', '#c99168'], ['#141a3d', '#2b3266', '#3a3550']];
+const DAY_STATE: MascotState[] = ['calm', 'thinking', 'listening', 'resting'];
+const LAST_DAY = SKY.length - 1;
 const HOW_STATE: MascotState[] = ['listening', 'thinking', 'happy', 'encouraging', 'celebrating'];
 function mix(a: string, b: string, k: number) {
   const p = (h: string) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
@@ -374,10 +376,10 @@ export function startWorld({ root, t, reduce }: { root: HTMLElement; t: Translat
   let dayIdx = 0;
   const daySlot = q('s-saudi');
   function setDay(p: number) {
-    const f = clamp(p, 0, 0.9999) * 6;
+    const f = clamp(p, 0, 0.9999) * SKY.length;
     const i = Math.floor(f);
     const k = f - i;
-    const j = Math.min(5, i + 1);
+    const j = Math.min(LAST_DAY, i + 1);
     q('daySky').style.background = `linear-gradient(${mix(SKY[i][0], SKY[j][0], k)}, ${mix(SKY[i][1], SKY[j][1], k)})`;
     q('dayGround').style.background = mix(SKY[i][2], SKY[j][2], k);
     const pin = q('dayPin');
@@ -388,8 +390,8 @@ export function startWorld({ root, t, reduce }: { root: HTMLElement; t: Translat
     const orb = q('orb');
     orb.style.left = `${ox}px`;
     orb.style.top = `${H * 0.78 - Math.sin(a) * H * 0.62}px`;
-    orb.classList.toggle('is-moon', i >= 5);
-    pin.classList.toggle('is-night', i >= 5 || (i === 4 && k > 0.6));
+    orb.classList.toggle('is-moon', i >= LAST_DAY);
+    pin.classList.toggle('is-night', i >= LAST_DAY || (i === LAST_DAY - 1 && k > 0.6));
     if (i !== dayIdx) {
       dayIdx = i;
       qa('.zw-moment').forEach((m, n) => m.classList.toggle('is-on', n === i));
@@ -455,9 +457,9 @@ export function startWorld({ root, t, reduce }: { root: HTMLElement; t: Translat
     // Pinned on phones too, as on a laptop. Only a screen too short to hold a moment (a phone on its side) gets the list.
     mm.add({ desk: '(min-height: 500px)', phone: '(max-height: 499px)' }, (c) => {
       if (c.conditions?.desk) {
-        ScrollTrigger.create({ trigger: q('dayPin'), start: 'top top', end: '+=260%', pin: true, scrub: true, onUpdate: (s) => setDay(s.progress) });
+        ScrollTrigger.create({ trigger: q('dayPin'), start: 'top top', end: '+=180%', pin: true, scrub: true, onUpdate: (s) => setDay(s.progress) });
       } else {
-        ScrollTrigger.create({ trigger: q('moments'), start: 'top 60%', end: 'bottom 60%', scrub: true, onUpdate: (s) => { daySlot.dataset.state = DAY_STATE[clamp(Math.floor(s.progress * 6), 0, 5)]; } });
+        ScrollTrigger.create({ trigger: q('moments'), start: 'top 60%', end: 'bottom 60%', scrub: true, onUpdate: (s) => { daySlot.dataset.state = DAY_STATE[clamp(Math.floor(s.progress * SKY.length), 0, LAST_DAY)]; } });
         if (!reduce) qa('.zw-moment').forEach((m) => gsap.from(m, { y: 40, opacity: 0, duration: 0.8, ease: 'expo.out', scrollTrigger: { trigger: m, start: 'top 88%' } }));
       }
       setDay(0);
