@@ -9,16 +9,15 @@ import { Segmented } from '../../components/ui/kit';
 import { LanguageSwitcher } from '../../components/ui/LanguageSwitcher';
 import { Overlay } from '../../components/ui/Overlay';
 import { useAppState, useStore } from '../../context/AppStateContext';
-import { isPlanResult, validatePlanConfig } from '../plan/config';
+import { validatePlanConfig } from '../plan/config';
 import { acknowledge, needsCheckIn } from '../prayer/gate';
 import { PrayerCheckIn } from '../prayer/PrayerBreak';
 import type { PrayerWindow } from '../prayer/times';
 import { useMissions } from './MissionProvider';
-import { planSummary } from '../challenges/games/PersonalPlanGame';
 import { useCountUp } from '../../hooks/useCountUp';
 import { useTimers } from '../../hooks/useTimers';
 import { useBackHandler } from '../../services/native';
-import { msg, tr, type Msg } from '../../i18n';
+import { msg, type Msg } from '../../i18n';
 import type { Difficulty, GameResult, ViewId } from '../../types';
 import { level } from '../../utils';
 import { CHALLENGES } from '../challenges/catalog';
@@ -167,11 +166,7 @@ export function MissionPlayer({ start, onClose, onNavigate }: { start: PlayerSta
     });
     const o = out as ReturnType<typeof completeItem>;
     if (!o) return;
-    // The companion follows up only on what was actually chosen and saved.
-    if (isPlanResult(r.data)) {
-      const plan = r.data;
-      store.update((d) => { d.chat.push({ b: 1, t: `${planSummary(plan)} ${tr('games.plan.followUp')}` }); });
-    }
+    // No chat message for a finished challenge. A saved plan reaches the companion as CONTEXT.last_plan.
     timers.clear();
     const st = store.getState();
     const m = st.mission!;

@@ -197,13 +197,12 @@ describe('the companion', () => {
     return JSON.parse(text.slice(text.indexOf('{'), text.lastIndexOf('}') + 1)) as { activities: { id: string; note?: string }[] };
   }
 
-  it('sees only the dhikr that fits the time now, with the rule not to write religious text', async () => {
+  it('sees every dhikr marked with whether it fits the time now, with the rule not to write religious text', async () => {
     const ctx = await modelInput({ dhikrNow: ['dhikr_morning', 'dhikr_calm_heart', 'dhikr_moment'] });
     const ids = ctx.activities.map((a) => a.id);
-    expect(ids).toContain('dhikr_calm_heart');
-    expect(ids).toContain('dhikr_morning');
-    expect(ids).not.toContain('dhikr_sleep');
-    expect(ids).not.toContain('dhikr_evening');
+    const fits = Object.fromEntries(ctx.activities.filter((a) => a.id.startsWith('dhikr_')).map((a) => [a.id, (a as { fits_now?: boolean }).fits_now]));
+    // Listed, so one the user names works at any time; fits_now steers an unnamed request.
+    expect(fits).toEqual({ dhikr_morning: true, dhikr_evening: false, dhikr_calm_heart: true, dhikr_moment: true, dhikr_sleep: false });
     const note = ctx.activities.find((a) => a.id === 'dhikr_calm_heart')!.note!;
     expect(note).toMatch(/never quote, write or paraphrase/);
     expect(note).toMatch(/not every time the user is stressed/);
@@ -217,7 +216,8 @@ describe('the companion', () => {
 
   it('ignores anything that is not a dhikr challenge in the time list', async () => {
     const ctx = await modelInput({ dhikrNow: ['dhikr_sleep', 'video', 'nonsense', 3] });
-    expect(ctx.activities.filter((a) => a.id.startsWith('dhikr_')).map((a) => a.id)).toEqual(['dhikr_sleep']);
+    const fitting = ctx.activities.filter((a) => (a as { fits_now?: boolean }).fits_now).map((a) => a.id);
+    expect(fitting).toEqual(['dhikr_sleep']);
   });
 
   it('sends only which dhikr fits the time, nothing about the user', () => {

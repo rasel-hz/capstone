@@ -11,6 +11,8 @@ export interface CompanionReply {
   tone: 'support' | 'friendly' | 'crisis';
   /** A proposed activity, not yet filtered. The chat runs it through the recommendation engine. */
   proposal?: SuggestInput;
+  /** A change to the journey the user asked for. The chat applies it and confirms only once it is saved. */
+  journey?: { focus: Goal; dhikr: boolean };
 }
 
 // Keywords in both languages, because someone can type either whichever language the app is in.

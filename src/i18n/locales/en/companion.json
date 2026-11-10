@@ -81,5 +81,12 @@
     "planStart": "Start planning",
     "toGoals": "Add them to today's goals",
     "goalsAdded": "Added to today's goals on Home."
+  },
+  "journey": {
+    "updated_m": "I've adjusted your journey a little and added {{list}}, to fit what you're going through. Give it a try and tell me what suits you.",
+    "updated_f": "I've adjusted your journey a little and added {{list}}, to fit what you're going through. Give it a try and tell me what suits you.",
+    "updated": "I've adjusted your journey a little and added {{list}}, to fit what you're going through. Give it a try and tell me what suits you.",
+    "failed": "I tried to adjust your journey but couldn't save it right now, so it's unchanged. Try again in a bit.",
+    "singleUnavailable": "I couldn't get that challenge ready right now. You'll find it in Challenges."
   }
 }

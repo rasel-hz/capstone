@@ -15,6 +15,10 @@ export interface SuggestInput {
   tasks?: string[];
   /** The user said they're coming from work, so an optional break is offered, clearly marked. */
   afterWork?: boolean;
+  /** The user asked for one activity: exactly one card, never more. */
+  single?: boolean;
+  /** Activities the user named themselves. A named dhikr is offered even outside its usual time. */
+  explicit?: ChallengeId[];
 }
 
 const PLANNING: ChallengeId[] = ['seq', 'breakdown'];
@@ -38,10 +42,10 @@ export function buildSuggestion(s: AppState, input: SuggestInput): ChatSuggestio
   const personal = wantsPlan && (tasks.length >= 2 || (!tasks.length && goals.includes('prioritize') && !aiPrefer.length));
   const prefer = personal ? ['seq' as ChallengeId, ...aiPrefer.filter((id) => id !== 'seq')] : aiPrefer;
 
-  const ranked = recommend(s, { prefer, goals, minutes: input.minutes, low: isLowEnergy(s) });
+  const ranked = recommend(s, { prefer, goals, minutes: input.minutes, low: isLowEnergy(s), explicit: input.explicit });
   if (!ranked.length) return undefined;
   const fromAi = prefer.filter((id) => ranked.some((r) => r.id === id));
-  const ids = [...new Set([...fromAi, ...ranked.map((r) => r.id)])].slice(0, 3);
+  const ids = [...new Set([...fromAi, ...ranked.map((r) => r.id)])].slice(0, input.single ? 1 : 3);
   // A written reason only fits the AI's own first pick. Otherwise the engine's reason code is used.
   const why = input.why && aiPrefer[0] === ids[0] ? input.why : undefined;
   const first = ranked.find((r) => r.id === ids[0]);

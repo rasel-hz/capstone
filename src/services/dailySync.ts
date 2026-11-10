@@ -1,8 +1,10 @@
 import type { Store } from '../context/AppStateContext';
 import { MAX_GOALS, todayGoals } from '../features/buddy/buddy';
+import { CHALLENGES } from '../features/challenges/catalog';
 import { validProfile, type LifeProfile } from '../features/profile/questions';
 import { streakTz } from '../features/streak/streak';
-import type { AppState, Goal } from '../types';
+import { avoidOf, buildPlan, validPlan, type PathPlan } from '../features/path/planner';
+import type { AppState, Feedback, Goal } from '../types';
 import { today } from '../utils';
 import { supabase } from './auth';
 import { onProgressChanged } from './progressSync';
@@ -71,7 +73,31 @@ export function mergeRest(local: string[], rows: { event_key: string; value: { o
   return [...new Set([...on, ...local.filter((d) => !known.has(d))])].sort().slice(-60);
 }
 
-const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b);
+/** JSON with object keys sorted. Postgres stores jsonb with its own key order, so plain text would differ. */
+export const stable = (v: unknown): string => JSON.stringify(v, (_k, x) => (x && typeof x === 'object' && !Array.isArray(x) ? Object.fromEntries(Object.keys(x).sort().map((k) => [k, x[k]])) : x));
+const same = (a: unknown, b: unknown) => stable(a) === stable(b);
+
+/** The newer of two copies of the journey. Each change stamps the plan, so the latest one wins. */
+export function newerJourney(local: PathPlan | null, remote: PathPlan | null): 'local' | 'remote' | 'same' {
+  if (!remote) return local ? 'local' : 'same';
+  if (!local) return 'remote';
+  const at = (x: PathPlan) => x.updated ?? x.created;
+  if (at(remote) > at(local)) return 'remote';
+  if (at(local) > at(remote)) return 'local';
+  return 'same';
+}
+
+/** Feedback from both places, each answer once, oldest first, the last 60. */
+export function mergeFeedback(local: Feedback[], remote: unknown): Feedback[] {
+  const ok = (f: unknown): f is Feedback => {
+    const x = f as Feedback;
+    return !!x && typeof x.id === 'string' && Object.hasOwn(CHALLENGES, x.id) && (x.v === 1 || x.v === 0 || x.v === -1) && Number.isFinite(x.ts);
+  };
+  const all = [...local.filter(ok), ...(Array.isArray(remote) ? remote.filter(ok) : [])];
+  const seenKeys = new Set<string>();
+  return all.filter((f) => { const k = `${f.id}|${f.ts}|${f.v}`; if (seenKeys.has(k)) return false; seenKeys.add(k); return true; })
+    .sort((a, b) => a.ts - b.ts).slice(-60);
+}
 
 /** The newer of the device's answers and the account's. Answers carry the time they were given. */
 export function newerProfile(local: LifeProfile | null, remote: LifeProfile | null): 'local' | 'remote' | 'same' {
@@ -103,6 +129,9 @@ interface Seen {
   rest: string[];
   prof: LifeProfile | null;
   grace: number;
+  /** The journey and feedback as last saved to the account, as JSON, so only real changes are sent. */
+  journey: string;
+  fb: string;
 }
 
 let store: Store | null = null;
@@ -125,6 +154,12 @@ async function pull(st: Store, uid: string) {
   report('reading answers', p.error);
   report('reading goals', g.error);
   report('reading rest days', r.error);
+  // Read on their own, so the answers above still load before the journey columns exist.
+  const jf = await sb.from('profiles').select('journey, challenge_feedback').eq('id', uid).maybeSingle();
+  report('reading the journey', jf.error);
+  const jRow = jf.error ? null : (jf.data as { journey?: unknown; challenge_feedback?: unknown } | null);
+  const remoteJourney = jRow ? validPlan(jRow.journey ?? null) : null;
+  const journeyWhich = jRow ? newerJourney(s.path, remoteJourney) : 'same';
 
   const remote = p.error ? null : validProfile((p.data as { life_profile?: unknown } | null)?.life_profile ?? null);
   const which = p.error ? 'same' : newerProfile(s.prof, remote);
@@ -135,6 +170,10 @@ async function pull(st: Store, uid: string) {
     if (which === 'remote') d.prof = remote;
     if (rows) d.goals = { d: today(), items: mergeGoals(todayGoals(d), rows) };
     if (restRows) d.rest = mergeRest(d.rest, restRows);
+    if (jRow) d.fb = mergeFeedback(d.fb ?? [], jRow.challenge_feedback);
+    if (journeyWhich === 'remote') d.path = remoteJourney;
+    // A first journey on this device, from the onboarding answers saved with the account.
+    if (!d.path && !remoteJourney && d.done && d.prof) d.path = buildPlan(d.prof, Date.now(), avoidOf(d));
   });
   const after = st.getState();
   // What the device has and the account doesn't is sent on the next step.
@@ -144,7 +183,25 @@ async function pull(st: Store, uid: string) {
     rest: restRows ? restRows.filter((x) => x.value?.on === true).map((x) => x.event_key) : after.rest,
     grace: after.streakGrace,
     prof: which === 'local' ? remote : after.prof,
+    // Anything newer on the device than in the account is sent on the next step.
+    journey: jRow ? stable(remoteJourney) : stable(after.path),
+    fb: jRow ? stable(Array.isArray(jRow.challenge_feedback) ? jRow.challenge_feedback : []) : stable(after.fb),
   };
+}
+
+/**
+ * Saves the journey to the account now and says whether it worked. A journey change from the chat is
+ * confirmed to the user only after this returns true.
+ */
+export async function saveJourneyNow(st: Store): Promise<boolean> {
+  const sb = supabase;
+  const s = st.getState();
+  if (!sb || !s.uid || !s.path) return false;
+  const { data, error } = await sb.from('profiles').update({ journey: s.path }).eq('id', s.uid).select('journey').maybeSingle();
+  report('saving the journey', error);
+  const saved = !error && !!data && stable((data as { journey: unknown }).journey) === stable(s.path);
+  if (saved && seen?.uid === s.uid) seen.journey = stable(s.path);
+  return saved;
 }
 
 async function push(st: Store, v: Seen) {
@@ -182,6 +239,20 @@ async function push(st: Store, v: Seen) {
     report('saving a rest day', error);
     if (error && !missing(error)) return;
   }
+  // The journey and the feedback, when they changed. An empty device never clears what the account has.
+  const journey = stable(s.path);
+  if (s.path && journey !== v.journey) {
+    const { error } = await sb.from('profiles').update({ journey: s.path }).eq('id', v.uid);
+    report('saving the journey', error);
+    if (!error || missing(error)) v.journey = journey;
+  }
+  const fb = stable(s.fb ?? []);
+  if ((s.fb ?? []).length && fb !== v.fb) {
+    const { error } = await sb.from('profiles').update({ challenge_feedback: s.fb }).eq('id', v.uid);
+    report('saving feedback', error);
+    if (!error || missing(error)) v.fb = fb;
+  }
+
   if (!same(s.rest, v.rest)) refreshStreak = true;
   v.rest = s.rest;
   if (s.streakGrace !== v.grace) {
@@ -242,7 +313,7 @@ export function dailySyncNow(): Promise<void> {
   return running;
 }
 
-const watched = (s: AppState) => JSON.stringify([s.uid, s.prof, s.goals, s.rest, s.streakGrace]);
+const watched = (s: AppState) => JSON.stringify([s.uid, s.prof, s.goals, s.rest, s.streakGrace, s.path, s.fb]);
 
 /** Starts keeping the signed-in user's streak, goals and answers in Supabase. Returns a function that stops it. */
 export function startDailySync(s: Store) {

@@ -11,7 +11,7 @@ import { LevelSheet } from '../../features/path/map/LevelSheet';
 import { NumoWalker } from '../../features/path/map/NumoWalker';
 import { OasisWorld } from '../../features/path/map/OasisWorld';
 import { useJourneyTravel } from '../../features/path/map/useJourneyTravel';
-import { buildPlan, completeReflect, currentNode, extendPlan, nodeState, pathItem, replan, type NodeState, type PathNode, type PathPlan } from '../../features/path/planner';
+import { avoidOf, buildPlan, completeReflect, currentNode, extendPlan, nodeState, pathItem, replan, timedView, type NodeState, type PathNode, type PathPlan } from '../../features/path/planner';
 import { chapterProgress, layoutWorld, WORLD_W } from '../../features/path/world';
 import { ProfileQuestions } from '../../features/profile/ProfileQuestions';
 import type { LifeProfile } from '../../features/profile/questions';
@@ -30,7 +30,7 @@ export function PathPage({ onNavigate }: { onNavigate(v: ViewId): void }) {
     store.update((d) => {
       d.prof = p;
       // Finished steps always stay. Only what hasn't happened yet changes.
-      d.path = d.path ? replan(d.path, p) : buildPlan(p);
+      d.path = d.path ? replan(d.path, p, Date.now(), avoidOf(d)) : buildPlan(p, Date.now(), avoidOf(d));
     });
     setEditing(false);
   }
@@ -45,7 +45,7 @@ export function PathPage({ onNavigate }: { onNavigate(v: ViewId): void }) {
       </div>
     );
   }
-  return <JourneyMap plan={s.path} onNavigate={onNavigate} onEdit={() => setEditing(true)} />;
+  return <JourneyMap plan={timedView(s.path)} onNavigate={onNavigate} onEdit={() => setEditing(true)} />;
 }
 
 function JourneyMap({ plan, onNavigate, onEdit }: { plan: PathPlan; onNavigate(v: ViewId): void; onEdit(): void }) {

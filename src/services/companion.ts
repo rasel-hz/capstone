@@ -1,8 +1,10 @@
+import { dhikrFitsNow, isDhikr } from '../features/dhikr/content';
+import { pickDhikr } from '../features/dhikr/pick';
 import { detectCrisis } from '../features/companion/crisis';
 import { buildChatRequest } from '../features/companion/request';
 import { mentionsWork, ruleReply, type CompanionReply } from '../features/companion/rules';
 import type { Goal } from '../features/recommend/goals';
-import type { AppState, ContextTag } from '../types';
+import type { AppState, ChallengeId, ContextTag } from '../types';
 import { apiUrl } from './native';
 
 export interface CompanionService {
@@ -36,7 +38,19 @@ export const aiCompanion: CompanionService = {
       tasks?: string[];
       minutes?: number;
       suggest?: { ids: string[]; why: string };
+      journey?: { action: 'single' | 'adjust'; focus?: Goal; named?: boolean; dhikr?: boolean };
     };
+    // One challenge asked for: one card. A named one is honoured even outside its usual time.
+    const single = r.journey?.action === 'single';
+    const named = single && r.journey?.named ? (r.suggest?.ids ?? []).slice(0, 1) : [];
+    // A dhikr asked for in general follows the user's local time, not the model's guess: morning in the
+    // morning, evening in the evening, bedtime at night. A fitting one the model chose, or "calm your heart"
+    // for worry, is kept; a dhikr the user named is never replaced.
+    if (single && !named.length && r.suggest?.ids[0] && isDhikr(r.suggest.ids[0])) {
+      const id = r.suggest.ids[0];
+      const keep = id === 'dhikr_calm_heart' || (id !== 'dhikr_moment' && dhikrFitsNow(id as ChallengeId));
+      if (!keep) r.suggest.ids = [pickDhikr()];
+    }
     // Only a request for help planning gets the board on its own; recalling a past plan doesn't.
     const planning = (r.intent === 'planning' || r.intent === 'advice') && !!r.tasks?.length && !!r.goals?.some((g) => g === 'prioritize' || g === 'time');
     return {
@@ -46,8 +60,9 @@ export const aiCompanion: CompanionService = {
       // Only shown as a card when the model actually suggested something.
       // Named tasks plus a wish to organise them is enough to offer the personal planning board.
       ...((r.suggest || planning) && r.tone !== 'crisis'
-        ? { proposal: { prefer: r.suggest?.ids ?? [], goals: r.goals, minutes: r.minutes, why: r.suggest?.why, tasks: r.tasks, afterWork: mentionsWork(text) } }
+        ? { proposal: { prefer: r.suggest?.ids ?? [], goals: r.goals, minutes: r.minutes, why: r.suggest?.why, tasks: r.tasks, afterWork: mentionsWork(text), ...(single ? { single: true, explicit: named as ChallengeId[] } : {}) } }
         : {}),
+      ...(r.journey?.action === 'adjust' && r.journey.focus && r.tone !== 'crisis' ? { journey: { focus: r.journey.focus, dhikr: !!r.journey.dhikr } } : {}),
     };
   },
 };

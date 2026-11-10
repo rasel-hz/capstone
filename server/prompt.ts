@@ -33,7 +33,17 @@ ACTIVITIES
 - If you suggest something, mention it briefly in the reply as optional. The user starts it with a button; you cannot start, change or save anything yourself.
 - Match the need: too many tasks or not knowing where to start → seq only when they named at least two of their own tasks, otherwise breakdown; hard to get going on something → micro_start or breakdown; focusing on study or any work → study_sprint; anxious or overwhelmed right now → grounding or calm; long screen time or tired eyes → eye_rest; stressed after a long day → calm or calm_landscape as an optional break; winding down for sleep → calm or calm_landscape; going over worries or practical decisions → advice first, then thought_sort, or calm for a pause, or emotion_map only if they want to reflect on feelings; planning a get-together → seq.
 - If they are exhausted or want to rest, respect that. Offering rest, or nothing at all, is a good answer. Suggest at most one gentle activity.
-- Respect CONTEXT.feedback: avoid activities the user said didn't suit them.
+- Respect CONTEXT.feedback. latest_answer "did not suit me": don't suggest it when anything else fits. "okay": prefer something else for now, it isn't a permanent dislike. "suited me": fine to offer again when relevant, but not every time.
+- CONTEXT.recently_completed is what the user actually finished lately; you may mention it naturally when relevant. There is no message in the chat when a challenge is finished.
+
+ONE CHALLENGE OR THE JOURNEY
+- Set journey.action to "single" when the user asks for one activity or one kind of activity, such as «أبي أذكار الصباح», «أبي أذكار» or «عطني تحدي يساعدني أركز». Put exactly one ID in suggest.challenge_ids. This never changes their journey.
+- If they named one specific activity, use exactly that one and set journey.named to true, even if its time doesn't fit now (morning dhikr in the evening is still morning dhikr). For dhikr in general, pick by the time: dhikr_morning when it fits_now, otherwise dhikr_evening when it fits_now, or dhikr_sleep when they say they're going to sleep and it fits_now; dhikr_moment only when none of those fits now, and dhikr_calm_heart when they're worried. If it's truly unclear, ask one short question and suggest nothing.
+- Set journey.action to "adjust" and journey.focus to one goal only when the user explicitly asks to change or focus their journey («أبي رحلتي تركز على النوم هالفترة»), or clearly describes a difficulty that has been going on («صار لي فترة أتشتت») or is weighing on today («اليوم أعاني من النوم») and CONTEXT.journey.upcoming doesn't already address it. Not for a passing remark, not for a request for one activity, and not again if CONTEXT.journey.adapted shows the same focus in the last 12 hours.
+- Set journey.include_dhikr to true only if they asked for dhikr in their journey.
+- Otherwise set journey.action to "none", focus to "none", and both flags to false.
+- For a single activity you may say you've got it ready («أبشر، جهزت لك تحدي ...»): the app shows it as a card right under your reply.
+- Never say you changed, updated or saved their journey. The app makes the change itself and tells the user only after it is saved. You may say something warm about what they're going through.
 - Set goals to what the user is trying to do, from: ${GOALS.join(', ')}. Use an empty list if none apply. Never use a condition or diagnosis as a goal.
 - Set available_minutes only if the user stated how much time they have now, otherwise null.
 
@@ -81,7 +91,7 @@ export const INTENTS = ['advice', 'planning', 'support', 'activity_request', 're
 export const REPLY_SCHEMA = {
   type: 'object',
   additionalProperties: false,
-  required: ['reply', 'reply_language', 'intent', 'tone', 'distress', 'goals', 'tasks', 'available_minutes', 'suggest', 'context'],
+  required: ['reply', 'reply_language', 'intent', 'tone', 'distress', 'goals', 'tasks', 'available_minutes', 'suggest', 'journey', 'context'],
   properties: {
     reply: { type: 'string' },
     reply_language: { type: 'string', enum: ['ar', 'en'] },
@@ -98,6 +108,17 @@ export const REPLY_SCHEMA = {
       properties: {
         challenge_ids: { type: 'array', items: { type: 'string', enum: ACTIVE_IDS } },
         reason: { type: 'string' },
+      },
+    },
+    journey: {
+      type: 'object',
+      additionalProperties: false,
+      required: ['action', 'focus', 'named', 'include_dhikr'],
+      properties: {
+        action: { type: 'string', enum: ['none', 'single', 'adjust'] },
+        focus: { type: 'string', enum: [...GOALS, 'none'] },
+        named: { type: 'boolean' },
+        include_dhikr: { type: 'boolean' },
       },
     },
     context: {

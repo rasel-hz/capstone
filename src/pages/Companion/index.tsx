@@ -6,7 +6,10 @@ import type { MascotState } from '../../components/mascot/manifest';
 import { useMascot } from '../../components/mascot/useMascot';
 import { fillName } from '../../features/companion/name';
 import { useAppSelector, useAppState, useStore } from '../../context/AppStateContext';
-import { tr } from '../../i18n';
+import { formatList, tr } from '../../i18n';
+import { adaptJourney } from '../../features/path/planner';
+import type { Goal } from '../../features/recommend/goals';
+import { saveJourneyNow } from '../../services/dailySync';
 import { SuggestionCard } from '../../features/companion/SuggestionCard';
 import { completeTalk } from '../../features/path/planner';
 import { buildSuggestion } from '../../features/recommend/suggest';
@@ -98,8 +101,28 @@ export function Companion() {
         d.chat.push({ b: 1, card: 1, t: '' });
       }
     });
+    // A single challenge was asked for but no card could be shown: say so, so the reply isn't left unbacked.
+    if (reply.proposal?.single && !sug && reply.tone !== 'crisis') store.update((d) => { d.chat.push({ b: 1, t: tr('companion.journey.singleUnavailable') }); });
+    if (reply.journey) await changeJourney(reply.journey.focus, reply.journey.dhikr);
     setSupportive(reply.tone === 'crisis' ? 'concerned' : reply.tone === 'support' ? 'calm' : null);
     if (reply.tone === 'friendly') mascot.play('happy');
+  }
+
+  // A journey change from the chat: made on the device, saved to the account, read back, and only then
+  // confirmed. If saving fails the journey goes back to how it was and the user is told plainly.
+  async function changeJourney(focus: Goal, dhikr: boolean) {
+    const res = adaptJourney(store.getState(), focus, { dhikr });
+    if (!res) return;
+    const before = store.getState().path;
+    store.update((d) => { d.path = res.plan; });
+    const saved = await saveJourneyNow(store).catch(() => false);
+    if (!saved) {
+      store.update((d) => { d.path = before; d.chat.push({ b: 1, t: tr('companion.journey.failed') }); });
+      return;
+    }
+    const added = [...res.change.swapped.map((w) => w.to), ...(res.change.dhikr ? [res.change.dhikr] : [])];
+    const list = formatList(added.map((id) => tr(`challenges.items.${id}.name`)));
+    store.update((d) => { d.chat.push({ b: 1, t: tr('companion.journey.updated', { list, context: d.g }) }); });
   }
 
   function answerCard(m: 0 | 1 | 2) {

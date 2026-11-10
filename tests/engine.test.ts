@@ -76,7 +76,8 @@ describe('mission state', () => {
     expect(r.all).toBe(false);
     expect(r.doneCount).toBe(1);
     expect(s.lastDaily?.all).toBe(false);
-    expect(s.chat[s.chat.length - 1].t.startsWith('انتهت المهمة')).toBe(true);
+    // Finishing posts nothing in the chat; the attempts are saved and reach the companion as context.
+    expect(s.chat).toHaveLength(0);
   });
 
   it('does not count a mission past its last item as open', () => {

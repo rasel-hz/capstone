@@ -19,7 +19,7 @@ import { acknowledge, breakLeft, needsCheckIn, nextOf, placeOf } from '../../fea
 import { PrayerCheckIn } from '../../features/prayer/PrayerBreak';
 import { useMinute } from '../../features/prayer/PrayerCity';
 import { formatPrayerTime } from '../../features/prayer/times';
-import { currentNode, nodeState, pathItem, type PathNode } from '../../features/path/planner';
+import { currentNode, nodeState, pathItem, timedView, type PathNode } from '../../features/path/planner';
 import { StreakChip } from '../../features/streak/StreakBits';
 import { progressStats } from '../../features/progress/stats';
 import { recommend } from '../../features/recommend/engine';
@@ -67,7 +67,8 @@ export function Home({ onNavigate }: { onNavigate(v: ViewId): void }) {
   const askWindow = needsCheckIn(s, now);
   const blocked = !!s.driving;
   const st = progressStats(s);
-  const node = currentNode(s.path);
+  // Shown as it is now: an upcoming timed dhikr step shows the one that fits the current time.
+  const node = currentNode(s.path ? timedView(s.path) : null);
 
   useEffect(() => {
     if (greeted || s.driving) return;

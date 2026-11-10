@@ -12,6 +12,11 @@ export interface RecOptions {
   low?: boolean;
   /** IDs the AI or the user asked for, best first. They still pass the same safety filters. */
   prefer?: ChallengeId[];
+  /**
+   * IDs the user named themselves, such as morning dhikr in the evening. A named dhikr is offered even
+   * outside its usual time; anything else still passes the same filters.
+   */
+  explicit?: ChallengeId[];
   exclude?: ChallengeId[];
   now?: number;
 }
@@ -29,6 +34,28 @@ const DAY = 864e5;
 export function helpfulness(s: AppState, id: ChallengeId): number {
   return (s.fb ?? []).filter((f) => f.id === id).slice(-3).reduce((n, f) => n + f.v, 0);
 }
+
+/** The user's most recent answer about this challenge, if any: 1 suited me, 0 okay, -1 didn't suit me. */
+export const lastFeedback = (s: AppState, id: ChallengeId) => {
+  const a = (s.fb ?? []).filter((f) => f.id === id);
+  return a.length ? a[a.length - 1] : null;
+};
+
+// How the last three answers move a challenge in the ranking. "Suited me" lifts it, "okay" lowers it a
+// little, "didn't suit me" lowers it a lot. Older answers count less, so one "okay" is never permanent.
+const WEIGHT = { 1: 2, 0: -1.5, '-1': -5 } as const;
+export function feedbackScore(s: AppState, id: ChallengeId): number {
+  const recent = (s.fb ?? []).filter((f) => f.id === id).slice(-3);
+  return recent.reduce((n, f, i) => n + WEIGHT[String(f.v) as '1' | '0' | '-1'] * (i === recent.length - 1 ? 1 : 0.5), 0);
+}
+
+/** Just rated "okay": not offered again the same day unless asked for, so something else gets a turn. */
+const justOkay = (s: AppState, id: ChallengeId, now: number) => {
+  const f = lastFeedback(s, id);
+  return !!f && f.v === 0 && now - f.ts < DAY;
+};
+/** The latest answer was "didn't suit me": left out whenever there is something else to offer. */
+const disliked = (s: AppState, id: ChallengeId) => lastFeedback(s, id)?.v === -1;
 
 const notForMe = (s: AppState, id: ChallengeId) => {
   const last = (s.fb ?? []).filter((f) => f.id === id).slice(-2);
@@ -55,14 +82,17 @@ export function recommend(s: AppState, o: RecOptions = {}): Recommendation[] {
     const c = CHALLENGES[id];
     const m = CHALLENGE_META[id];
     const asked = prefer.includes(id);
+    const named = !!o.explicit?.includes(id);
     const matched = goals.filter((g) => m.goals.includes(g));
 
     // Eligibility.
     if (c.retired || o.exclude?.includes(id)) continue;
-    if (m.dhikr && (!asked || !dhikrFitsNow(id, new Date(now)))) continue;
+    // Dhikr only when asked for, and at a fitting time, unless the user named that one themselves.
+    if (m.dhikr && (!asked || (!named && !dhikrFitsNow(id, new Date(now))))) continue;
     if (o.minutes != null && c.min > o.minutes) continue;
     if (m.onRequest && !asked && !(goals[0] && m.goals[0] === goals[0])) continue;
     if (!asked && notForMe(s, id)) continue;
+    if (!asked && justOkay(s, id, now)) continue;
     if (o.low && !m.gentle && c.min > 2 && !asked) continue;
     if ((goals.length || prefer.length) && !matched.length && !asked) continue;
 
@@ -73,7 +103,7 @@ export function recommend(s: AppState, o: RecOptions = {}): Recommendation[] {
     });
     if (asked) score += 6 - Math.min(5, prefer.indexOf(id));
     const help = helpfulness(s, id);
-    score += help * 2;
+    score += feedbackScore(s, id);
     score -= playedToday(id);
     if (o.low && m.gentle) score += 2;
     // On-request activities rank behind others unless the user or the AI asked for them by name.
@@ -91,6 +121,8 @@ export function recommend(s: AppState, o: RecOptions = {}): Recommendation[] {
     const diff: Difficulty = c.hasEasy && (o.low || (last != null && last < 60)) ? 'easy' : 'normal';
     out.push({ id, score, diff, why });
   }
+  // Something the user said didn't suit them is dropped when there is anything else to offer.
+  const kept = out.filter((r) => prefer.includes(r.id) || !disliked(s, r.id));
   // Stable sort keeps catalog order for ties, so results are predictable.
-  return out.sort((a, b) => b.score - a.score);
+  return (kept.length ? kept : out).sort((a, b) => b.score - a.score);
 }

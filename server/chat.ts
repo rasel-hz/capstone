@@ -38,8 +38,8 @@ export interface ChatRequest {
     attempts: number;
     avgAccuracy: number | null;
     byChallenge: { id: string; count: number; lastAccuracy: number | null }[];
-    /** Net self-reported helpfulness per challenge, from the last few answers. */
-    feedback: { id: string; net: number }[];
+    /** Net self-reported helpfulness per challenge, and the user's latest answer (1, 0 or -1). */
+    feedback: { id: string; net: number; last: number | null }[];
     /** What the user actually chose last time on the planning board, if anything. */
     lastPlan: LastPlan | null;
     /** Calculated on the device from the user's chosen city or location. Null when not set up. */
@@ -47,7 +47,21 @@ export interface ChatRequest {
     about: ReturnType<typeof validProfile>;
     /** Dhikr challenges that fit the user's local time now, worked out on the device. */
     dhikrNow: string[];
+    /** The personal journey: its theme now, the next steps, and the last change made from the chat. */
+    journey: { theme: string; upcoming: string[]; done: number; adapted: { goal: string; hours_ago: number } | null } | null;
+    /** The last few challenges the user completed, newest first, by their local day. */
+    recent: { id: string; day: string }[];
   };
+}
+
+// Only catalog IDs and known goals get through; anything else in the journey summary is dropped.
+function parseJourney(v: unknown): ChatRequest['context']['journey'] {
+  const j = v as { theme?: unknown; upcoming?: unknown; done?: unknown; adapted?: unknown } | null;
+  if (!j || typeof j.theme !== 'string' || !/^[a-z]{2,12}$/.test(j.theme)) return null;
+  const upcoming = (Array.isArray(j.upcoming) ? j.upcoming : []).filter((id): id is string => typeof id === 'string' && Object.hasOwn(CHALLENGES, id)).slice(0, 8);
+  const a = j.adapted as { goal?: unknown; hours_ago?: unknown } | null;
+  const adapted = a && isGoal(a.goal) && typeof a.hours_ago === 'number' && Number.isFinite(a.hours_ago) ? { goal: a.goal, hours_ago: Math.max(0, Math.round(a.hours_ago)) } : null;
+  return { theme: j.theme, upcoming, done: num(j.done, 1000), adapted };
 }
 
 const PRAYER_IDS = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'];
@@ -94,6 +108,11 @@ export interface ChatReply {
   minutes?: number;
   /** Activities the model proposed. Only catalog IDs survive; the app filters them again before showing. */
   suggest?: { ids: string[]; why: string };
+  /**
+   * What the user asked for: one challenge (named: they named that exact one), or a change to their journey
+   * towards a need. The app makes any journey change itself and confirms it only after it is saved.
+   */
+  journey?: { action: 'single' | 'adjust'; focus?: Goal; named?: boolean; dhikr?: boolean };
 }
 
 export class ChatError extends Error {
@@ -133,10 +152,15 @@ export function parseRequest(raw: unknown): ChatRequest {
       lowEnergyToday: c.lowEnergyToday === true,
       energy: c.energy === 'high' || c.energy === 'mid' || c.energy === 'low' ? c.energy : null,
       feedback: (Array.isArray(c.feedback) ? c.feedback : []).flatMap((x) => {
-        const f = x as { id?: unknown; net?: unknown };
+        const f = x as { id?: unknown; net?: unknown; last?: unknown };
         if (typeof f.id !== 'string' || !Object.hasOwn(CHALLENGES, f.id) || typeof f.net !== 'number' || !Number.isFinite(f.net)) return [];
-        return [{ id: f.id, net: Math.max(-3, Math.min(3, Math.round(f.net))) }];
+        return [{ id: f.id, net: Math.max(-3, Math.min(3, Math.round(f.net))), last: f.last === 1 || f.last === 0 || f.last === -1 ? f.last : null }];
       }),
+      journey: parseJourney(c.journey),
+      recent: (Array.isArray(c.recent) ? c.recent : []).flatMap((x) => {
+        const r = x as { id?: unknown; day?: unknown };
+        return typeof r.id === 'string' && Object.hasOwn(CHALLENGES, r.id) && typeof r.day === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(r.day) ? [{ id: r.id, day: r.day }] : [];
+      }).slice(0, 8),
       lastPlan: parseLastPlan(c.lastPlan),
       prayer: parsePrayer(c.prayer),
       about: validProfile(c.about),
@@ -184,6 +208,11 @@ export function acceptOutput(rawText: string, lang: 'ar-SA' | 'en' = 'ar-SA', sa
   const ids = [...new Set((Array.isArray(s.challenge_ids) ? s.challenge_ids : []).filter((id): id is string => typeof id === 'string' && Object.hasOwn(CHALLENGES, id) && !CHALLENGES[id as keyof typeof CHALLENGES].retired))].slice(0, 3);
   const why = typeof s.reason === 'string' ? s.reason.trim().slice(0, 240) : '';
   const tasks = groundedTasks(o.tasks, said);
+  // One challenge or a journey change. A request for one activity never becomes a journey change.
+  const j = (o.journey ?? {}) as { action?: unknown; focus?: unknown; named?: unknown; include_dhikr?: unknown };
+  const journey: ChatReply['journey'] = j.action === 'adjust' && isGoal(j.focus)
+    ? { action: 'adjust', focus: j.focus, dhikr: j.include_dhikr === true }
+    : j.action === 'single' ? { action: 'single', named: j.named === true } : undefined;
   const mins = typeof o.available_minutes === 'number' && Number.isFinite(o.available_minutes) && o.available_minutes > 0 ? Math.min(240, Math.round(o.available_minutes)) : undefined;
   return {
     reply,
@@ -194,7 +223,8 @@ export function acceptOutput(rawText: string, lang: 'ar-SA' | 'en' = 'ar-SA', sa
     goals,
     ...(tasks.length ? { tasks } : {}),
     ...(mins ? { minutes: mins } : {}),
-    ...(ids.length ? { suggest: { ids, why } } : {}),
+    ...(ids.length ? { suggest: { ids: journey?.action === 'single' ? ids.slice(0, 1) : ids, why } } : {}),
+    ...(journey ? { journey } : {}),
     ...(ctx.length || low ? { pending: { ctx, low } } : {}),
   };
 }
@@ -203,16 +233,18 @@ export function acceptOutput(rawText: string, lang: 'ar-SA' | 'en' = 'ar-SA', sa
 // Dhikr appears only when it fits the user's time now, and the model never writes religious text itself:
 // the app shows the verified words. It is offered sometimes, not whenever someone is stressed.
 const DHIKR_NOTE = 'Islamic remembrance (dhikr). The app shows the verified texts with their sources: never quote, write or paraphrase any dhikr, dua or verse yourself, only suggest the activity. Offer it gently and only when the user seems open to it, asks for it, or the time fits; not every time the user is stressed, and keep suggesting the other activities too. Never present it as treatment or promise that it removes anxiety.';
+// Every dhikr is listed with fits_now, so one the user names works at any time, while an unnamed request
+// gets the one that fits the user's local time (worked out on their device, never the server's clock).
 function activities(lang: 'ar-SA' | 'en', dhikrNow: string[] = []) {
   const L = lang === 'en' ? en : ar;
-  return (Object.keys(CHALLENGES) as (keyof typeof CHALLENGES)[]).filter((id) => !CHALLENGES[id].retired && (!isDhikr(id) || dhikrNow.includes(id))).map((id) => ({
+  return (Object.keys(CHALLENGES) as (keyof typeof CHALLENGES)[]).filter((id) => !CHALLENGES[id].retired).map((id) => ({
     id,
     name: L.items[id].name,
     minutes: CHALLENGES[id].min,
     purpose: L.items[id].purpose,
     supports: CHALLENGE_META[id].goals,
     ...(CHALLENGE_META[id].onRequest ? { note: 'only if the user wants to reflect on their feelings' } : {}),
-    ...(isDhikr(id) ? { note: DHIKR_NOTE } : {}),
+    ...(isDhikr(id) ? { note: DHIKR_NOTE, fits_now: dhikrNow.includes(id) } : {}),
     ...(id === 'seq' ? { note: "works only on the user's own tasks: now, later or not today, then time blocks if they know their time. Suggest it only when they named at least two tasks or have goals today; without tasks it asks them to write some." } : {}),
   }));
 }
@@ -225,7 +257,9 @@ function contextBlock(c: ChatRequest['context'], replyLang: 'ar-SA' | 'en') {
     reported_energy_today: c.energy,
     reported_low_energy_today: c.lowEnergyToday,
     confirmed_today: c.confirmed,
-    feedback: c.feedback.map((f) => ({ id: f.id, user_found_it: f.net > 0 ? 'helpful' : f.net < 0 ? 'not helpful' : 'mixed' })),
+    feedback: c.feedback.map((f) => ({ id: f.id, user_found_it: f.net > 0 ? 'helpful' : f.net < 0 ? 'not helpful' : 'mixed', latest_answer: f.last === 1 ? 'suited me' : f.last === 0 ? 'okay' : f.last === -1 ? 'did not suit me' : null })),
+    journey: c.journey,
+    recently_completed: c.recent.map((r) => ({ id: r.id, day: r.day })),
     activities: activities(replyLang, c.dhikrNow),
     about: c.about ? { daily_life: c.about.life, main_goal: c.about.primary ?? c.about.goals[0] ?? null, goals: c.about.goals, help_when: c.about.when, help_style: c.about.style, hard_days: c.about.hard, sleep_self_report: c.about.sleep, tasks_they_kept: c.about.tasks } : null,
     prayer: c.prayer ? { next_prayer: c.prayer.next, minutes_until_next: c.prayer.minutesUntil, in_prayer_window: c.prayer.inWindow } : null,

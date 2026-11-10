@@ -222,8 +222,7 @@ export function finishMission(s: AppState): MissionSummary {
     quiet: false,
     solo: M.solo,
   };
-  const head = tr(all ? (M.solo ? 'player.summary.headSolo' : 'player.summary.headDaily') : 'player.summary.headPartial');
-  // A chat message is a saved record, so it stays in the language it was written in.
-  s.chat.push({ b: 1, t: tr('player.summary.chat', { head, lines: summaryLines(sum), suggestion: summarySuggestion(sum) }) });
+  // Nothing is posted in the chat when a mission ends. The attempts are saved (and sent to Supabase), and
+  // the companion sees them in its context the next time the user writes.
   return sum;
 }
