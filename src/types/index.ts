@@ -4,8 +4,9 @@ export type JourneyId = 'adhd' | 'anx' | 'ocd' | 'mood' | 'sleep' | 'soc' | 'aut
 export type ChallengeId =
   | 'video' | 'mem' | 'seq' | 'time' | 'calm' | 'start2'
   | 'attention_scene' | 'priority_board' | 'breakdown' | 'study_sprint' | 'emotion_map' | 'calm_landscape'
-  | 'micro_start' | 'thought_sort' | 'eye_rest' | 'grounding'
-  | 'dhikr_morning' | 'dhikr_evening' | 'dhikr_calm_heart' | 'dhikr_moment' | 'dhikr_sleep';
+  | 'micro_start' | 'thought_sort'
+  | 'dhikr_morning' | 'dhikr_evening' | 'dhikr_calm_heart' | 'dhikr_moment' | 'dhikr_sleep'
+  | 'eye_break' | 'grounding';
 export type ChallengeCategory = 'focus' | 'memory' | 'planning' | 'time' | 'relax' | 'real';
 export type Difficulty = 'easy' | 'normal';
 export type ContextTag = 'event' | 'work' | 'sleep';

@@ -6,7 +6,6 @@ import { BreakdownGame } from './BreakdownGame';
 import { CalmGame } from './CalmGame';
 import { CalmLandscapeGame } from './CalmLandscapeGame';
 import { EmotionMapGame } from './EmotionMapGame';
-import { EyeRestGame } from './EyeRestGame';
 import { GroundingGame } from './GroundingGame';
 import { MemoryGame } from './MemoryGame';
 import { MicroStartGame } from './MicroStartGame';
@@ -17,6 +16,7 @@ import { StartGame } from './StartGame';
 import { StudySprintGame } from './StudySprintGame';
 import { TimeGame } from './TimeGame';
 import { VideoGame } from './VideoGame';
+import { EyeBreakGame } from './EyeBreakGame';
 import { DhikrGame } from '../../dhikr/DhikrGame';
 import type { DhikrId } from '../../dhikr/content';
 
@@ -37,13 +37,13 @@ export const GAMES: Record<ChallengeId, ComponentType<GameProps>> = {
   calm_landscape: CalmLandscapeGame,
   micro_start: MicroStartGame,
   thought_sort: ThoughtSortGame,
-  eye_rest: EyeRestGame,
-  grounding: GroundingGame,
   dhikr_morning: dhikr('dhikr_morning'),
   dhikr_evening: dhikr('dhikr_evening'),
   dhikr_calm_heart: dhikr('dhikr_calm_heart'),
   dhikr_moment: dhikr('dhikr_moment'),
   dhikr_sleep: dhikr('dhikr_sleep'),
+  eye_break: EyeBreakGame,
+  grounding: GroundingGame,
 };
 
 export { MemoryGame };

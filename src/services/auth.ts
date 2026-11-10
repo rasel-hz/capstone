@@ -41,7 +41,9 @@ function client(): SupabaseClient {
 async function post<T>(path: string, body: unknown): Promise<T> {
   let res: Response;
   try {
-    res = await fetch(apiUrl(path), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), signal: AbortSignal.timeout(15000) });
+    // Longer than the server's own limits (database 8s, Supabase sign-in 10s), so the server's answer, such as
+    // "wrong username or password", always arrives before the browser gives up and blames the connection.
+    res = await fetch(apiUrl(path), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body), signal: AbortSignal.timeout(25000) });
   } catch {
     throw new AuthError('network');
   }
@@ -50,6 +52,8 @@ async function post<T>(path: string, body: unknown): Promise<T> {
   const map: Record<string, string> = {
     invalid_credentials: 'invalidCredentials', email_not_confirmed: 'needsConfirmation', invalid_username: 'usernameFormat',
     slow_down: 'rateLimited', rate_limited: 'rateLimited', auth_not_configured: 'notConfigured',
+    // The server couldn't reach Supabase: a real service problem, never reported as wrong credentials.
+    auth_unreachable: 'network',
   };
   throw new AuthError(map[data.error ?? ''] ?? 'generic');
 }

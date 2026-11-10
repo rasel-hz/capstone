@@ -89,6 +89,7 @@
     "usedText": "{{points}} spent. Your balance is now {{balance}}.",
     "notEnough": "Your balance isn't enough yet.",
     "failed": "Couldn't use it right now. Try again.",
-    "historyTitle": "Used before"
+    "historyTitle": "Used before",
+    "reopen": "Open the site again, at no charge"
   }
 }

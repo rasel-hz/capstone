@@ -6,7 +6,7 @@ import type { GameResult } from '../../../types';
 import { Palm } from '../ChallengeArt';
 import type { GameProps } from '../types';
 import { CalmGame } from './CalmGame';
-import { EyeRestGame } from './EyeRestGame';
+import { EyeBreakGame } from './EyeBreakGame';
 import { AskNext, Ring } from './parts';
 
 // Staying a little while is the completion rule, so the reward isn't for tapping straight through.
@@ -21,7 +21,7 @@ const MOVES = ['neck', 'shoulders', 'stretch', 'walk'] as const;
 const MOVE_SEC = 30;
 
 /**
- * "A break your way" (calm_landscape). One question first: what do you need right now? Rest the eyes ("Rest your eyes"), move a
+ * "A break your way" (calm_landscape). One question first: what do you need right now? Rest the eyes (the eye break), move a
  * little, a busy mind (the breathing from "Take it easy"), or just quiet (the oasis). After a focus session
  * it offers another session at the end. A need chosen elsewhere, such as in "How do you feel?", skips the question.
  */
@@ -70,7 +70,7 @@ export function CalmLandscapeGame(props: GameProps) {
     );
   }
   if (need === 'mind') return <CalmGame {...props} onDone={end} />;
-  if (need === 'eyes') return <EyeRestGame {...props} onDone={end} />;
+  if (need === 'eyes') return <EyeBreakGame {...props} onDone={end} />;
   if (need === 'move') return <TimedBreak steps={[...MOVES]} sec={MOVE_SEC} kind="moves" env={env} onDone={end} />;
   return <Oasis env={env} onDone={end} />;
 }

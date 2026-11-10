@@ -148,6 +148,8 @@ export function Companion() {
       </header>
 
       <div className="chat-box">
+        {/* Zaho floats quietly behind the conversation. Decorative only: it never takes taps or covers text. */}
+        <div className="chat-bg" aria-hidden="true"><Mascot state="idle" size={280} still={!!s.rm} /></div>
         <div className="chat" ref={list} role="log" aria-live="polite" tabIndex={0} aria-label={t('companion.logLabel')}>
           {s.chat.map((m, i) => (m.card ? (
             <div key={i} className="ccard">

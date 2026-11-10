@@ -12,7 +12,7 @@
     "understood": "Sounds like you've got a lot going on today. Here's what I understood: {{facts}}. Should I save that to shape today's mission? That's only from what you said, and I'm not guessing beyond it.",
     "noResults": "I don't have any records yet. Once you finish a mission, I can tell you about your actual results.",
     "avg": ", with {{acc}}% average accuracy",
-    "results": "You have {{total}} attempts on record and completed {{done}}{{avg}}. This is just for your own tracking and doesn't measure your health.",
+    "results": "You have {{total}} attempts on record and completed {{done}}{{avg}}.",
     "greet": "Hey there! I'm doing well. How about you? How's your sleep and your day?",
     "thanks": "You're welcome! I'm here if you need me, and don't forget time with the people you love.",
     "fallback": "I hear you. Want to tell me more about your day? If you'd like to try something light, you can start today's mission from Home.",

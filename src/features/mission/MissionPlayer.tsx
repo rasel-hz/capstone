@@ -14,7 +14,6 @@ import { acknowledge, needsCheckIn } from '../prayer/gate';
 import { PrayerCheckIn } from '../prayer/PrayerBreak';
 import type { PrayerWindow } from '../prayer/times';
 import { useMissions } from './MissionProvider';
-import { StreakDone } from '../streak/StreakBits';
 import { planSummary } from '../challenges/games/PersonalPlanGame';
 import { useCountUp } from '../../hooks/useCountUp';
 import { useTimers } from '../../hooks/useTimers';
@@ -457,10 +456,8 @@ function Completion({ summary, mascotState, onClose, onNavigate }: { summary: Mi
                 <div><b>{level(s)}</b><span>{t('common.level')}</span></div>
               </div>
               <MissionTimeline items={s.mission!.items} />
-              <h3>{t('player.done.whatHappened')}</h3>
             </>
           )}
-          {!quiet && <StreakDone />}
           <p>{summaryLines(summary)}{t('common.sentenceEnd')}</p>
           {!quiet && <Helpful />}
           {!quiet && <h3>{t('player.done.tomorrow')}</h3>}

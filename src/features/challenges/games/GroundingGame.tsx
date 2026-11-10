@@ -1,108 +1,107 @@
-import { useEffect, useState } from 'react';
+import { ArrowRight, Ear, Eye, Flower2, Hand, Heart, Leaf, type LucideIcon } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useTimers } from '../../../hooks/useTimers';
-import type { GameResult } from '../../../types';
+import { Counter, tap } from '../../dhikr/DhikrGame';
 import type { GameProps } from '../types';
-import { HeavySupport } from './parts';
 
-// The 5-4-3-2-1 senses exercise: it brings attention back to the place you're in. It can calm a little;
-// it isn't a treatment. Nothing is typed: the user taps once for each thing they notice.
-const SENSES = [{ id: 'see', n: 5 }, { id: 'touch', n: 4 }, { id: 'hear', n: 3 }, { id: 'smell', n: 2 }, { id: 'taste', n: 1 }] as const;
-const EXAMPLES = ['a', 'b', 'c'];
-const LEVELS = [1, 2, 3, 4, 5];
-// 4 or 5 after the exercise means it still feels heavy, so support comes first.
-const HEAVY = 4;
+// Noticing what is around you, one sense at a time. The counts are this app's own sequence and are
+// fixed on purpose: 5 things seen, 3 heard, 3 touched, 2 smelled, 1 tasted. Any sense can be skipped,
+// so nobody has to tap a number that isn't true for them.
+export const STAGES: { id: 'see' | 'hear' | 'touch' | 'smell' | 'taste'; n: number; icon: LucideIcon }[] = [
+  { id: 'see', n: 5, icon: Eye },
+  { id: 'hear', n: 3, icon: Ear },
+  { id: 'touch', n: 3, icon: Hand },
+  { id: 'smell', n: 2, icon: Flower2 },
+  { id: 'taste', n: 1, icon: Leaf },
+];
+export type StageResult = { id: string; count: number; skipped: boolean };
+/** Done once at least one sense was really noticed. Skipping every stage isn't a completion. */
+export const groundingDone = (r: StageResult[]) => r.some((x) => !x.skipped && x.count >= (STAGES.find((s) => s.id === x.id)?.n ?? Infinity));
 
-/** "What's around you?" (grounding). A rating before and after, five senses in between, and support if it's still heavy. */
 export function GroundingGame({ env, onDone }: GameProps) {
   const { t } = useTranslation();
-  const timers = useTimers(env.paused);
-  const [phase, setPhase] = useState<'before' | 'sense' | 'after' | 'heavy'>('before');
-  const [before, setBefore] = useState<number | null>(null);
-  const [after, setAfter] = useState<number | null>(null);
-  const [i, setI] = useState(0);
-  const [found, setFound] = useState<number[]>([0, 0, 0, 0, 0]);
-  const sense = SENSES[i];
+  const [i, setI] = useState(-1);
+  const [res, setRes] = useState<StageResult[]>(() => STAGES.map((s) => ({ id: s.id, count: 0, skipped: false })));
+  const sent = useRef(false);
+  const next = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   useEffect(() => {
-    if (phase === 'sense') {
-      env.round(i + 1, SENSES.length, 'games.common.step');
-      env.say('calm', `games.grounding.say.${sense.id}`);
-    } else {
-      env.round(0, 0);
-      env.say(phase === 'heavy' ? 'concerned' : 'calm', `games.grounding.say.${phase}`);
-    }
+    env.say('calm', 'games.ground.introSay');
+    return () => clearTimeout(next.current);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [phase, i]);
+  }, []);
+  useEffect(() => { if (i >= 0 && i < STAGES.length) env.round(i + 1, STAGES.length, 'games.ground.round'); }, [i, env]);
 
-  function next() {
-    if (i + 1 < SENSES.length) setI(i + 1);
-    else setPhase('after');
+  const go = (to: number) => {
+    clearTimeout(next.current);
+    setI(to);
+    if (to >= 0 && to < STAGES.length) env.say('calm', `games.ground.say.${STAGES[to].id}`);
+    if (to === STAGES.length) env.say('happy', 'games.ground.doneSay');
+  };
+
+  function onTap() {
+    const s = STAGES[i];
+    const now = tap([res[i].count], 0, s.n)[0];
+    setRes((r) => r.map((x, k) => (k === i ? { ...x, count: now, skipped: false } : x)));
+    if (now >= s.n) {
+      env.sfx('tap');
+      // A short pause to see the full ring, then the next sense.
+      next.current = setTimeout(() => go(i + 1), env.rm ? 300 : 900);
+    }
+  }
+  function skip() {
+    setRes((r) => r.map((x, k) => (k === i ? { ...x, skipped: true } : x)));
+    go(i + 1);
+  }
+  function finish() {
+    if (sent.current || !groundingDone(res)) return;
+    sent.current = true;
+    onDone({ acc: null, retries: 0, mood: 'calm', say: 'games.ground.doneSay', data: { stages: res } });
   }
 
-  function tap() {
-    if (found[i] >= sense.n) return;
-    const n = found.map((v, k) => (k === i ? v + 1 : v));
-    setFound(n);
-    env.sfx('tap');
-    if (n[i] >= sense.n) timers.after(next, 600);
-  }
-
-  const result = (go?: 'chat'): GameResult => ({
-    acc: null, retries: 0, mood: 'calm', say: 'games.grounding.said', data: { before, after, found }, ...(go ? { go } : {}),
-  });
-  function finish(level: number | null) {
-    env.sfx('ok');
-    if (level != null && level >= HEAVY) setPhase('heavy');
-    else onDone(result());
-  }
-
-  if (phase === 'before' || phase === 'after') {
-    const value = phase === 'before' ? before : after;
-    const set = phase === 'before' ? setBefore : setAfter;
+  if (i < 0) {
     return (
-      <div className="scene form">
-        <h2 className="q__t">{t(phase === 'before' ? 'games.grounding.beforeQ' : 'games.grounding.afterQ')}</h2>
-        <div className="scale" role="group" aria-label={t('games.grounding.scale')}>
-          {LEVELS.map((n) => (
-            <button key={n} type="button" className={`scale__b ${value === n ? 'on' : ''}`} aria-pressed={value === n} onClick={() => set(n)}>
-              <i style={{ height: 2 + n * 8 }} aria-hidden="true" />{t(`games.grounding.levels.${n}`)}
-            </button>
-          ))}
-        </div>
+      <div className="scene gr">
+        <span className="gr__icon" aria-hidden="true"><Leaf size={32} /></span>
+        <h2 className="q__t">{t('games.ground.title')}</h2>
+        <p className="center">{t('games.ground.lead')}</p>
+        <div className="row row--c"><button type="button" className="btn" onClick={() => go(0)}>{t('games.ground.start')}</button></div>
+      </div>
+    );
+  }
+
+  if (i >= STAGES.length) {
+    const ok = groundingDone(res);
+    return (
+      <div className="scene gr">
+        <span className="gr__icon gr__icon--done" aria-hidden="true"><Heart size={32} /></span>
+        <h2 className="q__t" role="status">{ok ? t('games.ground.done') : t('games.ground.noneTitle')}</h2>
+        {!ok && <p className="note center">{t('games.ground.noneText')}</p>}
         <div className="row row--c">
-          {phase === 'before'
-            ? <button type="button" className="btn" onClick={() => setPhase('sense')}>{t(value ? 'common.next' : 'common.skip')}</button>
-            : <button type="button" className="btn" onClick={() => finish(value)}>{t(value ? 'games.grounding.finish' : 'common.skip')}</button>}
+          <button type="button" className="btn alt" onClick={() => go(STAGES.length - 1)}><ArrowRight size={16} className="flip" aria-hidden="true" /> {t('common.back')}</button>
+          {ok && <button type="button" className="btn" onClick={finish}>{t('games.ground.finish')}</button>}
         </div>
       </div>
     );
   }
 
-  if (phase === 'heavy') {
-    return (
-      <div className="scene form">
-        <HeavySupport text={t('games.grounding.heavy')} onChat={() => onDone(result('chat'))} />
-        <div className="row row--c"><button type="button" className="btn alt" onClick={() => onDone(result())}>{t('games.grounding.finish')}</button></div>
-      </div>
-    );
-  }
-
-  const got = found[i];
+  const s = STAGES[i];
+  const Icon = s.icon;
+  const doneCount = res.filter((x, k) => k < i || (k === i && x.count >= s.n)).length;
   return (
-    <div className="scene q gr">
-      <h2 className="q__t">{t(`games.grounding.senses.${sense.id}.q`)}</h2>
-      <div className="gr__dots" role="img" aria-label={t('games.grounding.progress', { found: got, total: sense.n })}>
-        {Array.from({ length: sense.n }, (_, k) => <i key={k} className={k < got ? 'on' : ''} />)}
+    <div className="scene gr" key={s.id}>
+      <div className="gr-dots" aria-hidden="true">
+        {STAGES.map((x, k) => <i key={x.id} className={k < i ? (res[k].skipped ? 'is-skip' : 'is-done') : k === i ? 'is-now' : ''} />)}
       </div>
-      <div className="tags tags--c" aria-label={t('games.common.examples')}>
-        {EXAMPLES.map((x) => <span key={x} className="tag">{t(`games.grounding.senses.${sense.id}.ex.${x}`)}</span>)}
-      </div>
+      <p className="sr-only">{t('games.ground.progress', { n: doneCount, total: STAGES.length })}</p>
+      <span className="gr__icon" aria-hidden="true"><Icon size={30} /></span>
+      <h2 className="q__t">{t(`games.ground.stages.${s.id}.title`)}</h2>
+      <p className="center">{t(`games.ground.stages.${s.id}.text`)}</p>
+      <Counter label={t(`games.ground.stages.${s.id}.title`)} count={res[i].count} target={s.n} still={env.rm} onTap={onTap} onReset={() => setRes((r) => r.map((x, k) => (k === i ? { ...x, count: 0 } : x)))} />
       <div className="row row--c">
-        <button type="button" className="btn btn--lg" disabled={got >= sense.n} onClick={tap}>{t('games.grounding.found')}</button>
-      </div>
-      <div className="row row--c">
-        <button type="button" className="btn-link" onClick={next}>{t(got ? 'games.grounding.moveOn' : 'games.grounding.none')}</button>
+        {i > 0 && <button type="button" className="btn-link" onClick={() => go(i - 1)}><ArrowRight size={14} className="flip" aria-hidden="true" /> {t('common.back')}</button>}
+        {res[i].count < s.n && <button type="button" className="btn-link" onClick={skip}>{t('games.ground.skip')}</button>}
+        {res[i].count >= s.n && <button type="button" className="btn" onClick={() => go(i + 1)}>{t('games.ground.next')}</button>}
       </div>
     </div>
   );

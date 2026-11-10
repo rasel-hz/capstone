@@ -23,14 +23,23 @@ let sql: ReturnType<typeof postgres> | null = null;
 function db(deps: AuthDeps) {
   if (!deps.databaseUrl) throw new ChatError(503, 'auth_not_configured');
   // prepare: false also works with Supabase's transaction pooler, if the connection string is switched to it.
-  sql ??= postgres(deps.databaseUrl, { ssl: 'require', max: 3, idle_timeout: 30, prepare: false, onnotice: () => {} });
+  // A short connect timeout, so a database that can't be reached gives a clear "service unreachable" answer
+  // well before the browser gives up. Otherwise a wrong password could surface as a connection error.
+  sql ??= postgres(deps.databaseUrl, { ssl: 'require', max: 3, idle_timeout: 30, connect_timeout: 8, prepare: false, onnotice: () => {} });
   return sql;
 }
 
 const findEmail = async (deps: AuthDeps, username: string) => {
   if (deps.findEmail) return deps.findEmail(username);
-  const rows = await db(deps)`select u.email from public.profiles p join auth.users u on u.id = p.id where p.username = ${username} limit 1`;
-  return (rows[0]?.email as string | undefined) ?? null;
+  try {
+    const rows = await db(deps)`select u.email from public.profiles p join auth.users u on u.id = p.id where p.username = ${username} limit 1`;
+    return (rows[0]?.email as string | undefined) ?? null;
+  } catch (e) {
+    if (e instanceof ChatError) throw e;
+    // The lookup itself failed: that's the service, not the user's credentials. Logs the type only.
+    console.error(`Username lookup failed: ${(e as Error).name}`);
+    throw new ChatError(503, 'auth_unreachable');
+  }
 };
 
 const usernameTaken = async (deps: AuthDeps, username: string) => {

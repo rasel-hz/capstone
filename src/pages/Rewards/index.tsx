@@ -195,6 +195,7 @@ export function Rewards() {
 
   const balance = data ? balanceOf(data.summary) : 0;
   const titleOf = (id: string) => { const r = data?.rewards.find((x) => x.id === id); return r ? (en ? r.title_en : r.title_ar) : id; };
+  const urlOf = (id: string) => { const r = data?.rewards.find((x) => x.id === id); return r ? safeUrl(r.website_url) : null; };
   const newOne = data?.rewards.find((r) => fresh.has(r.id));
   const shown = data?.rewards.find((r) => r.id === open);
 
@@ -226,7 +227,12 @@ export function Rewards() {
               <h2>{t('rewards.my.historyTitle')}</h2>
               <ul>
                 {data.summary.redemptions.map((u) => (
-                  <li key={u.at}><span>{titleOf(u.reward_id)}</span><span className="note">-{t('rewards.my.pts', { count: u.points })}</span></li>
+                  <li key={u.at}>
+                    <span>{titleOf(u.reward_id)}</span>
+                    <span className="note">-{t('rewards.my.pts', { count: u.points })}</span>
+                    {/* Reopening a used reward's site never spends points again. */}
+                    {urlOf(u.reward_id) && <a className="rw-used__go" href={urlOf(u.reward_id)!} target="_blank" rel="noopener noreferrer external">{t('rewards.my.reopen')} <ExternalLink size={13} aria-hidden="true" /></a>}
+                  </li>
                 ))}
               </ul>
             </section>

@@ -194,7 +194,7 @@
     "compareLabel": "You estimated {{est}}, and it took {{act}}",
     "estimate": "Estimate",
     "actual": "Actual",
-    "explain": "The difference is the gap between your estimate and the actual time. It's only for tracking, not a health measure.",
+    "explain": "The difference is the gap between your estimate and the actual time.",
     "reflect": "How did the time feel? (optional)",
     "reflections": {
       "fast": "It went fast",
@@ -832,93 +832,64 @@
     "call997": "Call 997",
     "call937": "Call 937"
   },
-  "eye_rest": {
-    "readyQ": "Look at something far away, a window or the far end of the room.",
-    "go": "Let's go",
-    "lookTitle": "Look far away",
-    "left_one": "{{count}} second left",
-    "left_other": "{{count}} seconds left",
-    "stop": "Pause",
-    "resume": "Continue",
-    "blink": "Blink a few times, gently.",
-    "done": "Done",
-    "again": "Once more?",
-    "said": "Your eyes got a rest.",
-    "say": {
-      "ready": "Let your eyes rest from the screen for a moment.",
-      "look": "Just look far away, at your ease.",
-      "blink": "That's it."
-    }
+  "eye": {
+    "intro": "Your eyes need a break!",
+    "title": "Your eyes need a break!",
+    "lead": "Look at something far away from you, like a window or the far end of the room, for 20 seconds.",
+    "rule": "The 20-20-20 habit: every 20 minutes in front of a screen, look at something about 6 metres (20 feet) away for 20 seconds. A simple habit that gives your eyes a break from the screen.",
+    "start": "Start the timer",
+    "lookAway": "Now take your eyes off the screen and look far away.",
+    "awayCue": "Look away from the screen; the timer runs by itself.",
+    "leftLabel": "{{n}} seconds left",
+    "pause": "Pause",
+    "resume": "Resume",
+    "paused": "Timer paused",
+    "done": "Well done! You gave your eyes the break they deserve",
+    "doneSay": "Well done! You gave your eyes the break they deserve",
+    "finish": "Done"
   },
-  "grounding": {
-    "beforeQ": "How are you right now?",
-    "afterQ": "How are you now, after the exercise?",
-    "scale": "How you are",
+  "ground": {
+    "introSay": "Mind busy? Come and focus a little on what is around us",
+    "title": "Mind busy? Come and focus a little on what is around us",
+    "lead": "You will notice things around you, one sense at a time. Tap the counter each time you notice something, and skip any sense that does not work for you.",
+    "start": "Start",
+    "round": "Sense",
+    "progress": "Done {{n}} of {{total}}",
+    "skip": "Not this time, skip",
+    "next": "Next",
     "finish": "Done",
-    "levels": {
-      "1": "At ease",
-      "2": "A little",
-      "3": "Medium",
-      "4": "Heavy",
-      "5": "Very heavy"
+    "done": "Well done! You took a moment to focus on what is around you",
+    "doneSay": "Well done! You took a moment to focus on what is around you",
+    "noneTitle": "No sense noticed this time",
+    "noneText": "Go back to any sense and try it, or leave with the Skip button above.",
+    "say": {
+      "see": "Take your time and look around.",
+      "hear": "Slow down and listen.",
+      "touch": "Feel what is around you.",
+      "smell": "Take a calm breath.",
+      "taste": "Last one, at your own pace."
     },
-    "found": "Found one",
-    "moveOn": "Move on",
-    "none": "Didn't find one",
-    "heavy": "It still sounds heavy. You don't have to carry it alone: talk to me, or to someone you trust.",
-    "said": "You're back in the place you're in.",
-    "senses": {
+    "stages": {
       "see": {
-        "q": "5 things you can see",
-        "ex": {
-          "a": "The wall colour",
-          "b": "The window",
-          "c": "A cup in front of you"
-        }
-      },
-      "touch": {
-        "q": "4 things you can touch",
-        "ex": {
-          "a": "Your scarf or sleeve",
-          "b": "The sofa",
-          "c": "Your phone"
-        }
+        "title": "5 things you can see",
+        "text": "Look around, and tap the counter each time you notice something."
       },
       "hear": {
-        "q": "3 sounds you can hear",
-        "ex": {
-          "a": "The air conditioner",
-          "b": "The call to prayer",
-          "c": "Cars outside"
-        }
+        "title": "3 things you can hear",
+        "text": "Focus on the sounds around you, and count 3 things you can hear."
+      },
+      "touch": {
+        "title": "3 things you can touch",
+        "text": "Notice 3 things around you that you can touch."
       },
       "smell": {
-        "q": "2 things you can smell",
-        "ex": {
-          "a": "Coffee",
-          "b": "Oud",
-          "c": "Incense"
-        }
+        "title": "2 things you can smell",
+        "text": "Notice two smells around you, if you can."
       },
       "taste": {
-        "q": "1 thing you can taste",
-        "ex": {
-          "a": "A sip of water",
-          "b": "A date",
-          "c": "Coffee"
-        }
+        "title": "1 thing you can taste",
+        "text": "Notice the taste of something safe that you have, or the taste already in your mouth."
       }
-    },
-    "say": {
-      "before": "Take a breath, and let's start.",
-      "see": "Look around, slowly.",
-      "touch": "Feel what is under your hand.",
-      "hear": "Listen to the sounds around you.",
-      "smell": "What can you smell around you?",
-      "taste": "And last, one taste.",
-      "after": "How are you now?",
-      "heavy": "I'm here with you."
-    },
-    "progress": "Found {{found}} of {{total}}"
+    }
   }
 }

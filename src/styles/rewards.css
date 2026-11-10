@@ -89,3 +89,5 @@ body.rm .rw-card:hover, body.rm .rw-card:active { transform: none; }
 .rw-confirm p { margin: 0 0 10px; }
 .rw-used ul { list-style: none; padding: 0; margin: 8px 0 0; }
 .rw-used li { display: flex; justify-content: space-between; gap: 10px; padding: 8px 0; border-top: 1px solid var(--line); }
+.rw-used li { flex-wrap: wrap; align-items: center; }
+.rw-used__go { flex-basis: 100%; font-size: var(--fs-meta); color: var(--em-d); }

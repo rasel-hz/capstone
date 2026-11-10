@@ -16,14 +16,15 @@ export const CHALLENGES: Record<ChallengeId, Challenge> = {
   calm_landscape: { cat: 'relax', min: 2, xp: 10, k: 'l', hasEasy: false, scored: false },
   micro_start: { cat: 'real', min: 2, xp: 20, k: 'u', hasEasy: true, scored: false },
   thought_sort: { cat: 'relax', min: 3, xp: 15, k: 'o', hasEasy: true, scored: false },
-  eye_rest: { cat: 'relax', min: 1, xp: 10, k: 'w', hasEasy: false, scored: false },
-  grounding: { cat: 'relax', min: 3, xp: 15, k: 'f', hasEasy: false, scored: false },
   // Dhikr. The texts are verified and generated (src/features/dhikr/content.json, docs/dhikr-challenges.md).
   dhikr_morning: { cat: 'relax', min: 5, xp: 15, k: 'r', hasEasy: false, scored: false },
   dhikr_evening: { cat: 'relax', min: 5, xp: 15, k: 'g', hasEasy: false, scored: false },
   dhikr_calm_heart: { cat: 'relax', min: 3, xp: 15, k: 'h', hasEasy: false, scored: false },
   dhikr_moment: { cat: 'relax', min: 2, xp: 10, k: 'n', hasEasy: false, scored: false },
   dhikr_sleep: { cat: 'relax', min: 5, xp: 15, k: 'z', hasEasy: false, scored: false, quiet: true },
+  // A 20-second screen break, and noticing the surroundings with each sense.
+  eye_break: { cat: 'relax', min: 1, xp: 10, k: 'i', hasEasy: false, scored: false },
+  grounding: { cat: 'relax', min: 2, xp: 15, k: 'f', hasEasy: false, scored: false },
 };
 
 /** Every challenge still offered. Retired ones stay in CHALLENGES only so old history reads. */
@@ -37,21 +38,21 @@ export type GroupId = 'start' | 'focus' | 'calm' | 'think' | 'dhikr';
 export const GROUPS: { id: GroupId; ids: ChallengeId[] }[] = [
   { id: 'start', ids: ['micro_start', 'breakdown', 'seq'] },
   { id: 'focus', ids: ['study_sprint', 'video', 'attention_scene', 'mem'] },
-  { id: 'calm', ids: ['calm', 'grounding', 'eye_rest', 'calm_landscape'] },
+  { id: 'calm', ids: ['calm', 'grounding', 'eye_break', 'calm_landscape'] },
   { id: 'think', ids: ['thought_sort', 'emotion_map'] },
   { id: 'dhikr', ids: ['dhikr_morning', 'dhikr_evening', 'dhikr_calm_heart', 'dhikr_moment', 'dhikr_sleep'] },
 ];
 
 // A retired challenge is replaced in its own place, and new ones go at the end, so a journey already under way keeps its days.
 export const JOURNEYS: Journey[] = [
-  { id: 'adhd', a: ['video', 'attention_scene', 'thought_sort', 'seq', 'breakdown', 'micro_start', 'calm_landscape', 'mem', 'eye_rest', 'study_sprint'] },
+  { id: 'adhd', a: ['video', 'attention_scene', 'thought_sort', 'seq', 'breakdown', 'micro_start', 'calm_landscape', 'mem', 'eye_break', 'study_sprint'] },
   { id: 'anx', a: ['calm', 'calm_landscape', 'thought_sort', 'emotion_map', 'video', 'mem', 'grounding'] },
   { id: 'ocd', a: ['calm', 'thought_sort'] },
   { id: 'mood', a: ['micro_start', 'calm_landscape', 'emotion_map', 'breakdown', 'calm', 'seq'] },
   { id: 'sleep', a: ['calm', 'calm_landscape', 'seq', 'thought_sort'] },
   { id: 'soc', a: ['seq', 'mem'] },
   { id: 'aut', a: ['seq', 'breakdown', 'calm', 'calm_landscape'] },
-  { id: 'gen', a: ['video', 'attention_scene', 'mem', 'calm', 'micro_start', 'calm_landscape', 'emotion_map', 'eye_rest'] },
+  { id: 'gen', a: ['video', 'attention_scene', 'mem', 'calm', 'micro_start', 'calm_landscape', 'emotion_map', 'eye_break'] },
 ];
 
 // Everyday Saudi things for "What do you remember?", drawn in a 24-unit box and filled with the round's colour.

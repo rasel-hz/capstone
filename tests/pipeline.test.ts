@@ -112,7 +112,8 @@ describe('Test C: stress after work', () => {
   it('offers only an optional break, never a planning board or a demanding puzzle', () => {
     const s = { ...defaultState(), en: [{ d: today(), e: 'low' as const, ts: 1 }] };
     const sug = buildSuggestion(s, { goals: ['stress', 'rest'] })!;
-    sug.ids.forEach((id) => expect(['calm', 'calm_landscape', 'eye_rest', 'grounding']).toContain(id));
+    // Gentle breaks only: the breathing and landscape breaks, the eye break and noticing the senses.
+    sug.ids.forEach((id) => expect(['calm', 'calm_landscape', 'eye_break', 'grounding']).toContain(id));
     expect(sug.cfg).toBeUndefined();
   });
 });

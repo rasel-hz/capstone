@@ -15,8 +15,8 @@ Every activity supports practice, planning, reflection or an optional break. **N
 | `attention_scene` | What Changed? | 2 | 25 | focus | yes (one scene, 2 differences) | yes | First-try accuracy, how many differences |
 | `mem` | What Do You Remember? | 2 | 25 | memory, focus | yes | yes | First-try accuracy |
 | `calm` | Take It Easy | 2 | 15 | stress, sleep, worry (gentle) | no | no | Method, minutes, and whether it helped |
-| `grounding` | What's Around You? | 3 | 15 | worry, stress (gentle) | no | no | How it felt before and after (1 to 5), and how many things they found for each sense. Nothing typed |
-| `eye_rest` | Rest Your Eyes | 1 | 10 | rest, focus (gentle) | no | no | How many 20-second rounds |
+| `grounding` | بالي مشغول (noticing the senses) | 2 | 15 | stress, worry (gentle) | no | no | How many things were noticed for each sense, and which were skipped. Nothing typed |
+| `eye_break` | عيوني تعبت (eye break) | 1 | 10 | rest, focus (gentle) | no | no | The 20 seconds and how many pauses |
 | `calm_landscape` | A Break Your Way | 2 | 10 | rest, stress, sleep (gentle) | no | no | Which break, and whether it helped |
 | `emotion_map` | How Are You Feeling? | 1 | 0 | worry, only on request (gentle) | no | no | A self-report that never leaves the device, earns no XP and is never sent to the AI |
 
@@ -45,10 +45,10 @@ A game can hand the user on, only after asking them (`GameResult.then`). The nex
 
 "Let's think it through" can also set a time for what was put under "later" (in an hour, tonight, tomorrow morning, or a time). It then shows on Home at that time, with "done" or "remind me tomorrow" (`src/features/later/later.ts`).
 
-## The two short calm exercises
+## The two short calm exercises (Razan)
 
-- **Rest Your Eyes** (`eye_rest`, the 20-20-20 habit): look at something about 6 metres away for 20 seconds, then blink. One round completes it, another is optional. The timer can be paused, and with reduced motion the ring steps instead of gliding. It's also the "rest my eyes" option in "A break your way". It rests the eyes; it says nothing about eyesight.
-- **What's Around You?** (`grounding`, 5-4-3-2-1): five things you see, four you touch, three you hear, two you smell and one you taste. The user taps once for each thing found, with three Saudi examples per sense, and "didn't find one" moves on with no sense of failing. A rating before and after (both optional). If the after rating is 4 or 5, the same support as "How are you feeling?" comes first: talk to Zaho, or call 937. It can calm a little; it isn't a treatment.
+- **Eye break** (`eye_break`, «عيوني تعبت», the 20-20-20 habit): look at something about 6 metres away for 20 seconds. The timer only counts while it runs, and can be paused. It's also the "rest my eyes" option in "A break your way". It rests the eyes; it says nothing about eyesight.
+- **Noticing the senses** (`grounding`, «بالي مشغول»): one sense at a time, tapping a counter for each thing noticed: 5 seen, 3 heard, 3 touched, 2 smelled, 1 tasted. Any sense can be skipped, and skipping every one doesn't count as done.
 
 ## Variety in the attention games
 
@@ -63,7 +63,7 @@ A game can hand the user on, only after asking them (`GameResult.then`). The nex
 | "I have so much to do and don't know where to start" | prioritize | `seq` only with at least two of their own tasks, otherwise `breakdown` |
 | "I want to study but can't get myself to begin" | start | `micro_start`, `breakdown`, `study_sprint` |
 | "I'm anxious right now" or "it's all too much" | stress, worry | `grounding`, `calm` |
-| "I've been on the screen for hours" | rest, focus | `eye_rest` |
+| "I've been on the screen for hours" | rest, focus | `eye_break` |
 | "I'm stressed after a long day" | stress | `calm`, `calm_landscape`, as an optional break |
 | "I can't relax before bed" | sleep | `calm`, `calm_landscape`. Persistent sleep trouble → suggest a doctor |
 | "I keep thinking about things I can't control" | worry | Advice first, then `thought_sort`, `calm`, or `emotion_map` only if they want to reflect |
@@ -102,7 +102,7 @@ After a mission, the finish screen asks "Did this suit you?" with three answers:
 ## Planned, not built yet
 
 - **More `seq` modes:** break one of the user's tasks into steps (mode C) and a weekly board with rest days (mode D).
-- **New activities**, in priority order (`micro_start`, `thought_sort`, `grounding` and `eye_rest` are done): `sleep_winddown` (هديها قبل النوم), `estimate_compare` (قدّرها, replacing the retired `time`), `routine_builder` (رتّب روتينك), `switch_rules` (غيّر القاعدة), `daily_reflection` (وش ضبط اليوم؟), `self_compassion` (كلم نفسك زين), `social_dialogue` (وش ترد؟), `family_event_plan` (جهّز للعزيمة).
+- **New activities**, in priority order (`micro_start`, `thought_sort`, `grounding` and `eye_break` are done): `sleep_winddown` (هديها قبل النوم), `estimate_compare` (قدّرها, replacing the retired `time`), `routine_builder` (رتّب روتينك), `switch_rules` (غيّر القاعدة), `daily_reflection` (وش ضبط اليوم؟), `self_compassion` (كلم نفسك زين), `social_dialogue` (وش ترد؟), `family_event_plan` (جهّز للعزيمة).
 - **Question banks:** "Focus for a moment" and "What changed?" now build each round at random, with answer-key tests and no repeated round twice in a row. Still to do: versioned, reviewed variants for every scored game.
 - **Checkpoints:** resuming at the exact round. Today a resumed challenge restarts and says so. To add one: implement `GameProps` in `src/features/challenges/games/`, register it in `games/index.ts`, add it to `catalog.ts`, give it goals in `recommend/goals.ts`, and add its text in both locale files. It then becomes available to the AI's schema and the engine automatically.
 

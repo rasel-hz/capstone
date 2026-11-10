@@ -31,7 +31,7 @@ export interface PathPlan {
 
 const BASE: Record<GoalId, ChallengeId[]> = {
   organize: ['breakdown', 'micro_start', 'thought_sort', 'calm_landscape'],
-  focus: ['attention_scene', 'video', 'mem', 'calm_landscape', 'eye_rest'],
+  focus: ['attention_scene', 'video', 'mem', 'calm_landscape', 'eye_break'],
   start: ['micro_start', 'breakdown', 'study_sprint', 'calm_landscape'],
   stress: ['calm_landscape', 'thought_sort', 'calm', 'grounding', 'micro_start'],
   sleep: ['calm_landscape', 'calm', 'thought_sort', 'emotion_map'],
