@@ -351,17 +351,23 @@ export function startWorld({ root, t, reduce }: { root: HTMLElement; t: Translat
   }
 
   // ---------- meet: the moods around ZAHO ----------
+  // On every screen, in a circle around ZAHO. Each mood is kept inside the stage, so on a phone the circle
+  // tightens instead of spilling off the side.
   function layoutMoods() {
-    const moods = qa('.zw-mood');
-    if (innerWidth < 1025) { moods.forEach((m) => { m.style.left = m.style.top = ''; }); return; }
     const st = q('stage');
     const W = st.clientWidth;
     const H = st.clientHeight;
     const cx = W / 2;
     const cy = H * 0.46;
     const rx = Math.min(330, W * 0.42);
-    const ry = 200;
-    moods.forEach((m, i) => { const a = ((-90 + i * 60 + 30) * Math.PI) / 180; m.style.left = `${cx + Math.cos(a) * rx}px`; m.style.top = `${cy + Math.sin(a) * ry}px`; m.style.animationDelay = `${i * -0.8}s`; });
+    const ry = Math.min(200, H * 0.4);
+    qa('.zw-mood').forEach((m, i) => {
+      const a = ((-90 + i * 60 + 30) * Math.PI) / 180;
+      const half = m.offsetWidth / 2 + 6;
+      m.style.left = `${clamp(cx + Math.cos(a) * rx, half, W - half)}px`;
+      m.style.top = `${cy + Math.sin(a) * ry}px`;
+      m.style.animationDelay = `${i * -0.8}s`;
+    });
   }
 
   // ---------- your Saudi day: the sky follows the day ----------
@@ -446,7 +452,8 @@ export function startWorld({ root, t, reduce }: { root: HTMLElement; t: Translat
       else ScrollTrigger.create({ trigger: roadBox, start: 'top 70%', end: 'bottom 60%', scrub: true, onUpdate: (s) => setHow(s.progress) });
       setHow(0, true);
     });
-    mm.add({ desk: '(min-width: 761px) and (min-height: 560px)', phone: '(max-width: 760px), (max-height: 559px)' }, (c) => {
+    // Pinned on phones too, as on a laptop. Only a screen too short to hold a moment (a phone on its side) gets the list.
+    mm.add({ desk: '(min-height: 500px)', phone: '(max-height: 499px)' }, (c) => {
       if (c.conditions?.desk) {
         ScrollTrigger.create({ trigger: q('dayPin'), start: 'top top', end: '+=260%', pin: true, scrub: true, onUpdate: (s) => setDay(s.progress) });
       } else {

@@ -168,7 +168,7 @@ export function Landing() {
           <div className="zw-head"><span className="zw-kicker">{t('landing.k.meet')}</span><h2 className="zw-title">{t('landing.meetTitle')}</h2><p className="zw-lead">{t('landing.meetText')}</p></div>
           <div className="zw-stage" data-zw="stage">
             <div className="zw-halo" /><div className="zw-orbit" data-zw="orbit" />
-            <div className="zw-slot" data-zw="s-meet" data-state="listening" style={css({ '--s': 'clamp(170px, 22vw, 250px)' })} />
+            <div className="zw-slot" data-zw="s-meet" data-state="listening" style={css({ '--s': 'clamp(120px, 22vw, 250px)' })} />
             <div className="zw-moods">
               {MOODS.map(([m, c]) => (
                 <button key={m} type="button" className={`zw-mood ${mood === m ? 'is-on' : ''}`} style={css({ '--c': c })} aria-pressed={mood === m} onClick={() => pickMood(m)} onMouseEnter={coarse ? undefined : () => pickMood(m)}>
@@ -376,10 +376,14 @@ function FocusSample(p: SampleProps) {
   const [left, setLeft] = useState(DIST.map((d) => d[1]));
   const [gone, setGone] = useState<string[]>([]);
   const field = useRef<HTMLDivElement>(null);
+  // In a context that's reverted on cleanup: killing the tween alone would leave the buttons at scale 0
+  // (and React starts this twice in development), so they'd never show.
   useEffect(() => {
     if (!field.current || prefersReduced()) return;
-    const tw = gsap.from(field.current.querySelectorAll('.zw-dist'), { scale: 0, stagger: 0.1, duration: 0.5, ease: 'back.out(2.5)', delay: 0.2 });
-    return () => { tw.kill(); };
+    const ctx = gsap.context(() => {
+      gsap.fromTo('.zw-dist', { scale: 0 }, { scale: 1, stagger: 0.1, duration: 0.5, ease: 'back.out(2.5)', delay: 0.2, clearProps: 'transform' });
+    }, field);
+    return () => ctx.revert();
   }, []);
   function clear(k: string, el: HTMLElement) {
     p.world.current?.burstAt(el, 'spark', 8);

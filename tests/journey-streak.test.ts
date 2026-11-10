@@ -360,8 +360,9 @@ describe('smart replies', () => {
     for (const l of ['en', 'ar-SA']) expect(load(l).consent).toBeUndefined();
   });
 
-  it('still say under the chat title that replies come from OpenAI', () => {
-    expect(chat).toContain("'companion.statusAi'");
-    for (const l of ['en', 'ar-SA']) expect(load(l).statusAi).toContain('OpenAI');
+  it('no longer say under the chat title where replies come from; only the limited mode is announced', () => {
+    expect(chat).not.toContain('companion.statusAi');
+    expect(chat).toContain("{!useAi && <span className=\"status status--limited\">");
+    for (const l of ['en', 'ar-SA']) expect(load(l).statusAi).toBeUndefined();
   });
 });

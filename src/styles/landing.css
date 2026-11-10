@@ -143,6 +143,7 @@
 .zw-halo { position: absolute; left: 50%; top: 46%; width: 340px; height: 340px; translate: -50% -50%; border-radius: 50%; background: radial-gradient(circle, #ffffff 0, #ffffff00 70%); }
 .zw-orbit { position: absolute; left: 50%; top: 46%; width: 620px; height: 380px; translate: -50% -50%; border: 2px dashed #d9c9f5; border-radius: 50%; opacity: .7; }
 .zw-mood { position: absolute; transition: scale .45s var(--spring), background .3s, border-color .3s, color .3s; translate: -50% -50%; min-height: 48px; display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 99px; border: 2px solid #e6dcfa; background: #fff; font-weight: 800; cursor: pointer; box-shadow: 0 8px 20px #a57ff01f; animation: zw-float 5s ease-in-out infinite; }
+.zw-mood { white-space: nowrap; }
 .zw-mood i { width: 10px; height: 10px; border-radius: 50%; background: var(--c); }
 .zw-mood:hover, .zw-mood.is-on { scale: 1.1; border-color: var(--lil); }
 .zw-mood.is-on { background: var(--lil); color: #fff; } .zw-mood.is-on i { background: #fff; }
@@ -270,12 +271,10 @@
   .zw-links { display: none; }
   .zw-split, .zw-try .zw-split { grid-template-columns: 1fr 180px; gap: 24px; }
   .zw-day-in { grid-template-columns: 1fr 180px; }
-  .zw-stage { height: auto; margin-top: 10px; display: flex; flex-direction: column; align-items: center; }
-  .zw-stage .zw-slot { position: relative; left: auto; top: auto; translate: none; }
-  .zw-halo { top: 90px; width: 240px; height: 240px; } .zw-orbit { display: none; }
-  .zw-moods { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 18px; }
-  .zw-mood { position: static; translate: none; animation: none; }
-  .zw-mood-cap { position: static; translate: none; margin-top: 4px; font-size: 20px; order: 0; }
+  /* The moods stay in a circle around ZAHO on every screen; world.ts keeps each one inside the stage. */
+  .zw-stage { height: 440px; }
+  .zw-orbit { width: 86%; height: 320px; }
+  .zw-halo { width: 240px; height: 240px; }
 }
 /* ---------- phone ---------- */
 @media (max-width: 760px) {
@@ -300,16 +299,20 @@
   .zw-tab span { font-size: 14px; }
   .zw-pebbles { gap: 10px; }
   .zw-peb { flex: 1 1 calc(50% - 10px); min-width: 0; padding: 12px 12px 12px 10px; font-size: 14.5px; }
-  .zw-day-pin { height: auto; overflow: visible; }
-  .zw-day-sky, .zw-day-arc, .zw-day-ground { display: none; }
-  .zw-day-in { display: block; padding: 80px 16px 40px; }
-  .zw-day-in .zw-side { margin: 8px 0 10px; }
-  .zw-moments { display: flex; flex-direction: column; gap: 14px; }
-  .zw-moment { position: relative; inset: auto; opacity: 1; translate: none; padding: 20px; border-radius: 26px; background: var(--tint); pointer-events: auto; }
-  .zw-moment.is-night { color: #fff; } .zw-moment.is-night .zw-time, .zw-moment.is-night .zw-big { background: #ffffff22; color: #fff; }
-  .zw-moment .zw-big { width: 60px; height: 60px; border-radius: 20px; } .zw-moment .zw-big svg { width: 30px; height: 30px; }
-  .zw-moment h3 { font-size: 22px; } .zw-moment p { font-size: 16px; }
-  .zw-dots { display: none; }
+  /* Meet: a smaller circle that fits a phone. */
+  .zw-stage { height: 420px; margin-top: 18px; }
+  .zw-orbit { width: 94%; height: 300px; }
+  .zw-halo { width: 200px; height: 200px; }
+  .zw-mood { min-height: 40px; padding: 7px 12px; gap: 6px; font-size: 13.5px; white-space: nowrap; }
+  .zw-mood-cap { font-size: 18px; }
+  /* Your day: pinned like on a laptop, the sky moving from dawn to night, one moment at a time. */
+  .zw-day-in { grid-template-columns: 1fr; grid-template-rows: auto 1fr auto auto; padding: calc(var(--nav-h) + 14px) 16px calc(20px + var(--sab)); gap: 6px; }
+  .zw-day-in .zw-side { order: 0; justify-content: center; }
+  .zw-moment { gap: 10px; }
+  .zw-moment .zw-big { width: 64px; height: 64px; border-radius: 22px; } .zw-moment .zw-big svg { width: 32px; height: 32px; }
+  .zw-moment h3 { font-size: 25px; } .zw-moment p { font-size: 16px; line-height: 1.75; }
+  .zw-orbital { width: 64px; height: 64px; margin: -32px; }
+  .zw-dots { justify-content: center; }
   .zw-end .zw-slot { --s: 150px; }
 }
 @media (max-width: 360px) {
@@ -323,6 +326,15 @@
   .zw-hero-zaho { order: 0; }
   .zw-h1 { font-size: 26px; } .zw-hero-copy { padding: 16px 18px; } .zw-hero-copy > p { font-size: 14.5px; margin-bottom: 12px; }
   .zw-cue { display: none; }
+}
+/* A screen too short to pin (a phone on its side): your day as a list, each moment with its time's colour. */
+@media (max-height: 499px) {
+  .zw-day-pin { height: auto; overflow: visible; }
+  .zw-day-sky, .zw-day-arc, .zw-day-ground, .zw-dots { display: none; }
+  .zw-day-in { display: block; padding: 80px 16px 40px; }
+  .zw-moments { display: flex; flex-direction: column; gap: 14px; }
+  .zw-moment { position: relative; inset: auto; opacity: 1; translate: none; padding: 20px; border-radius: 26px; background: var(--tint); pointer-events: auto; }
+  .zw-moment.is-night { color: #fff; } .zw-moment.is-night .zw-time, .zw-moment.is-night .zw-big { background: #ffffff22; color: #fff; }
 }
 /* Reduced motion, from the system or the app's own setting: only this page is affected. */
 @media (prefers-reduced-motion: reduce) {

@@ -167,7 +167,8 @@ export function Companion() {
         <div className="chat-head__buddy"><Mascot state={mascot.state} size={104} label={t('common.brand')} /></div>
         <div className="grow">
           <h1>{t('nav.chat')}</h1>
-          <span className={`status ${useAi ? 'status--ai' : 'status--limited'}`}><Bot size={14} aria-hidden="true" /> {t(useAi ? 'companion.statusAi' : 'companion.statusRules')}</span>
+          {/* Only the limited mode is announced, because then the replies really are simpler. */}
+          {!useAi && <span className="status status--limited"><Bot size={14} aria-hidden="true" /> {t('companion.statusRules')}</span>}
         </div>
       </header>
 
