@@ -6,6 +6,7 @@ import { Mascot } from '../../components/mascot/Mascot';
 import ClickSpark, { type ClickSparkHandle } from '../../components/reactbits/ClickSpark';
 import { Reveal, SettleText } from '../../components/ui/HomeMotion';
 import { useMascot } from '../../components/mascot/useMascot';
+import { PokeBubble, usePoke } from '../../components/mascot/usePoke';
 import { useAppState, useStore } from '../../context/AppStateContext';
 import { CHALLENGES } from '../../features/challenges/catalog';
 import { ChallengeArt } from '../../features/challenges/ChallengeArt';
@@ -49,6 +50,8 @@ export function Home({ onNavigate }: { onNavigate(v: ViewId): void }) {
   const lastCheckIn = s.en[s.en.length - 1];
   const mascot = useMascot(buddyMood(s, !!lastCheckIn && lastCheckIn.d === today() && lastCheckIn.e === 'low'));
   const nrg = buddyEnergy(s);
+  // Tapping Zaho: a reaction and a line. Asleep, the first tap wakes him up.
+  const { poke, line: pokeLine } = usePoke(mascot, 'home', nrg === 0 ? 'mascot.poke.home.wake' : undefined);
   const lastNrg = useRef(nrg);
   const energySpark = useRef<ClickSparkHandle>(null);
   const [steps, setSteps] = useState(false);
@@ -129,7 +132,8 @@ export function Home({ onNavigate }: { onNavigate(v: ViewId): void }) {
             <div className="hw-stage">
               <span className="hw-glow" aria-hidden="true" />
               <div className="hero__buddy">
-                <Mascot state={mascot.state} size={190} label={t('common.brand')} interactive />
+                <Mascot state={mascot.state} size={190} label={t('common.brand')} interactive onClick={() => { energySpark.current?.spark(); poke(); }} />
+                <PokeBubble line={pokeLine} />
               </div>
               {energyToday && !askEnergy && (() => {
                 const Icon = ENERGY.find((x) => x.value === energyToday)!.icon;

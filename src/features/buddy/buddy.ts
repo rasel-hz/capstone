@@ -1,5 +1,6 @@
 import type { AppState, DayGoals, Goal } from '../../types/index.ts';
 import { today } from '../../utils/index.ts';
+import { streakOf } from '../streak/streak.ts';
 
 // Today's goals and the buddy's energy. Doing things for yourself fills the buddy's energy for the day.
 // Nothing here is ever taken away: a new day simply starts fresh.
@@ -47,11 +48,19 @@ export function toggleGoal(s: AppState, id: string, d = today()) {
   return false;
 }
 
-/** Today's energy. Yesterday's doesn't carry over, so it never reads as a debt. */
-export const energyToday = (s: AppState, d = today()) => (s.nrgD === d ? s.nrg : 0);
+/**
+ * Today's energy. Yesterday's doesn't carry over, so it never reads as a debt. The count itself is kept on this
+ * device, so a challenge finished today on another device (it reaches here as a streak day) counts as at least one,
+ * and the buddy isn't asleep after a full day.
+ */
+export const energyToday = (s: AppState, d = today()) => {
+  const here = s.nrgD === d ? s.nrg : 0;
+  return d === today() && !here && streakOf(s).todayDone ? 1 : here;
+};
 
 export function addEnergy(s: AppState, d = today()) {
-  s.nrg = Math.min(ENERGY_FULL, energyToday(s, d) + 1);
+  // Counts only what was done on this device, so the floor from another device is never added twice.
+  s.nrg = Math.min(ENERGY_FULL, (s.nrgD === d ? s.nrg : 0) + 1);
   s.nrgD = d;
   if (s.nrg >= ENERGY_FULL && !s.fullDays.includes(d)) s.fullDays = [...s.fullDays, d].slice(-60);
 }

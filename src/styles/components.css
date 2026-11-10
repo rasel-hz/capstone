@@ -649,3 +649,22 @@ html[lang='en'] h1, html[lang='en'] h2 { letter-spacing: -.01em; }
 @keyframes dp-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .dp__now, .dp__list li { animation: none; } }
 .rm .dp__now, .rm .dp__list li { animation: none; }
+
+/* Tapping Zaho: a short line in a bubble above him, that pops in and fades away. */
+.poke-wrap { position: relative; z-index: 20; display: inline-flex; }
+.poke-bubble { position: absolute; bottom: calc(100% + 4px); left: 50%; z-index: 5; width: max-content; max-width: min(240px, 70vw); padding: 7px 13px; border-radius: 16px; background: #fff; color: var(--ink); font-size: 14px; font-weight: 600; line-height: 1.45; text-align: center; box-shadow: var(--shadow-lift); pointer-events: none;
+  opacity: 0; transform: translate(-50%, 8px) scale(.8); transition: opacity .25s ease, transform .35s cubic-bezier(.3, 1.5, .5, 1); }
+.poke-bubble::after { content: ''; position: absolute; top: 100%; left: 50%; margin-left: -7px; border: 7px solid transparent; border-top-color: #fff; }
+.poke-bubble.is-on { opacity: 1; transform: translate(-50%, 0) scale(1); }
+/* In a page header Zaho sits at the edge with cards below, so the bubble opens beside him, towards the title. */
+.page-head .poke-bubble { bottom: auto; top: 50%; left: auto; inset-inline-end: calc(100% + 10px); transform: translateY(-50%) scale(.8); }
+.page-head .poke-bubble.is-on { transform: translateY(-50%); }
+.page-head .poke-bubble::after { top: 50%; left: auto; inset-inline-start: 100%; margin: -7px 0 0; border-top-color: transparent; border-inline-start-color: #fff; }
+@media (prefers-reduced-motion: reduce) { .poke-bubble { transition: none; } }
+/* On Home the greeting text sits on the reading side, so the bubble leans the other way (left in Arabic, right in English). */
+/* The tail sits a fixed distance in from the bubble's corner, away from its rounding, and right over Zaho's head. */
+.hero__buddy .poke-bubble { --lean: calc(-100% + 20px); transform: translate(var(--lean), 8px) scale(.8); transform-origin: calc(100% - 20px) 100%; }
+.hero__buddy .poke-bubble.is-on { transform: translate(var(--lean), 0) scale(1); }
+.hero__buddy .poke-bubble::after { content: ''; left: auto; right: 14px; top: auto; bottom: -5px; margin: 0; width: 12px; height: 12px; border: 0; border-radius: 2px; background: #fff; transform: rotate(45deg); box-shadow: 3px 3px 5px rgba(38, 61, 55, .08); }
+[dir='ltr'] .hero__buddy .poke-bubble { --lean: -20px; transform-origin: 20px 100%; }
+[dir='ltr'] .hero__buddy .poke-bubble::after { right: auto; left: 14px; }

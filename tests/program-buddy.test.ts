@@ -154,3 +154,30 @@ describe('goals and energy', () => {
     expect(s.xp).toBe(40);
   });
 });
+
+describe('the buddy on another device', () => {
+  it('is awake when a challenge was finished today on another device, without counting it twice', async () => {
+    const { energyToday, addEnergy } = await import('../src/features/buddy/buddy');
+    const { localDate, SAUDI_TZ } = await import('../src/features/prayer/times');
+    const s = { ...(await import('../src/services/storage')).defaultState(), streakDays: [localDate(new Date(), SAUDI_TZ)] };
+    expect(energyToday(s)).toBe(1);
+    addEnergy(s);
+    expect(energyToday(s)).toBe(1);
+    addEnergy(s);
+    expect(energyToday(s)).toBe(2);
+    expect(energyToday({ ...s, nrg: 0, nrgD: '', streakDays: [] })).toBe(0);
+  });
+});
+
+describe('tapping Zaho', () => {
+  it('reacts with a line on Home and in My rewards, in both languages', async () => {
+    const { readFileSync } = await import('node:fs');
+    expect(readFileSync('src/pages/Home/index.tsx', 'utf8')).toMatch(/usePoke\(mascot, 'home'/);
+    expect(readFileSync('src/pages/Rewards/index.tsx', 'utf8')).toMatch(/usePoke\(mascot, 'rewards'\)/);
+    for (const l of ['ar-SA', 'en']) {
+      const poke = JSON.parse(readFileSync(`src/i18n/locales/${l}/mascot.json`, 'utf8')).poke;
+      for (const area of ['home', 'rewards']) for (const n of ['1', '2', '3', '4', '5']) expect(poke[area][n], `${l} ${area}.${n}`).toBeTruthy();
+      expect(poke.home.wake).toBeTruthy();
+    }
+  });
+});

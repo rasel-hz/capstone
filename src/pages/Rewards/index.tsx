@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Dialog, PageHeader } from '../../components/ui/kit';
 import { Mascot } from '../../components/mascot/Mascot';
 import { useMascot } from '../../components/mascot/useMascot';
+import { PokeBubble, usePoke } from '../../components/mascot/usePoke';
 import { useCountUp } from '../../hooks/useCountUp';
 import { useBackHandler } from '../../services/native';
 import { balanceOf, fetchRewards, fetchSummary, markCelebrated, onPointsChanged, PointsError, redeemReward, safeUrl, type PointsSummary, type Reward } from '../../services/points';
@@ -178,6 +179,7 @@ export function Rewards() {
   const { t, i18n } = useTranslation();
   const en = i18n.language === 'en';
   const mascot = useMascot('idle');
+  const { poke, line: pokeLine } = usePoke(mascot, 'rewards');
   const { data, error, load } = useRewardsData();
   const [open, setOpen] = useState<string | null>(null);
   const [fresh, setFresh] = useState<Set<string>>(new Set());
@@ -202,7 +204,10 @@ export function Rewards() {
   return (
     <>
       <PageHeader title={t('rewards.my.title')} sub={t('rewards.my.sub')}>
-        <Mascot state={mascot.state} size={72} label={t('common.brand')} interactive />
+        <span className="poke-wrap">
+          <Mascot state={mascot.state} size={72} label={t('common.brand')} interactive onClick={poke} />
+          <PokeBubble line={pokeLine} />
+        </span>
       </PageHeader>
 
       {error ? (

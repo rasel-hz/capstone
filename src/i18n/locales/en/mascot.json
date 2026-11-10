@@ -1,0 +1,19 @@
+{
+  "poke": {
+    "home": {
+      "wake": "Oh! You woke me up. Shall we start the day?",
+      "1": "Hehe, that tickles!",
+      "2": "I'm right here",
+      "3": "Yay! Want to do something together?",
+      "4": "You look like a champ today",
+      "5": "A small step makes a difference, trust me"
+    },
+    "rewards": {
+      "1": "Every challenge brings a reward closer",
+      "2": "Well done! Your points are growing",
+      "3": "Pick what you like, I'm cheering you on",
+      "4": "Hehe, rewards are exciting!",
+      "5": "Bit by bit, you'll get there"
+    }
+  }
+}
