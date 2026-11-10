@@ -81,7 +81,6 @@ function JourneyDetail({ j, onBack, onNavigate }: { j: Journey; onBack(): void; 
           );
         })}
       </ol>
-      <p className="note">{t('journeys.disclaimerDetail')}</p>
       <button type="button" className="btn-link" aria-pressed={suggesting} onClick={toggleSuggest}>{t(suggesting ? 'journeys.suggestOff' : 'journeys.suggestOn')}</button>
     </>
   );

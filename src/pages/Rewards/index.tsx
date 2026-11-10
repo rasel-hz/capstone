@@ -1,5 +1,5 @@
 import { Award, Check, Crown, ExternalLink, Footprints, Layers, Lock, Palette, RefreshCw, Shapes, Sparkles, Sunrise, type LucideIcon } from 'lucide-react';
-import { useCallback, useEffect, useState, type CSSProperties } from 'react';
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Dialog, PageHeader } from '../../components/ui/kit';
 import { Mascot } from '../../components/mascot/Mascot';
@@ -10,7 +10,11 @@ import { CHALLENGES } from '../../features/challenges/catalog';
 import { achievements, UNLOCKS, type AchievementArt } from '../../features/rewards/achievements';
 import { useCountUp } from '../../hooks/useCountUp';
 import { useBackHandler } from '../../services/native';
-import { fetchRewards, fetchSummary, markCelebrated, onPointsChanged, safeUrl, type PointsSummary, type Reward } from '../../services/points';
+import {
+  canRedeemOnServer, fetchRewards, fetchSummary, markCelebrated, newRequestKey, onPointsChanged, redeemReward, safeUrl, spendable,
+  type PointsSummary, type RedeemResult, type Redemption, type Reward,
+} from '../../services/points';
+import { formatDate } from '../../i18n';
 import type { ChallengeId } from '../../types';
 import { level } from '../../utils';
 
@@ -58,24 +62,68 @@ function useRewardsData() {
     void load();
     return onPointsChanged(() => void load());
   }, [load]);
-  return { data, error, load };
+  // After a redemption the server's new balance is shown straight away, before the next full reload.
+  const patch = useCallback((fn: (s: PointsSummary) => PointsSummary) => setData((d) => (d ? { ...d, summary: fn(d.summary) } : d)), []);
+  return { data, error, load, patch };
 }
 
-function RewardDetails({ r, unlocked, lifetime, en, onClose }: { r: Reward; unlocked: boolean; lifetime: number; en: boolean; onClose(): void }) {
+type Redeemed = Extract<RedeemResult, { status: 'redeemed' | 'already' }>;
+
+// Redeeming spends the reward's points. It asks first, the server checks the balance and records it in one
+// step, and the same confirmation can't be charged twice. Opening the brand's site is the next step; it
+// doesn't mean the reward itself was claimed there.
+function RewardDetails({ r, have, server, last, en, onClose, onRedeemed, onBalance }: {
+  r: Reward; have: number; server: boolean; last: Redemption | null; en: boolean;
+  onClose(): void; onRedeemed(res: Redeemed): void; onBalance(balance: number): void;
+}) {
   const { t } = useTranslation();
-  const mascot = useMascot(unlocked ? 'happy' : 'curious');
+  const afford = have >= r.required_points;
+  const mascot = useMascot(afford ? 'happy' : 'curious');
+  const [step, setStep] = useState<'view' | 'confirm' | 'busy' | 'done'>('view');
+  const [err, setErr] = useState<'' | 'insufficient' | 'failed' | 'notAvailable'>('');
+  const [done, setDone] = useState<Redeemed | null>(null);
+  // One key per opening of this dialog: a double tap or a retry sends the same key and is charged once.
+  const key = useRef(newRequestKey());
   useBackHandler(onClose);
   useEffect(() => {
-    if (unlocked) mascot.play('celebrating');
-  }, [unlocked, mascot.play]);
+    if (afford) mascot.play('celebrating');
+  }, [afford, mascot.play]);
   const brand = en ? r.brand_en : r.brand_ar;
   const title = en ? r.title_en : r.title_ar;
-  const url = safeUrl(r.website_url);
-  const left = Math.max(0, r.required_points - lifetime);
+  const left = Math.max(0, r.required_points - have);
+  const lastUrl = last ? safeUrl(last.url) : null;
+
+  async function confirm() {
+    if (step === 'busy') return;
+    setStep('busy');
+    setErr('');
+    try {
+      const res = await redeemReward(r.id, key.current);
+      if (res.status === 'insufficient') {
+        onBalance(res.balance);
+        setErr('insufficient');
+        setStep('view');
+        return;
+      }
+      onRedeemed(res);
+      setDone(res);
+      setStep('done');
+      mascot.play('celebrating');
+      // Opens the site straight away where the browser allows it; the button below always works too.
+      const u = safeUrl(res.url);
+      if (u) window.open(u, '_blank', 'noopener,noreferrer');
+    } catch (e) {
+      // Nothing was spent unless the server said so. The same key is kept, so trying again can't charge twice.
+      setErr((e as Error).message === 'notAvailable' ? 'notAvailable' : 'failed');
+      setStep('confirm');
+    }
+  }
+
+  const doneUrl = done ? safeUrl(done.url) : null;
   return (
     <Dialog label={title}>
       <div className="rw-dlg" style={{ '--brand': r.accent_color } as CSSProperties}>
-        {unlocked && (
+        {(afford || done) && (
           <>
             <span className="auth-spark auth-spark--a" aria-hidden="true"><Sparkles size={22} /></span>
             <span className="auth-spark auth-spark--b" aria-hidden="true"><Sparkles size={16} /></span>
@@ -87,24 +135,51 @@ function RewardDetails({ r, unlocked, lifetime, en, onClose }: { r: Reward; unlo
         </div>
         <h2>{title}</h2>
         <p className="rw-pts">{t('rewards.my.pts', { count: r.required_points })}</p>
-        {unlocked ? (
+        {done ? (
           <>
-            <p className="rw-badge"><Check size={15} aria-hidden="true" /> {t('rewards.my.unlocked')}</p>
-            <p className="note rw-demo">{t('rewards.my.demo')}</p>
-            {url && (
-              <a className="btn btn--lg rw-go" href={url} target="_blank" rel="noopener noreferrer external" aria-label={t('rewards.my.openSiteLabel', { brand })}>
+            <p className="rw-badge" role="status"><Check size={15} aria-hidden="true" /> {t('rewards.my.redeemed', { points: t('rewards.my.pts', { count: done.points }), balance: t('rewards.my.pts', { count: done.balance }) })}</p>
+            <p className="note">{t('rewards.my.continueOnSite', { brand })}</p>
+            {doneUrl && (
+              <a className="btn btn--lg rw-go" href={doneUrl} target="_blank" rel="noopener noreferrer external" aria-label={t('rewards.my.openSiteLabel', { brand })}>
                 {t('rewards.my.openSite', { brand })} <ExternalLink size={16} aria-hidden="true" />
               </a>
             )}
+            <p className="note rw-demo">{t('rewards.my.demo')}</p>
+          </>
+        ) : afford ? (
+          <>
+            <p className="rw-left">{t('rewards.my.balanceAfter', { have: t('rewards.my.pts', { count: have }), after: t('rewards.my.pts', { count: have - r.required_points }) })}</p>
+            {!server ? (
+              <p className="note" role="status">{t('rewards.my.notAvailable')}</p>
+            ) : step === 'view' ? (
+              <button type="button" className="btn btn--lg" onClick={() => setStep('confirm')}>{t('rewards.my.redeem', { points: t('rewards.my.pts', { count: r.required_points }) })}</button>
+            ) : (
+              <div className="rw-confirm">
+                <p><b>{t('rewards.my.confirmQ')}</b></p>
+                <p className="note">{t('rewards.my.confirmText', { points: t('rewards.my.pts', { count: r.required_points }), brand })}</p>
+                <div className="row row--c">
+                  <button type="button" className="btn" onClick={() => void confirm()} disabled={step === 'busy'} aria-busy={step === 'busy'}>{t(step === 'busy' ? 'rewards.my.redeeming' : 'rewards.my.confirm')}</button>
+                  <button type="button" className="btn alt" onClick={() => setStep('view')} disabled={step === 'busy'}>{t('rewards.my.cancel')}</button>
+                </div>
+              </div>
+            )}
+            <p className="note rw-demo">{t('rewards.my.demo')}</p>
           </>
         ) : (
           <>
             <p className="rw-left">{t('rewards.my.left', { count: left })}</p>
-            <div className="rw-bar" role="progressbar" aria-valuemin={0} aria-valuemax={r.required_points} aria-valuenow={Math.min(lifetime, r.required_points)} aria-label={t('rewards.my.progressLabel', { title })}>
-              <i style={{ width: `${Math.min(100, (lifetime / r.required_points) * 100)}%` }} />
+            <div className="rw-bar" role="progressbar" aria-valuemin={0} aria-valuemax={r.required_points} aria-valuenow={Math.min(have, r.required_points)} aria-label={t('rewards.my.progressLabel', { title })}>
+              <i style={{ width: `${Math.min(100, (have / r.required_points) * 100)}%` }} />
             </div>
             <p className="note">{t('rewards.my.lockedText', { points: t('rewards.my.pts', { count: r.required_points }) })}</p>
           </>
+        )}
+        {err && <p className="hint auth-err" role="alert">{t(`rewards.my.err.${err}`)}</p>}
+        {!done && last && lastUrl && (
+          <p className="note">
+            {t('rewards.my.lastRedeemed', { date: formatDate(new Date(last.redeemed_at), { day: 'numeric', month: 'short' }) })}{' '}
+            <a href={lastUrl} target="_blank" rel="noopener noreferrer external">{t('rewards.my.reopen', { brand })} <ExternalLink size={13} aria-hidden="true" /></a>
+          </p>
         )}
         <button type="button" className="btn-link" onClick={onClose}>{t('rewards.my.close')}</button>
       </div>
@@ -113,6 +188,7 @@ function RewardDetails({ r, unlocked, lifetime, en, onClose }: { r: Reward; unlo
 }
 
 function RewardCard({ r, unlocked, fresh, lifetime, en, i, onOpen }: { r: Reward; unlocked: boolean; fresh: boolean; lifetime: number; en: boolean; i: number; onOpen(): void }) {
+  // `unlocked` is true when the spendable balance covers this reward; `lifetime` is that balance.
   const { t } = useTranslation();
   const brand = en ? r.brand_en : r.brand_ar;
   const title = en ? r.title_en : r.title_ar;
@@ -130,7 +206,7 @@ function RewardCard({ r, unlocked, fresh, lifetime, en, i, onOpen }: { r: Reward
       <h3 className="rw-title">{title}</h3>
       <p className="rw-pts">{t('rewards.my.pts', { count: r.required_points })}</p>
       {unlocked ? (
-        <p className="rw-badge"><Check size={15} aria-hidden="true" /> {t('rewards.my.unlocked')}</p>
+        <p className="rw-badge"><Check size={15} aria-hidden="true" /> {t('rewards.my.canRedeem')}</p>
       ) : (
         <>
           <p className="rw-left"><Lock size={13} aria-hidden="true" /> {t('rewards.my.left', { count: left })}</p>
@@ -148,13 +224,14 @@ function RewardCard({ r, unlocked, fresh, lifetime, en, i, onOpen }: { r: Reward
 
 function PointsHero({ summary }: { summary: PointsSummary }) {
   const { t } = useTranslation();
+  const bal = useCountUp(spendable(summary), 900);
   const life = useCountUp(summary.lifetime, 900);
   const today = useCountUp(summary.today, 900);
   return (
     <section className="rw-hero">
       <div className="grow">
         <p className="rw-hero__t">{t('rewards.my.heroTitle')}</p>
-        <p className="rw-hero__n" aria-live="polite">{t('rewards.my.collected', { count: life })}</p>
+        <p className="rw-hero__n" aria-live="polite">{t('rewards.my.balance', { count: bal })}</p>
         <div className="rw-stats">
           <div><b>{today}</b><span>{t('rewards.my.today')}</span></div>
           <div><b>{life}</b><span>{t('rewards.my.lifetime')}</span></div>
@@ -175,11 +252,10 @@ export function Rewards() {
   const mascot = useMascot('idle');
   const done = new Set(s.hist.filter((h) => h.status === 'COMPLETED').map((h) => h.id));
   const stickers = STICKERS.filter((id) => done.has(id)).length;
-  const { data, error, load } = useRewardsData();
+  const { data, error, load, patch } = useRewardsData();
   const [open, setOpen] = useState<string | null>(null);
   const [fresh, setFresh] = useState<Set<string>>(new Set());
 
-  const unlocked = new Set(data?.summary.unlocks.map((u) => u.reward_id));
 
   // A reward unlocked since the last visit is celebrated once, then recorded so it doesn't repeat.
   useEffect(() => {
@@ -191,7 +267,17 @@ export function Rewards() {
     void markCelebrated().catch(() => {});
   }, [data, mascot.play]);
 
-  const lifetime = data?.summary.lifetime ?? 0;
+  // Rewards are bought with the spendable balance, not with everything ever earned.
+  const have = data ? spendable(data.summary) : 0;
+  const server = !!data && canRedeemOnServer(data.summary);
+  const lastOf = (id: string) => data?.summary.redemptions?.find((x) => x.reward_id === id) ?? null;
+  const redeemed = (res: Redeemed) => patch((sm) => ({
+    ...sm,
+    balance: res.balance,
+    redemptions: res.status === 'redeemed'
+      ? [{ id: res.redemption_id, reward_id: res.reward_id, points: res.points, url: res.url, redeemed_at: res.redeemed_at }, ...(sm.redemptions ?? [])]
+      : sm.redemptions,
+  }));
   const newOne = data?.rewards.find((r) => fresh.has(r.id));
   const shown = data?.rewards.find((r) => r.id === open);
 
@@ -214,7 +300,7 @@ export function Rewards() {
           {newOne && <p className="rw-toast" role="status"><Sparkles size={16} aria-hidden="true" /> {t('rewards.my.newUnlock', { title: en ? newOne.title_en : newOne.title_ar })}</p>}
           <ul className="rw-grid">
             {data.rewards.map((r, i) => (
-              <RewardCard key={r.id} r={r} i={i} en={en} lifetime={lifetime} unlocked={unlocked.has(r.id)} fresh={fresh.has(r.id)} onOpen={() => setOpen(r.id)} />
+              <RewardCard key={r.id} r={r} i={i} en={en} lifetime={have} unlocked={have >= r.required_points} fresh={fresh.has(r.id)} onOpen={() => setOpen(r.id)} />
             ))}
           </ul>
           <p className="note center rw-how">{t('rewards.my.howChallenge')} · {t('rewards.my.howMission')}</p>
@@ -271,7 +357,12 @@ export function Rewards() {
         </ul>
       </section>
 
-      {shown && data && <RewardDetails r={shown} en={en} lifetime={lifetime} unlocked={unlocked.has(shown.id)} onClose={() => setOpen(null)} />}
+      {shown && data && (
+        <RewardDetails
+          r={shown} en={en} have={have} server={server} last={lastOf(shown.id)}
+          onClose={() => setOpen(null)} onRedeemed={redeemed} onBalance={(b) => patch((sm) => ({ ...sm, balance: b }))}
+        />
+      )}
     </>
   );
 }

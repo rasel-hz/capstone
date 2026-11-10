@@ -1,3 +1,4 @@
+import { named } from '../../features/companion/name';
 import { BatteryFull, BatteryLow, BatteryMedium, Check, ChevronDown, Clock, Compass, Flag, MessageCircle, Play, Shuffle, Sparkles, Timer, type LucideIcon } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -120,7 +121,7 @@ export function Home({ onNavigate }: { onNavigate(v: ViewId): void }) {
           <div className="hero__txt">
             <h1><SettleText text={t('dashboard.hello', { name: iso(s.name), greeting })} /></h1>
             {/* While the buddy's bubble asks about energy, the line would repeat it, so it waits for the answer. */}
-            {energyToday && !askEnergy && <p className="hero__line">{t(`dashboard.energyLine.${energyToday}`)}</p>}
+            {energyToday && !askEnergy && <p className="hero__line">{t(`dashboard.energyLine.${energyToday}`, named(s.name))}</p>}
           </div>
           <ClickSpark ref={energySpark} auto={false} className="hero__scene" disabled={!!s.rm} sparkColor={['#28785B', '#FFD36E', '#A78BFA']} sparkSize={9} sparkRadius={26} sparkCount={10} duration={500}>
             <div className="hw-stage">

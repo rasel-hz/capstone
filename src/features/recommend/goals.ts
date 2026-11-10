@@ -40,6 +40,8 @@ export const CHALLENGE_META: Record<ChallengeId, ChallengeMeta> = {
   dhikr_calm_heart: { goals: ['worry', 'stress'], gentle: true, dhikr: true },
   dhikr_moment: { goals: ['rest', 'stress'], gentle: true, dhikr: true },
   dhikr_sleep: { goals: ['sleep'], gentle: true, dhikr: true },
+  eye_break: { goals: ['rest', 'focus'], gentle: true },
+  grounding: { goals: ['stress', 'worry'], gentle: true },
 };
 
 export const isGoal = (v: unknown): v is Goal => typeof v === 'string' && (GOALS as readonly string[]).includes(v);

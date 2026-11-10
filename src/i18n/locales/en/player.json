@@ -57,10 +57,8 @@
     "none": "No worries, the mission has ended",
     "ofTotal": "{{n}} of {{total}}",
     "completed": "completed",
-    "whatHappened": "What actually happened",
     "tomorrow": "A suggestion for tomorrow",
     "prayer": "If prayer time is close, we can plan around it.",
-    "disclaimer": "These are game results for your own tracking. They don't show clinical improvement.",
     "chat": "Chat with your buddy"
   },
   "block": {

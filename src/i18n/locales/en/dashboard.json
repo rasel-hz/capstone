@@ -7,7 +7,8 @@
   "energyLine": {
     "high": "Great! Let's put that energy to good use.",
     "mid": "Okay, we'll keep it at your pace.",
-    "low": "You told me your energy's low, so we'll keep it light."
+    "low": "You told me your energy's low, so we'll keep it light.",
+    "low_named": "{{name}}, you told me your energy's low, so we'll keep it light."
   },
   "energyAsk": "How's your energy today? I'll shape the mission around it.",
   "energyLabel": "Your energy today",

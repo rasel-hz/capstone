@@ -1,3 +1,4 @@
+import { fillName } from '../features/companion/name';
 import { detectCrisis } from '../features/companion/crisis';
 import { buildChatRequest } from '../features/companion/request';
 import { mentionsWork, ruleReply, type CompanionReply } from '../features/companion/rules';
@@ -40,13 +41,14 @@ export const aiCompanion: CompanionService = {
     // Only a request for help planning gets the board on its own; recalling a past plan doesn't.
     const planning = (r.intent === 'planning' || r.intent === 'advice') && !!r.tasks?.length && !!r.goals?.some((g) => g === 'prioritize' || g === 'time');
     return {
-      messages: [r.reply],
+      // The model never sees the user's name; it writes a placeholder that is filled in here.
+      messages: [fillName(r.reply, state.name)],
       tone: r.tone,
       ...(r.pending ? { pending: { ctx: r.pending.ctx, low: r.pending.low ? 1 : 0, card: 1 } } : {}),
       // Only shown as a card when the model actually suggested something.
       // Named tasks plus a wish to organise them is enough to offer the personal planning board.
       ...((r.suggest || planning) && r.tone !== 'crisis'
-        ? { proposal: { prefer: r.suggest?.ids ?? [], goals: r.goals, minutes: r.minutes, why: r.suggest?.why, tasks: r.tasks, afterWork: mentionsWork(text) } }
+        ? { proposal: { prefer: r.suggest?.ids ?? [], goals: r.goals, minutes: r.minutes, why: r.suggest?.why && fillName(r.suggest.why, state.name), tasks: r.tasks, afterWork: mentionsWork(text) } }
         : {}),
     };
   },

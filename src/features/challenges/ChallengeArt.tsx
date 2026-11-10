@@ -199,6 +199,25 @@ const ART: Record<ChallengeId, ReactNode> = {
       <path d="M60 62q20-14 44-32" stroke={C.em} strokeWidth="2" fill="none" strokeLinecap="round" />
     </Frame>
   ),
+  // An eye resting, looking out of a window at the far horizon.
+  eye_break: (
+    <Frame bg="#E3F1FB">
+      <rect x="92" y="18" width="52" height="56" rx="6" fill={C.iv} />
+      <path d="M92 58q26-14 52 0v16H92z" fill={C.sage} />
+      <circle cx="128" cy="34" r="6" fill={C.sun} />
+      <path d="M22 54q22-22 44 0q-22 22-44 0z" fill={C.iv} />
+      <circle cx="44" cy="54" r="8" fill={C.em} />
+      <circle cx="47" cy="51" r="2.4" fill={C.iv} />
+    </Frame>
+  ),
+  // Five small marks for the senses around a leaf.
+  grounding: (
+    <Frame bg="#EAF5EC">
+      {[[30, 30, C.sky], [56, 22, C.sun], [104, 22, C.pe], [130, 30, C.lav], [80, 82, C.cor]].map(([x, y, f]) => <circle key={`${x}${y}`} cx={x as number} cy={y as number} r="7" fill={f as string} />)}
+      <path d="M60 70C60 46 80 36 104 34c0 24-14 36-44 36z" fill={C.sage} />
+      <path d="M62 68q18-12 40-30" stroke={C.em} strokeWidth="2" fill="none" strokeLinecap="round" />
+    </Frame>
+  ),
   // A crescent and a few stars over a calm night.
   dhikr_sleep: (
     <Frame bg="#26264A">

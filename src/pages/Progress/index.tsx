@@ -180,7 +180,6 @@ function ProgressView({ onNavigate, s }: { onNavigate(v: ViewId): void; s: AppSt
             <p><b>{t('progress.maybe')}</b> {t('progress.maybeText')}</p>
           </>
         ) : <p className="note">{t('progress.needMore')}</p>}
-        <p className="note">{t('progress.disclaimer')}</p>
       </section>
     </>
   );

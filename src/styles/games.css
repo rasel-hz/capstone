@@ -316,3 +316,29 @@
 .dk--night .dk-count__b.is-done, .dk--night .dk-count__b.is-done .dk-count__n { background: #A78BFA; color: #141433; }
 .dk--night .btn { background: #A78BFA; color: #141433; }
 .dk--night .btn-link { color: #CFC6FF; }
+
+/* Eye break: one large ring that empties slowly; it breathes gently while it runs. */
+.eye, .gr { display: flex; flex-direction: column; align-items: center; gap: 12px; max-width: 560px; margin: 0 auto; width: 100%; text-align: center; }
+.eye__icon, .gr__icon { display: grid; place-items: center; width: 64px; height: 64px; border-radius: 50%; background: var(--em-l); color: var(--em-d); }
+.eye__icon--done, .gr__icon--done { background: var(--em); color: #fff; }
+.eye__away { font-size: 17px; font-weight: 600; color: var(--em-d); margin: 0; }
+.eye-timer { position: relative; width: 200px; height: 200px; display: grid; place-items: center; }
+.eye-timer svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.eye-timer__track { stroke: var(--line); }
+.eye-timer__v { stroke: var(--em); transition: stroke-dashoffset .12s linear; }
+.eye-timer__n { font-size: 54px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--ink); }
+.eye-timer.is-breathing { animation: eye-breathe 4s ease-in-out infinite; }
+@keyframes eye-breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.04); } }
+@media (prefers-reduced-motion: reduce) { .eye-timer.is-breathing { animation: none; } }
+.rm .eye-timer.is-breathing { animation: none; }
+
+/* Noticing the senses: one stage at a time, with dots for the whole path. */
+.gr { animation: gr-in .32s ease-out; }
+@keyframes gr-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .gr { animation: none; } }
+.rm .gr { animation: none; }
+.gr-dots { display: flex; gap: 8px; }
+.gr-dots i { width: 10px; height: 10px; border-radius: 50%; background: var(--line); }
+.gr-dots i.is-now { background: var(--em); transform: scale(1.25); }
+.gr-dots i.is-done { background: var(--sage, #8DBFA3); }
+.gr-dots i.is-skip { background: transparent; box-shadow: inset 0 0 0 2px var(--line); }

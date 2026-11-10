@@ -34,7 +34,6 @@ export function ProgramResultView({ r }: { r: ProgramResult }) {
         <div><span className="note">{t('journeys.program.after')}</span><b>{r.after}</b></div>
       </div>
       <p className="flush">{t(`journeys.program.${key}`, { before: r.before, after: r.after })}</p>
-      <p className="note flush">{t('journeys.program.selfNote')}</p>
     </div>
   );
 }

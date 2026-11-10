@@ -14,7 +14,6 @@ import { acknowledge, needsCheckIn } from '../prayer/gate';
 import { PrayerCheckIn } from '../prayer/PrayerBreak';
 import type { PrayerWindow } from '../prayer/times';
 import { useMissions } from './MissionProvider';
-import { StreakDone } from '../streak/StreakBits';
 import { planSummary } from '../challenges/games/PersonalPlanGame';
 import { useCountUp } from '../../hooks/useCountUp';
 import { useTimers } from '../../hooks/useTimers';
@@ -451,16 +450,13 @@ function Completion({ summary, mascotState, onClose, onNavigate }: { summary: Mi
                 <div><b>{level(s)}</b><span>{t('common.level')}</span></div>
               </div>
               <MissionTimeline items={s.mission!.items} />
-              <h3>{t('player.done.whatHappened')}</h3>
             </>
           )}
-          {!quiet && <StreakDone />}
           <p>{summaryLines(summary)}{t('common.sentenceEnd')}</p>
           {!quiet && <Helpful />}
           {!quiet && <h3>{t('player.done.tomorrow')}</h3>}
           <p>{summarySuggestion(summary)}</p>
           {s.prayer && <p className="note">{t('player.done.prayer')}</p>}
-          {!quiet && <p className="note">{t('player.done.disclaimer')}</p>}
           <div className="row row--c">
             {s.mission!.items.some((i) => i.jn) && <button type="button" className="btn" onClick={() => leave('path')}>{t('path.see')}</button>}
             <button type="button" className={s.mission!.items.some((i) => i.jn) ? 'btn alt' : 'btn'} onClick={() => leave('chat')}>{t('player.done.chat')}</button>

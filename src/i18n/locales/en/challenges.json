@@ -1,6 +1,6 @@
 {
   "title": "Challenges",
-  "sub": "Short games to try at your own pace. They're for your own tracking, not a measure of your health.",
+  "sub": "Short games to try at your own pace.",
   "categories": {
     "all": "All",
     "focus": "Focus",
@@ -133,6 +133,18 @@
       "desc": "Bedtime adhkar, quietly, with no sounds or celebration.",
       "purpose": "The established bedtime adhkar, with their text, source and number of times.",
       "instructions": "Read each dhikr and tap the counter gently. Everything here stays quiet to help you wind down."
+    },
+    "eye_break": {
+      "name": "My eyes are tired",
+      "desc": "A 20-second break for your eyes, away from the screen.",
+      "purpose": "The 20-20-20 habit: after a long time on a screen, look at something far away for 20 seconds.",
+      "instructions": "Tap start and look at something far from you for 20 seconds. The timer runs by itself, and you can pause and resume it."
+    },
+    "grounding": {
+      "name": "My mind is busy",
+      "desc": "A moment to notice what is around you, with your senses.",
+      "purpose": "Notice your surroundings one sense at a time: 5 you see, 3 you hear, 3 you touch, 2 you smell and 1 you taste.",
+      "instructions": "One sense at a time. Tap the counter each time you notice something, and skip any sense that does not work for you."
     }
   },
   "groups": {

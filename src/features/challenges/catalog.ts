@@ -22,6 +22,9 @@ export const CHALLENGES: Record<ChallengeId, Challenge> = {
   dhikr_calm_heart: { cat: 'relax', min: 3, xp: 15, k: 'h', hasEasy: false, scored: false },
   dhikr_moment: { cat: 'relax', min: 2, xp: 10, k: 'n', hasEasy: false, scored: false },
   dhikr_sleep: { cat: 'relax', min: 5, xp: 15, k: 'z', hasEasy: false, scored: false, quiet: true },
+  // A 20-second screen break, and noticing the surroundings with each sense.
+  eye_break: { cat: 'relax', min: 1, xp: 10, k: 'i', hasEasy: false, scored: false },
+  grounding: { cat: 'relax', min: 2, xp: 15, k: 'f', hasEasy: false, scored: false },
 };
 
 export const CATEGORIES: ChallengeCategory[] = ['focus', 'memory', 'planning', 'time', 'relax', 'real'];
@@ -33,7 +36,7 @@ export const GROUPS: { id: GroupId; ids: ChallengeId[] }[] = [
   { id: 'arrange', ids: ['seq', 'priority_board', 'time'] },
   { id: 'start', ids: ['micro_start', 'start2', 'breakdown', 'study_sprint'] },
   { id: 'focus', ids: ['video', 'attention_scene', 'mem'] },
-  { id: 'calm', ids: ['calm', 'calm_landscape'] },
+  { id: 'calm', ids: ['calm', 'calm_landscape', 'eye_break', 'grounding'] },
   { id: 'think', ids: ['thought_sort', 'emotion_map'] },
   { id: 'dhikr', ids: ['dhikr_morning', 'dhikr_evening', 'dhikr_calm_heart', 'dhikr_moment', 'dhikr_sleep'] },
 ];

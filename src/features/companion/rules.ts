@@ -1,3 +1,4 @@
+import { named } from './name';
 import { currentLang, formatList, tr } from '../../i18n';
 import type { AppState, ContextTag } from '../../types';
 import type { Goal } from '../recommend/goals';
@@ -81,7 +82,7 @@ export function ruleReply(v: string, s: AppState): CompanionReply {
   if (l.length) {
     return {
       tone: 'support',
-      messages: [say('companion.rules.understood', { facts: formatList(l, lng) })],
+      messages: [say('companion.rules.understood', { facts: formatList(l, lng), ...named(s.name) })],
       pending: { ctx: c, low: lw, card: 1 },
     };
   }

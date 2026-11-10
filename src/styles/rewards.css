@@ -83,3 +83,7 @@
 }
 body.rm .rw-hero, body.rm .rw-card, body.rm .rw-bar > i, body.rm .rw-toast { animation: none; }
 body.rm .rw-card:hover, body.rm .rw-card:active { transform: none; }
+
+/* Redeeming: a clear confirmation step before any points are taken. */
+.rw-confirm { width: 100%; padding: 12px 14px; border-radius: var(--r-md, 14px); background: var(--cr); text-align: center; }
+.rw-confirm p { margin: 0 0 6px; }

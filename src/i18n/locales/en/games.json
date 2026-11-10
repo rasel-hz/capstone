@@ -152,7 +152,7 @@
     "compareLabel": "You estimated {{est}}, and it took {{act}}",
     "estimate": "Estimate",
     "actual": "Actual",
-    "explain": "The difference is the gap between your estimate and the actual time. It's only for tracking, not a health measure.",
+    "explain": "The difference is the gap between your estimate and the actual time.",
     "reflect": "How did the time feel? (optional)",
     "reflections": {
       "fast": "It went fast",
@@ -180,7 +180,7 @@
     "tone": "A soft tone with each breath",
     "startBreathing": "Start breathing",
     "noBreathing": "I don't like breathing exercises",
-    "disclaimer": "A relaxation exercise, with no promised result. If it bothers you, stop it from the top.",
+    "disclaimer": "If the exercise bothers you, stop it from the top.",
     "feel": "How do you feel?",
     "phases": {
       "ready": "Get ready",
@@ -640,5 +640,65 @@
     "doneNight": "Good night.",
     "quranSource": "Quran text from {{name}}",
     "ayah": "﴿{{n}}﴾"
+  },
+  "eye": {
+    "intro": "Your eyes need a break!",
+    "title": "Your eyes need a break!",
+    "lead": "Look at something far away from you, like a window or the far end of the room, for 20 seconds.",
+    "rule": "The 20-20-20 habit: every 20 minutes in front of a screen, look at something about 6 metres (20 feet) away for 20 seconds. A simple habit that gives your eyes a break from the screen.",
+    "start": "Start the timer",
+    "lookAway": "Now take your eyes off the screen and look far away.",
+    "awayCue": "Look away from the screen; the timer runs by itself.",
+    "leftLabel": "{{n}} seconds left",
+    "pause": "Pause",
+    "resume": "Resume",
+    "paused": "Timer paused",
+    "done": "Well done! You gave your eyes the break they deserve",
+    "doneSay": "Well done! You gave your eyes the break they deserve",
+    "finish": "Done"
+  },
+  "ground": {
+    "introSay": "Mind busy? Come and focus a little on what is around us",
+    "title": "Mind busy? Come and focus a little on what is around us",
+    "lead": "You will notice things around you, one sense at a time. Tap the counter each time you notice something, and skip any sense that does not work for you.",
+    "start": "Start",
+    "round": "Sense",
+    "progress": "Done {{n}} of {{total}}",
+    "skip": "Not this time, skip",
+    "next": "Next",
+    "finish": "Done",
+    "done": "Well done! You took a moment to focus on what is around you",
+    "doneSay": "Well done! You took a moment to focus on what is around you",
+    "noneTitle": "No sense noticed this time",
+    "noneText": "Go back to any sense and try it, or leave with the Skip button above.",
+    "say": {
+      "see": "Take your time and look around.",
+      "hear": "Slow down and listen.",
+      "touch": "Feel what is around you.",
+      "smell": "Take a calm breath.",
+      "taste": "Last one, at your own pace."
+    },
+    "stages": {
+      "see": {
+        "title": "5 things you can see",
+        "text": "Look around, and tap the counter each time you notice something."
+      },
+      "hear": {
+        "title": "3 things you can hear",
+        "text": "Focus on the sounds around you, and count 3 things you can hear."
+      },
+      "touch": {
+        "title": "3 things you can touch",
+        "text": "Notice 3 things around you that you can touch."
+      },
+      "smell": {
+        "title": "2 things you can smell",
+        "text": "Notice two smells around you, if you can."
+      },
+      "taste": {
+        "title": "1 thing you can taste",
+        "text": "Notice the taste of something safe that you have, or the taste already in your mouth."
+      }
+    }
   }
 }

@@ -71,7 +71,7 @@
     "openSite": "Open the {{brand}} website ↗",
     "openSiteLabel": "Opens the official {{brand}} website in a new tab",
     "demo": "Reward preview — no actual voucher",
-    "lockedText": "Unlocks by itself when you reach {{points}}, and stays yours for good.",
+    "lockedText": "You can redeem it once your balance reaches {{points}}.",
     "close": "Back",
     "loading": "One moment, getting your points...",
     "error": "We couldn’t load your points right now.",
@@ -79,6 +79,26 @@
     "howTitle": "How do I earn points?",
     "howChallenge": "+10 for each challenge you finish",
     "howMission": "+20 when you finish the whole daily mission",
-    "moreTitle": "Your achievements and collection"
+    "moreTitle": "Your achievements and collection",
+    "balance_one": "Your balance: {{count}} point",
+    "balance_other": "Your balance: {{count}} points",
+    "canRedeem": "You have enough",
+    "balanceAfter": "Your balance is {{have}}; after redeeming it will be {{after}}.",
+    "redeem": "Redeem for {{points}}",
+    "confirmQ": "Redeem this reward?",
+    "confirmText": "{{points}} will be taken from your balance, then the {{brand}} site will open.",
+    "confirm": "Confirm",
+    "cancel": "Back",
+    "redeeming": "One moment...",
+    "redeemed": "We took {{points}}. Your balance is now {{balance}}.",
+    "continueOnSite": "Continue on the {{brand}} site. Opening the site does not mean the reward was claimed.",
+    "lastRedeemed": "You redeemed this on {{date}}.",
+    "reopen": "Open the {{brand}} site again, at no charge",
+    "notAvailable": "Redeeming is not available right now. No points were taken.",
+    "err": {
+      "insufficient": "Your balance is not enough for this reward. Nothing was taken.",
+      "failed": "We could not finish redeeming, and nothing was taken. Please try again.",
+      "notAvailable": "Redeeming is not available right now. No points were taken."
+    }
   }
 }

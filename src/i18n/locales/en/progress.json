@@ -1,6 +1,6 @@
 {
   "title": "My Progress",
-  "sub": "Your real numbers from the attempts saved in your account. For your own tracking, not a diagnosis.",
+  "sub": "Your real numbers from the attempts saved in your account.",
   "sparkLabel": "Recent results: {{values}}%",
   "emptyTitle": "No data yet",
   "emptyText": "Your real numbers appear here once you finish a challenge. We don't show sample numbers.",
@@ -19,10 +19,9 @@
   "maybe": "Maybe:",
   "maybeText": "Shorter challenges suit you better. That's only a guess, and you decide.",
   "needMore": "I need at least 4 attempts before mentioning any pattern.",
-  "disclaimer": "Game results are for your own tracking. They don't show clinical improvement or a diagnosis.",
   "programs": {
     "title": "Your journey results",
-    "note": "Your own rating on the first and last day, not a medical measure.",
+    "note": "Your own rating on the first and last day.",
     "row": "From {{before}} to {{after}}"
   },
   "fullDays": {

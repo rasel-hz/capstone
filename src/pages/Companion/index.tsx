@@ -1,3 +1,4 @@
+import { named } from '../../features/companion/name';
 import { Bot, CarFront, Check, Pencil, Send, ShieldAlert, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -112,7 +113,7 @@ export function Companion() {
         if (m === 1) d.pref = 'short';
       }
       d.pend = null;
-      d.chat.push({ b: 1, t: tr(m === 1 ? 'companion.card.savedLighter' : m === 2 ? 'companion.card.saved' : 'companion.card.declined') });
+      d.chat.push({ b: 1, t: tr(m === 1 ? 'companion.card.savedLighter' : m === 2 ? 'companion.card.saved' : 'companion.card.declined', named(d.name)) });
     });
   }
 
@@ -140,9 +141,10 @@ export function Companion() {
           <span className={`status ${useAi ? 'status--ai' : 'status--limited'}`}><Bot size={14} aria-hidden="true" /> {t(useAi ? 'companion.statusAi' : 'companion.statusRules')}</span>
         </div>
       </header>
-      <p className="note chat-disc">{t('companion.disclaimer')}</p>
 
       <div className="chat-box">
+        {/* Zaho floats quietly behind the conversation. Decorative only: it never takes taps or covers text. */}
+        <div className="chat-bg" aria-hidden="true"><Mascot state="idle" size={280} still={!!s.rm} /></div>
         <div className="chat" ref={list} role="log" aria-live="polite" tabIndex={0} aria-label={t('companion.logLabel')}>
           {!s.chat.length && <p className="note center">{t('companion.empty')}</p>}
           {s.chat.map((m, i) => (m.card ? (
