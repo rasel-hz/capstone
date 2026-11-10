@@ -77,5 +77,70 @@
   },
   "honestTitle": "To be honest",
   "honestText": "Your data is saved in your private account. Rewards are a preview with no actual vouchers. If you’re going through a hard time, talk to someone you trust or a professional.",
-  "closing": "Ready to start? ZAHO is waiting."
+  "closing": "Ready to start? ZAHO is waiting.",
+  "menu": "Menu",
+  "heroKey": "ZAHO",
+  "cue": "Scroll, ZAHO walks with you",
+  "nav": {
+    "how": "How it works",
+    "meet": "Meet ZAHO",
+    "try": "Try it",
+    "journeys": "Journeys",
+    "saudi": "Your day"
+  },
+  "k": {
+    "how": "Step by step",
+    "meet": "Your companion",
+    "try": "No sign-up",
+    "journeys": "Your choice",
+    "saudi": "From dawn to night"
+  },
+  "say": {
+    "hero": "Hi there! Scroll, I'll walk with you",
+    "how": "Let's walk the road together",
+    "meet": "Pick a mood and watch me",
+    "try": "Try a small challenge, no sign-up needed.",
+    "journeys": "Pick what suits you, I'm with you",
+    "saudi": "I know your day, dawn to night",
+    "honest": "Your data is safe",
+    "end": "Shall we? I'm ready!"
+  },
+  "poke": {
+    "1": "Hehe, that tickles!",
+    "2": "I'm right here",
+    "3": "Yay!",
+    "4": "Shall we go on?"
+  },
+  "tabs": {
+    "memory": "Memory",
+    "focus": "Focus",
+    "breathe": "Breathe"
+  },
+  "focusHint": "Distractions crowd your task. Tap them away",
+  "focusTask": "Your task: study 25 minutes",
+  "focusDone": "Clear mind! That is focus",
+  "dist": {
+    "alert": "Alert",
+    "message": "Message",
+    "video": "Video",
+    "group": "Group",
+    "ad": "Ad"
+  },
+  "breathHint": "Breathe with the circle, three times",
+  "breathIn": "Breathe in",
+  "breathHold": "Hold",
+  "breathOut": "Breathe out",
+  "breathDone": "Better? That is how we calm down",
+  "again": "Again",
+  "sample": "A sample only. Nothing is saved.",
+  "picked_one": "1 picked. ZAHO walks it with you",
+  "picked_other": "{{count}} picked. ZAHO walks them with you",
+  "times": {
+    "dawn": "Dawn",
+    "morning": "Morning",
+    "noon": "Noon",
+    "afternoon": "Afternoon",
+    "sunset": "Sunset",
+    "night": "Night"
+  }
 }
